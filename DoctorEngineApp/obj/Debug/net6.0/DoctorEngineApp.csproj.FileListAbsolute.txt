@@ -276,3 +276,4 @@ C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Debug\net6.0\run
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\DoctorEngineApp.csproj.AssemblyReference.cache
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\DoctorEn.16389BDF.Up2Date
+C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\DoctorEngineApp.sourcelink.json
