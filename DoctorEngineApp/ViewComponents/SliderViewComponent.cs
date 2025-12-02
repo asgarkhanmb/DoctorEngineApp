@@ -3,17 +3,25 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.ViewComponents
 {
-    public class SliderViewComponent: ViewComponent
+    using DoctorEngineApp.Data;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+
+    public class SliderViewComponent : ViewComponent
     {
+        private readonly AppDbContext _context;
+
+        public SliderViewComponent(AppDbContext context)
+        {
+            _context = context;
+        }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            return View();
+            var sliders = await _context.Sliders.ToListAsync();
+
+            return View(sliders);  // ← Model NULL olmamalıdır
         }
     }
-    public class SliderVMVC
-    {
-        public IEnumerable<Slider> Sliders { get; set; }
 
-    }
 }

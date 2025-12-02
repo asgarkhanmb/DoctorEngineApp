@@ -6,12 +6,10 @@ namespace DoctorEngineApp.Data
 {
     public class AppDbContext : IdentityDbContext<AppUser>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options)
-        {
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options):base(options){}
+
 
         public DbSet<Slider> Sliders { get; set; }
-
+        public DbSet<Inform>Informs { get; set; }
     }
 }

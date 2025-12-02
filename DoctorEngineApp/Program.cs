@@ -1,5 +1,7 @@
 using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
+using DoctorEngineApp.Services;
+using DoctorEngineApp.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +34,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 //});
 
 // Servisler
-
+builder.Services.AddScoped<ISliderService, SliderService>();
 
 
 // HttpContext
