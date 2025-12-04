@@ -1,21 +1,34 @@
-﻿using System.Diagnostics;
-using DoctorEngineApp.Models;
+﻿using DoctorEngineApp.Services.Interfaces;
+using DoctorEngineApp.ViewModels;
+using DoctorEngineApp.ViewModels.Infroms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IInformService _informService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IInformService informService)
         {
-            _logger = logger;
+            _informService = informService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var informs = await _informService.GetAllAsync();
+
+            var vm = new HomeVM
+            {
+                Informs = informs.Select(x => new InformVM
+                {
+                    Icon = x.Icon, 
+                    Title = x.Title,
+                    Description = x.Description
+                }).ToList()
+            };
+
+            return View(vm);
         }
     }
 }

@@ -1,0 +1,23 @@
+﻿@model InformCreateVM
+
+<h3>Create Inform</h3>
+
+<form method="post" enctype="multipart/form-data">
+
+    <div class="mb-3">
+        <label>Icon</label>
+        <input type="file" asp-for="Icon" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Title</label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
