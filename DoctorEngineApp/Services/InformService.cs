@@ -1,8 +1,9 @@
 ﻿using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
+using DoctorEngineApp.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace DoctorEngineApp.Services.Interfaces
+namespace DoctorEngineApp.Services
 {
     public class InformService :IInformService
     {

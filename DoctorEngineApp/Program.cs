@@ -36,6 +36,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 // Servisler
 builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<IInformService, InformService>();
+builder.Services.AddScoped<IAboutService, AboutService>();
 
 
 // HttpContext

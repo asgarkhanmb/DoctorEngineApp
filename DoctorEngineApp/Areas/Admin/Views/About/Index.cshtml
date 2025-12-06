@@ -1,0 +1,50 @@
+﻿@model List<About>
+
+@{
+    ViewData["Title"] = "About list";
+}
+
+<h2>Aboutlar</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Yeni About Yarat</a>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Video</th>
+            <th>Updated</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@Model[i].Title</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model[i].VideoPath))
+                    {
+                        <video width="200" controls>
+                            <source src="@Model[i].VideoPath" />
+                            Sizin brauzer video tagini dəstəkləmir.
+                        </video>
+                    }
+                </td>
+                <td>@Model[i].CreatedDate.ToLocalTime().ToString("g")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@Model[i].Id" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Edit" asp-route-id="@Model[i].Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@Model[i].Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,17 @@
+﻿@model About
+
+<h2>About Details</h2>
+
+<div class="mb-3">
+    <h4>@Model.Title</h4>
+    <p>@Model.Description</p>
+    @if (!string.IsNullOrEmpty(Model.VideoPath))
+    {
+        <video width="640" controls>
+            <source src="@Model.VideoPath" />
+        </video>
+    }
+    <p class="text-muted">Updated: @Model.CreatedDate.ToLocalTime()</p>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Geri</a>

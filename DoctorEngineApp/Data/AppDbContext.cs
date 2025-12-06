@@ -11,5 +11,6 @@ namespace DoctorEngineApp.Data
 
         public DbSet<Slider> Sliders { get; set; }
         public DbSet<Inform>Informs { get; set; }
+        public DbSet<About> Abouts { get; set; } = null!;
     }
 }

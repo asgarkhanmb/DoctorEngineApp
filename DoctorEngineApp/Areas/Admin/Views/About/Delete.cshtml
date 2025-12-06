@@ -1,0 +1,15 @@
+﻿@model About
+
+<h2>About sil</h2>
+
+<div class="alert alert-warning">
+    <p>Bu About-u silmək istədiyinizə əminsiniz?</p>
+    <h4>@Model.Title</h4>
+    <p>@Model.Description</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">Ləğv</a>
+</form>

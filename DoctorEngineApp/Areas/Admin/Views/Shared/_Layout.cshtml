@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -194,7 +195,7 @@
                                 <li>
                                     <a asp-area="Admin" asp-controller="About" asp-action="Index" class="waves-effect waves-dark">
                                         <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
-                                        <span class="pcoded-mtext" data-i18n="nav.form-components.main">Categories</span>
+                                        <span class="pcoded-mtext" data-i18n="nav.form-components.main">Abouts</span>
                                         <span class="pcoded-mcaret"></span>
                                     </a>
                                 </li>
@@ -270,7 +271,7 @@
             </div>
         </div>
     </div>
- 
+
     <!-- Warning Section Ends -->
     <!-- Required Jquery -->
     <script type="text/javascript" src="~/admin/assets/js/jquery/jquery.min.js"></script>
@@ -302,8 +303,7 @@
     <!-- custom js -->
     <script type="text/javascript" src="~/admin/assets/pages/dashboard/custom-dashboard.js"></script>
     <script type="text/javascript" src="~/admin/assets/js/script.js "></script>
-    @RenderSection("js", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 
 </html>
-

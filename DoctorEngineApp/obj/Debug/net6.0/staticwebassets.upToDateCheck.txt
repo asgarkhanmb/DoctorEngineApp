@@ -416,6 +416,7 @@ wwwroot\lib\jquery\dist\jquery.js
 wwwroot\lib\jquery\dist\jquery.min.js
 wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\uploads\about\65885975-a9a2-4178-98fe-d0d432c02ac2.mp4
 wwwroot\uploads\inform\2cbb746c-8946-4efe-b224-cb59d7cb356f.png
 wwwroot\uploads\inform\3f9c6911-e41b-4e4a-9555-015ed626e13b.png
 wwwroot\uploads\inform\ee406bd6-6973-473d-97aa-1110da823200.png
