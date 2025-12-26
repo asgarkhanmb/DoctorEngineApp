@@ -1,40 +1,55 @@
-﻿<header class="s-header">
+﻿@using Microsoft.AspNetCore.Mvc.Routing
+@inject IHttpContextAccessor HttpContextAccessor
 
-<!-- Navbar Start -->
-<nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
-    <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-        <h2 class="m-0 text-primary">
-            <i class="fa fa-car me-3"></i>DoctorEngine.Az
-        </h2>
-    </a>
+<header class="s-header">
 
-    <!-- Mobile Toggle Button -->
-    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- Navbar Start -->
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+        <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
+            <h2 class="m-0 text-primary">
+                <i class="fa fa-car me-3"></i>DoctorEngine.Az
+            </h2>
+        </a>
 
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <div class="navbar-nav ms-auto p-4 p-lg-0">
+        <!-- Mobile Toggle Button -->
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <a href="index.html" class="nav-item nav-link active">Ana Səhifə</a>
-            <a href="about.html" class="nav-item nav-link">Haqqımızda</a>
-            <a href="service.html" class="nav-item nav-link">Xidmətlər</a>
-            <a href="booking.html" class="nav-item nav-link">Rezervasiya</a>
-            <a href="contact.html" class="nav-item nav-link">Əlaqə</a>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto p-4 p-lg-0">
 
-            <!-- Login Button (responsive) -->
-            <a href="login.html"
-               class="btn btn-primary ms-lg-4 mt-3 mt-lg-0 py-2 px-3 px-lg-5 py-lg-3">
-                Giriş <i class="fa fa-arrow-right ms-2"></i>
-            </a>
+                <a asp-controller="Home" asp-action="Index" class="nav-item nav-link @(IsActive("Home", "Index"))">Ana Səhifə</a>
+                <a asp-controller="About" asp-action="Index" class="nav-item nav-link @(IsActive("About", "Index"))">Haqqımızda</a>
+                <a asp-controller="Service" asp-action="Index" class="nav-item nav-link @(IsActive("Service", "Index"))">Xidmətlər</a>
+                <a asp-controller="Booking" asp-action="Index" class="nav-item nav-link @(IsActive("Booking", "Index"))">Rezervasiya</a>
+                <a asp-controller="Contact" asp-action="Index" class="nav-item nav-link @(IsActive("Contact", "Index"))">Əlaqə</a>
+
+                <!-- Login Button -->
+                <a href="login.html" class="btn btn-primary ms-lg-4 mt-3 mt-lg-0 py-2 px-3 px-lg-5 py-lg-3">
+                    Giriş <i class="fa fa-arrow-right ms-2"></i>
+                </a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<!-- WhatsApp Floating Button -->
-<a href="https://wa.me/994501112233" class="whatsapp-btn" target="_blank">
-    <i class="bi bi-whatsapp"></i>
-</a>
-
-<!-- Navbar End -->
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/994501112233" class="whatsapp-btn" target="_blank">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+    <!-- Navbar End -->
 </header>
+
+@functions {
+    private string IsActive(string controller, string action)
+    {
+        var routeData = HttpContextAccessor.HttpContext.GetRouteData();
+        string currentController = routeData.Values["controller"]?.ToString();
+        string currentAction = routeData.Values["action"]?.ToString();
+
+        return (string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase))
+            ? "text-danger" 
+            : "";
+    }
+}

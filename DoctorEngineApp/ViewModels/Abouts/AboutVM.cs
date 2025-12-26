@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.ViewModels.Infroms;
+﻿using DoctorEngineApp.Models;
+using DoctorEngineApp.ViewModels.Infroms;
 
 namespace DoctorEngineApp.ViewModels.Abouts
 {
@@ -8,5 +9,6 @@ namespace DoctorEngineApp.ViewModels.Abouts
         public string Description { get; set; }
         public string VideoPath { get; set; }
         public List<InformVM> Informs { get; set; }
+        public List<About> About { get; internal set; }
     }
 }

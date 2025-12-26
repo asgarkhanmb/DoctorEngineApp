@@ -2,6 +2,7 @@ using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services;
 using DoctorEngineApp.Services.Interfaces;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,23 @@ builder.Services.AddIdentity<AppUser, IdentityRole>()
 builder.Services.AddScoped<ISliderService, SliderService>();
 builder.Services.AddScoped<IInformService, InformService>();
 builder.Services.AddScoped<IAboutService, AboutService>();
+builder.Services.AddScoped<ISubServiceService, SubServiceService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+
+
+
+builder.WebHost.ConfigureKestrel(o =>
+{
+    o.Limits.MaxRequestBodySize = 2_000_000_000; // e.g. 2GB
+});
+
+// If using IIS, adjust configuration accordingly (web.config)
+// For forms, if needed:
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 2_000_000_000; // 2GB
+});
 
 
 // HttpContext

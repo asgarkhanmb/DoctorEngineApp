@@ -1,0 +1,14 @@
+﻿@model CategoryCreateVM
+<form asp-action="Create" enctype="multipart/form-data" method="post">
+    <div class="mb-3">
+        <label>Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label>Icon</label>
+        <input asp-for="IconFile" type="file" class="form-control" />
+        <span asp-validation-for="IconFile" class="text-danger"></span>
+    </div>
+    <button class="btn btn-success">Create</button>
+</form>

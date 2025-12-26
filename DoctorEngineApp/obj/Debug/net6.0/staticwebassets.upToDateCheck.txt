@@ -235,6 +235,7 @@ wwwroot\assets\img\carousel-1.png
 wwwroot\assets\img\carousel-2.png
 wwwroot\assets\img\carousel-bg-1.jpg
 wwwroot\assets\img\carousel-bg-2.jpg
+wwwroot\assets\img\el1.png
 wwwroot\assets\img\service-1.jpg
 wwwroot\assets\img\service-2.jpg
 wwwroot\assets\img\service-3.jpg
@@ -416,7 +417,9 @@ wwwroot\lib\jquery\dist\jquery.js
 wwwroot\lib\jquery\dist\jquery.min.js
 wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\LICENSE.txt
-wwwroot\uploads\about\65885975-a9a2-4178-98fe-d0d432c02ac2.mp4
+wwwroot\uploads\about\1b0290e5-81aa-4d20-a8df-f4f8b4176551.mp4
+wwwroot\uploads\categories\05568088-f1a6-402c-9772-e69d03c03029.png
+wwwroot\uploads\categories\e194189f-ea89-4861-bba8-db6aa52ae3e3.png
 wwwroot\uploads\inform\2cbb746c-8946-4efe-b224-cb59d7cb356f.png
 wwwroot\uploads\inform\3f9c6911-e41b-4e4a-9555-015ed626e13b.png
 wwwroot\uploads\inform\ee406bd6-6973-473d-97aa-1110da823200.png
@@ -426,3 +429,5 @@ wwwroot\uploads\sliders\883a1ade-e8b2-4e04-9d5f-f5e2ba391d0b.png
 wwwroot\uploads\sliders\9bba705f-e56e-4d17-bb85-a1cf1be9dd70.jpg
 wwwroot\uploads\sliders\c7c7db60-9ffb-4542-96c1-5d19b0d00054.jpg
 wwwroot\uploads\sliders\f658b50e-dd23-42fc-b5e9-b8653e25f707.jpg
+wwwroot\uploads\subvideos\1aea9de7-6e33-42bb-8c16-35a56dcee303.mp4
+wwwroot\uploads\subvideos\2c2eefe6-5957-43a0-b04f-45f943785ec8.mp4

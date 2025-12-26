@@ -3,7 +3,7 @@
 namespace DoctorEngineApp.Areas.Admin.Controllers
 {
 
-    [Area("admin")]
+    [Area("Admin")]
     public class DashboardController : Controller
     {
         public IActionResult Index()

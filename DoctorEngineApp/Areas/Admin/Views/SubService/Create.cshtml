@@ -1,0 +1,18 @@
+﻿@model SubServiceCreateVM
+<form asp-action="Create" enctype="multipart/form-data" method="post">
+    <div class="mb-3"><label>Title</label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger"></span></div>
+    <div class="mb-3"><label>Description</label><textarea asp-for="Description" class="form-control"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+    <div class="mb-3">
+        <label>Category</label>
+        <select asp-for="CategoryId" class="form-control">
+            <option value="">-- choose --</option>
+            @foreach (var c in (List<ServiceCategory>)ViewBag.Categories)
+            {
+                <option value="@c.Id">@c.Name</option>
+            }
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="mb-3"><label>Video (max 1GB)</label><input asp-for="VideoFile" type="file" class="form-control" /></div>
+    <button class="btn btn-success">Create</button>
+</form>

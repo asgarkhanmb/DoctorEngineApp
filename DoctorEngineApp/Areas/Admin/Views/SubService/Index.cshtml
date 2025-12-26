@@ -1,0 +1,28 @@
+﻿@model List<SubServiceVM>
+<h2>SubServices</h2>
+<a asp-action="Create" class="btn btn-success mb-2">Create</a>
+<table class="table">
+    <thead><tr><th>Title</th><th>Category</th><th>Video</th><th>Actions</th></tr></thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Title</td>
+                <td>@s.CategoryName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(s.Video))
+                    {
+                        <video width="200" controls>
+                            <source src="~/uploads/subvideos/@s.Video" />
+                            Your browser does not support video tag.
+                        </video>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
