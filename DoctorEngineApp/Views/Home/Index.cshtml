@@ -1,5 +1,4 @@
 ﻿@model HomeVM
-
 @{
     ViewData["Title"] = "Ana Səhifə";
     var about = Model.Abouts?.FirstOrDefault();
@@ -7,17 +6,10 @@
 
 <main>
 
-    <!-- Carousel Start -->
+    <!-- Slider -->
     @await Component.InvokeAsync("Slider")
-    <!-- Carousel End -->
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-    <!-- Spinner End -->
-    <!-- Service Start -->
+
+    <!-- Informlar -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-4">
@@ -30,12 +22,7 @@
                         <div class="d-flex @(i == 1 ? "bg-light" : "") py-5 px-4 align-items-center">
                             @if (!string.IsNullOrEmpty(item.Icon))
                             {
-                                <img src="@item.Icon" alt="@item.Title" class="flex-shrink-0"
-                                     style="width:50px; height:50px; object-fit:contain;" />
-                            }
-                            else
-                            {
-                                <span style="width:50px; height:50px; display:inline-block;"></span>
+                                <img src="@item.Icon" alt="@item.Title" class="flex-shrink-0" style="width:50px; height:50px; object-fit:contain;" />
                             }
                             <div class="ps-4">
                                 <h5 class="mb-3">@item.Title</h5>
@@ -47,48 +34,29 @@
             </div>
         </div>
     </div>
-    <!-- Service End -->
-    <!-- About Start -->
+
+    <!-- About Video -->
     <div class="container-xxl py-5">
         <div class="container">
             <div class="row g-5">
-
-                <!-- VIDEO LEFT -->
                 <div class="col-lg-6 pt-4 d-flex justify-content-center position-relative">
-                    <video id="aboutVideo" class="w-100"
-                           style="max-height:600px; object-fit:cover; border-radius:20px;"
-                           controls>
+                    <video id="aboutVideo" class="w-100" style="max-height:600px; object-fit:cover; border-radius:20px;" controls>
                         @if (about != null && !string.IsNullOrEmpty(about.VideoPath))
                         {
                             <source src="@Url.Content(about.VideoPath)" type="video/mp4" />
                         }
                     </video>
                 </div>
-                <!-- RIGHT INFO -->
                 <div class="col-lg-6">
                     <h6 class="text-primary text-uppercase">HAQQIMIZDA</h6>
-                    <h1 class="mb-4">
-                        <span class="text-primary"></span> @about?.Title
-                    </h1>
+                    <h1 class="mb-4">@about?.Title</h1>
                     <p class="mb-4">@about?.Description</p>
-
-                    <div class="row g-4 mb-3 pb-3">
-                        @for (int i = 0; i < Model.Informs.Count; i++)
-                        {
-                            <div class="col-12">
-                                <h6>@Model.Informs[i].Title</h6>
-                                <span>@Model.Informs[i].Description</span>
-                            </div>
-                        }
-                    </div>
                 </div>
-
             </div>
         </div>
     </div>
-<!-- About End -->
-    <!-- Service Start -->
-    <!-- Service Start -->
+
+    <!-- Categories + SubServices -->
     <div class="container-xxl service py-5">
         <div class="container">
             <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
@@ -97,87 +65,166 @@
             </div>
 
             <div class="row g-4 wow fadeInUp" data-wow-delay="0.3s">
-
-                <!-- LEFT : CATEGORIES -->
                 <div class="col-lg-4">
                     <div class="nav w-100 nav-pills me-4" role="tablist">
                         @for (int i = 0; i < Model.Categories.Count; i++)
                         {
                             var cat = Model.Categories[i];
-
                             <button class="nav-link w-100 d-flex align-items-center text-start p-4 mb-3 @(i == 0 ? "active" : "")"
-                                    data-bs-toggle="pill"
-                                    data-bs-target="#cat-@cat.Id"
-                                    type="button">
-
+                                    data-bs-toggle="pill" data-bs-target="#cat-@cat.Id" type="button">
                                 @if (!string.IsNullOrEmpty(cat.Icon))
                                 {
-                                    <img src="~/uploads/categories/@cat.Icon"
-                                         width="40"
-                                         class="me-3" />
+                                    <img src="~/uploads/categories/@cat.Icon" width="40" class="me-3" />
                                 }
-
                                 <h4 class="m-0">@cat.Name</h4>
                             </button>
                         }
                     </div>
                 </div>
 
-                <!-- RIGHT : SUBSERVICES -->
                 <div class="col-lg-8">
                     <div class="tab-content w-100">
-
                         @for (int i = 0; i < Model.Categories.Count; i++)
                         {
                             var cat = Model.Categories[i];
-
-                            <div class="tab-pane fade @(i == 0 ? "show active" : "")"
-                                 id="cat-@cat.Id">
-
+                            <div class="tab-pane fade @(i == 0 ? "show active" : "")" id="cat-@cat.Id">
                                 @foreach (var sub in cat.SubServices)
                                 {
                                     <div class="row g-4 mb-4">
-
-                                        <!-- VIDEO -->
                                         <div class="col-md-6" style="min-height:350px;">
                                             <div class="position-relative h-100">
                                                 @if (!string.IsNullOrEmpty(sub.Video))
                                                 {
                                                     <video class="position-absolute w-100 h-100"
-                                                           style="object-fit:cover; border-radius:15px;"
-                                                           controls
-                                                           preload="metadata">
+                                                           style="object-fit:cover; border-radius:15px;" controls preload="metadata">
                                                         <source src="~/uploads/subvideos/@sub.Video" />
                                                     </video>
                                                 }
                                             </div>
                                         </div>
 
-                                        <!-- CONTENT -->
                                         <div class="col-md-6">
                                             <h3 class="mb-3">@sub.Title</h3>
                                             <p class="mb-4">@sub.Description</p>
-
-                                            @* Subservice-ə aid bütün informs-i göstər *@
-                                            @foreach (var info in Model.Informs)
-                                            {
-                                                <div class="mb-2">
-                                                    <h6>@info.Title</h6>
-                                                    <span>@info.Description</span>
-                                                </div>
-                                            }
                                         </div>
-
-
                                     </div>
-                                }
-
-                                @if (!cat.SubServices.Any())
-                                {
-                                    <p>Bu kateqoriyaya aid xidmət yoxdur.</p>
                                 }
                             </div>
                         }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+
+    <div class="container-fluid bg-secondary booking my-5">
+        <div class="container">
+            <div class="row gx-5">
+
+                <div class="col-lg-6 py-5">
+                    <h1 class="text-white mb-4">
+                        Etibarlı Avtomobil Təmiri Xidməti
+                    </h1>
+                    <p class="text-white">
+                        Peşəkar və sürətli texniki xidmət
+                    </p>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="bg-primary p-5 text-center">
+
+                        <h2 class="text-white mb-4">Öncədən Rezervasiya</h2>
+
+                        @if (TempData["Success"] != null)
+                        {
+                            <div class="alert alert-success">
+                                @TempData["Success"]
+                            </div>
+                        }
+
+                        @if (TempData["Error"] != null)
+                        {
+                            <div class="alert alert-danger">
+                                @TempData["Error"]
+                            </div>
+                        }
+                        <form id="reservationForm">
+                            @Html.AntiForgeryToken()
+
+                            <div class="row g-3">
+
+                                <div class="col-12 col-sm-6">
+                                    <input asp-for="Reservation.FullName"
+                                           class="form-control"
+                                           placeholder="Ad Soyad"
+                                           required />
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <input asp-for="Reservation.Phone"
+                                           id="phoneInput"
+                                           class="form-control"
+                                           placeholder="+994 XX XXX XX XX"
+                                           required />
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <select asp-for="Reservation.ServiceId"
+                                            class="form-select"
+                                            required>
+                                        <option value="">Xidmət seçin</option>
+                                        @foreach (var s in Model.Reservation.Services)
+                                        {
+                                            <option value="@s.Id">@s.Name</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <input asp-for="Reservation.DateTime"
+                                           type="datetime-local"
+                                           class="form-control"
+                                           step="60"
+                                           required />
+                                </div>
+
+                                <div class="col-12">
+                                    <textarea asp-for="Reservation.Note"
+                                              class="form-control"
+                                              placeholder="Əlavə qeyd (məs: avtomobil modeli, ili, mühərrik həcmi)"></textarea>
+                                </div>
+
+                                <!-- WhatsApp checkbox -->
+                                <div class="col-12 text-start">
+                                    <input type="checkbox" id="sameAsPhone" />
+                                    <label for="sameAsPhone" class="text-white">
+                                        WhatsApp nömrəsi telefonla eyni olsun
+                                    </label>
+                                </div>
+
+                                <div class="col-12">
+                                    <input asp-for="Reservation.WhatsApp"
+                                           id="whatsappInput"
+                                           class="form-control"
+                                           placeholder="+994 XX XXX XX XX" />
+                                </div>
+
+                                <div class="col-12">
+                                    <button type="submit"
+                                            class="btn btn-dark w-100 py-3">
+                                        REZERVASİYA
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <div id="reservationMessage" class="mt-3"></div>
+                        </form>
+
+
+
 
                     </div>
                 </div>
@@ -185,111 +232,103 @@
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener('shown.bs.tab', function (e) {
-
-            const previousTab = document.querySelector(e.relatedTarget?.dataset.bsTarget);
-            if (!previousTab) return;
-
-            previousTab.querySelectorAll('video').forEach(video => {
-                video.pause();
-                video.currentTime = 0;
-            });
-
-        });
-    </script>
-    <!-- Service End -->
-    <!-- Service End -->
-
-<!-- Booking Start -->
-<div class="container-fluid bg-secondary booking my-5 wow fadeInUp" data-wow-delay="0.1s">
-    <div class="container">
-        <div class="row gx-5">
-            <div class="col-lg-6 py-5">
-                <div class="py-5">
-                    <h1 class="text-white mb-4">Etibarli Avtomobil Təmiri Xidməti Mərkəzi</h1>
-                        <p class="text-white mb-0">Avtomobiliniz üçün peşəkar və keyfiyyətli texniki xidmət göstəririk. Təcrübəli ustalarımız müasir avadanlıqlardan istifadə edərək diaqnostika, təmir və baxım işlərini dəqiqliklə həyata keçirir. Məqsədimiz təhlükəsiz, etibarlı və uzunömürlü sürüş təmin etməkdir.</p>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="bg-primary h-100 d-flex flex-column justify-content-center text-center p-5 wow zoomIn" data-wow-delay="0.6s">
-                    <h1 class="text-white mb-4">Öncədən Rezervasiya</h1>
-                    <form>
-                        <div class="row g-3">
-                            <div class="col-12 col-sm-6">
-                                <input type="text" class="form-control border-0" placeholder="Ad" style="height: 55px;">
-                            </div>
-                                <div class="col-12 col-sm-6">
-                                    <input type="tel"
-                                           class="form-control border-0"
-                                           placeholder="+994 XX XXX XX XX"
-                                           value="+994 "
-                                           maxlength="17"
-                                           pattern="\+994\s(50|51|55|70|77|99)\s\d{3}\s\d{2}\s\d{2}"
-                                           style="height: 55px;"
-                                           required>
-                                </div>
-
-                            <div class="col-12 col-sm-6">
-                                <select class="form-select border-0" style="height: 55px;">
-                                    <option selected>Xidmət Seçin</option>
-                                    <option value="1">Service 1</option>
-                                    <option value="2">Service 2</option>
-                                    <option value="3">Service 3</option>
-                                </select>
-                            </div>
-                                <div class="col-12 col-sm-6">
-                                    <div class="date" id="date1" data-target-input="nearest">
-                                        <input type="text"
-                                               class="form-control border-0 datetimepicker-input"
-                                               placeholder="Tarix və vaxt"
-                                               data-target="#date1"
-                                               data-toggle="datetimepicker"
-                                               style="height:55px;">
-                                    </div>
-                                </div>
-                            <div class="col-12">
-                                <textarea class="form-control border-0" placeholder="Əlavə Qeyd"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <button class="btn btn-secondary w-100 py-3" type="submit">Rezervasiya</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <!-- Booking End -->
-<!-- Team Start -->
-<div class="container-xxl py-5">
-    <div class="container">
-        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+    <!-- Team Start -->
+    <div class="container-xxl py-5">
+        <div class="container">
+
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
                 <h6 class="text-primary text-uppercase">Bizim Texniklər</h6>
                 <h1 class="mb-5">Mütəxəssislərimiz</h1>
-        </div>
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="team-item">
-                    <div class="position-relative overflow-hidden">
-                        <img class="img-fluid" src="~/assets/img/el1.png" alt="">
-                        <div class="team-overlay position-absolute start-0 top-0 w-100 h-100">
-                            <a class="btn btn-square mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square mx-1" href=""><i class="fab fa-instagram"></i></a>
-                                <a class="btn btn-square mx-1" href=""><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+
+                @foreach (var t in Model.Technicians)
+                {
+                    <div class="col-lg-3 col-md-6 wow fadeInUp">
+                        <div class="team-item shadow rounded overflow-hidden">
+
+                            <div class="position-relative overflow-hidden">
+                                <img class="img-fluid w-100"
+                                     src="~/uploads/technicians/@t.Image"
+                                     style="height:300px; object-fit:cover;" />
+
+                                <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex align-items-center justify-content-center">
+
+                                    @if (!string.IsNullOrEmpty(t.FacebookUrl))
+                                    {
+                                        <a class="btn btn-square mx-1" href="@t.FacebookUrl" target="_blank">
+                                            <i class="fab fa-facebook-f"></i>
+                                        </a>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(t.InstagramUrl))
+                                    {
+                                        <a class="btn btn-square mx-1" href="@t.InstagramUrl" target="_blank">
+                                            <i class="fab fa-instagram"></i>
+                                        </a>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(t.TiktokUrl))
+                                    {
+                                        <a class="btn btn-square mx-1" href="@t.TiktokUrl" target="_blank">
+                                            <i class="fab fa-tiktok"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="bg-light text-center p-4">
+                                <h5 class="fw-bold mb-0">@t.FullName</h5>
+                                <small>@t.Position</small>
+                            </div>
+
                         </div>
                     </div>
-                    <div class="bg-light text-center p-4">
-                        <h5 class="fw-bold mb-0">Elton Əlizadə</h5>
-                        <small>Mühərrik Ustası</small>
-                    </div>
-                </div>
+                }
+
             </div>
         </div>
     </div>
-</div>
+    <!-- Team End -->
+    @section js {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            document.addEventListener('shown.bs.tab', function (e) {
+                const previousTab = document.querySelector(e.relatedTarget?.dataset.bsTarget);
+                if (!previousTab) return;
+                previousTab.querySelectorAll('video').forEach(video => { video.pause(); video.currentTime = 0; });
+            });
+        </script>
+    }
+    <script>
+        document.getElementById("reservationForm").addEventListener("submit", function(e) {
+            e.preventDefault();
 
+            var form = e.target;
+            var formData = new FormData(form);
+
+            fetch('@Url.Action("CreateReservation", "Home")', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageDiv = document.getElementById("reservationMessage");
+                messageDiv.innerHTML = '';
+                if (data.success) {
+                    messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    form.reset();
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        });
+    </script>
     <script>
         (function () {
 
@@ -352,7 +391,56 @@
 
         })();
     </script>
+    <script>
+        function maskAZPhone(input) {
+            input.addEventListener("input", function () {
+                let digits = this.value.replace(/\D/g, "");
 
+                if (!digits.startsWith("994")) {
+                    digits = "994" + digits;
+                }
 
-<!-- Team End -->
-</main> 
+                digits = digits.substring(0, 12);
+
+                let f = "+";
+                if (digits.length > 0) f += digits.substring(0, 3);
+                if (digits.length > 3) f += " " + digits.substring(3, 5);
+                if (digits.length > 5) f += " " + digits.substring(5, 8);
+                if (digits.length > 8) f += " " + digits.substring(8, 10);
+                if (digits.length > 10) f += " " + digits.substring(10, 12);
+
+                this.value = f;
+            });
+
+            input.addEventListener("keypress", function (e) {
+                if (!/[0-9]/.test(e.key)) e.preventDefault();
+            });
+        }
+
+        maskAZPhone(document.getElementById("phoneInput"));
+        maskAZPhone(document.getElementById("whatsappInput"));
+
+        // WhatsApp = Phone
+        document.getElementById("sameAsPhone").addEventListener("change", function () {
+            document.getElementById("whatsappInput").value =
+                this.checked ? document.getElementById("phoneInput").value : "";
+        });
+
+        // AJAX submit
+        document.getElementById("reservationForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            fetch("@Url.Action("CreateReservation", "Home")", {
+                method: "POST",
+                body: new FormData(this),
+                headers: { "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value }
+            })
+            .then(r => r.json())
+            .then(res => {
+                let box = document.getElementById("reservationMessage");
+                box.innerHTML = `<div class="alert alert-${res.success ? "success" : "danger"}">${res.message}</div>`;
+            });
+        });
+    </script>
+
+</main>

@@ -1,0 +1,8 @@
+﻿<form asp-action="Reject" method="post">
+    <input type="hidden" name="id" value="@ViewBag.Id" />
+    <div class="mb-3">
+        <label>İmtina səbəbini yazın</label>
+        <textarea name="reason" class="form-control" placeholder="İmtina səbəbi"></textarea>
+    </div>
+    <button class="btn btn-danger">Qeydi Yadda Saxla</button>
+</form>

@@ -9,6 +9,7 @@ namespace DoctorEngineApp.ViewModels.Abouts
         public string Description { get; set; }
         public string VideoPath { get; set; }
         public List<InformVM> Informs { get; set; }
-        public List<About> About { get; internal set; }
+        public List<About> Abouts { get; internal set; }
+        public List<Technician> Technicians { get; set; }
     }
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DoctorEngineApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3975cb3f6b5597d54e99f859b1726e5833e20d68")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6119bda8c887df33e4c2e996b2fcae283c22e4f9")]
 [assembly: System.Reflection.AssemblyProductAttribute("DoctorEngineApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DoctorEngineApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

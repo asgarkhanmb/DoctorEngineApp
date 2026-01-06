@@ -1,0 +1,56 @@
+﻿@model ReservationCreateVM
+
+@{
+    ViewData["Title"] = "Rezervasiya";
+}
+
+<h2 class="mb-4">Öncədən Rezervasiya</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label">Ad və Soyad</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label">Telefon</label>
+        <input asp-for="Phone" class="form-control" placeholder="+994 XX XXX XX XX" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ServiceId" class="form-label">Xidmət</label>
+        <select asp-for="ServiceId" class="form-select">
+            <option value="">Xidmət seçin</option>
+            @foreach (var s in Model.Services)
+            {
+                <option value="@s.Id">@s.Name</option>
+            }
+        </select>
+        <span asp-validation-for="ServiceId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DateTime" class="form-label">Tarix və Vaxt</label>
+        <input asp-for="DateTime" type="datetime-local" class="form-control" />
+        <span asp-validation-for="DateTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Note" class="form-label">Əlavə Qeyd</label>
+        <textarea asp-for="Note" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WhatsApp" class="form-label">WhatsApp</label>
+        <input asp-for="WhatsApp" class="form-control" placeholder="+994..." />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Rezervasiya Göndər</button>
+</form>
+
+@section js {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

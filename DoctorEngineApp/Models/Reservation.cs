@@ -13,7 +13,7 @@
         public string Note { get; set; }
 
         public string Status { get; set; } = "Pending";
-        public string RejectionReason { get; set; }
+        public string? RejectionReason { get; set; }
 
     }
 }

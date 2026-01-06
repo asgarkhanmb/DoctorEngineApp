@@ -9,19 +9,26 @@ namespace DoctorEngineApp.Controllers
     {
         private readonly IAboutService _aboutService;
         private readonly IInformService _informService;
+        private readonly ITechnicianService _technicianService;
 
         public AboutController(
             IAboutService aboutService,
-            IInformService informService)
+            IInformService informService,
+            ITechnicianService technicianService)
         {
             _aboutService = aboutService;
             _informService = informService;
+            _technicianService = technicianService;
         }
 
+        // ================================
+        // ABOUT PAGE
+        // ================================
         public async Task<IActionResult> Index()
         {
             var abouts = await _aboutService.GetAllAsync();
             var informs = await _informService.GetAllAsync();
+            var technicians = await _technicianService.GetAllAsync();
 
             var about = abouts.FirstOrDefault();
 
@@ -36,7 +43,10 @@ namespace DoctorEngineApp.Controllers
                     Title = i.Title,
                     Description = i.Description,
                     Icon = i.Icon
-                }).ToList()
+                }).ToList(),
+
+                // 👇 TEAM (NULL OLMAYACAQ)
+                Technicians = technicians
             };
 
             return View(model);

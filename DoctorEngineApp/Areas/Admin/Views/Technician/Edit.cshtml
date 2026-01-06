@@ -1,0 +1,49 @@
+﻿@model TechnicianEditVM
+
+<div class="container mt-4">
+    <h2>Edit Technician</h2>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label>Full Name</label>
+            <input asp-for="FullName" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Position</label>
+            <input asp-for="Position" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Current Image</label><br />
+            <img src="~/uploads/technicians/@Model.ExistingImage"
+                 width="120"
+                 style="border-radius:10px" />
+        </div>
+
+        <div class="mb-3">
+            <label>Change Photo</label>
+            <input asp-for="Photo" type="file" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Facebook</label>
+            <input asp-for="FacebookUrl" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>Instagram</label>
+            <input asp-for="InstagramUrl" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label>TikTok</label>
+            <input asp-for="TiktokUrl" class="form-control" />
+        </div>
+
+        <button class="btn btn-primary">Update</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </form>
+</div>

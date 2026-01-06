@@ -1,0 +1,23 @@
+﻿<a asp-action="Create" class="btn btn-primary mb-3">Yeni Xidmət</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ad</th>
+            <th>WhatsApp</th>
+            <th>Əməliyyat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Name</td>
+                <td>@s.WhatsApp</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-warning">Düzəliş et</a>
+                    <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

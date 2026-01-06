@@ -1,12 +1,326 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\areas\\admin\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\views\\shared\\components\\footer\\default.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\views\\shared\\components\\footer\\default.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\viewcomponents\\footerviewcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\viewcomponents\\footerviewcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\services\\serviceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\services\\serviceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\areas\\admin\\views\\reservation\\reject.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\areas\\admin\\views\\reservation\\reject.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\areas\\admin\\views\\reservation\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\areas\\admin\\views\\reservation\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\services\\technicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\services\\technicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\controllers\\aboutcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\controllers\\aboutcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\views\\about\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\views\\about\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\viewmodels\\abouts\\aboutvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\viewmodels\\abouts\\aboutvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\services\\interfaces\\itechnicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\services\\interfaces\\itechnicianservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\viewmodels\\homevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\viewmodels\\homevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\viewmodels\\technicians\\techniciancreatevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\viewmodels\\technicians\\techniciancreatevm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\viewmodels\\technicians\\technicianeditvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\viewmodels\\technicians\\technicianeditvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\viewmodels\\technicians\\technicianlistvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\viewmodels\\technicians\\technicianlistvm.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 9,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FooterViewComponent.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewComponents\\FooterViewComponent.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\ViewComponents\\FooterViewComponent.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewComponents\\FooterViewComponent.cs",
+              "RelativeToolTip": "DoctorEngineApp\\ViewComponents\\FooterViewComponent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-01T10:03:16.5Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ServiceService.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Services\\ServiceService.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Services\\ServiceService.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Services\\ServiceService.cs",
+              "RelativeToolTip": "DoctorEngineApp\\Services\\ServiceService.cs",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAgwEwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-01T10:00:31.25Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Default.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\Shared\\Components\\Footer\\Default.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Views\\Shared\\Components\\Footer\\Default.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\Shared\\Components\\Footer\\Default.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Views\\Shared\\Components\\Footer\\Default.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAACcAAAA8AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-01T09:58:58.846Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Reject.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Reject.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Reject.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Reject.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Reject.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-01T09:54:24.497Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Index.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Index.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Index.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Areas\\Admin\\Views\\Reservation\\Index.cshtml",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAAB0AAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-31T22:19:11.763Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "AboutController.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Controllers\\AboutController.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Controllers\\AboutController.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Controllers\\AboutController.cs",
+              "RelativeToolTip": "DoctorEngineApp\\Controllers\\AboutController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T10:12:05.007Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "AboutVM.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Abouts\\AboutVM.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\ViewModels\\Abouts\\AboutVM.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Abouts\\AboutVM.cs",
+              "RelativeToolTip": "DoctorEngineApp\\ViewModels\\Abouts\\AboutVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T10:10:54.829Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\About\\Index.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Views\\About\\Index.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\About\\Index.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Views\\About\\Index.cshtml",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-31T10:10:24.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "TechnicianService.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Services\\TechnicianService.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Services\\TechnicianService.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Services\\TechnicianService.cs",
+              "RelativeToolTip": "DoctorEngineApp\\Services\\TechnicianService.cs",
+              "ViewState": "AgIAAJYAAAAAAAAAAAAAAKYAAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T10:04:06.029Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Areas\\Admin\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAAAkAAABWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-31T09:58:22.562Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Program.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Program.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Program.cs",
+              "RelativeToolTip": "DoctorEngineApp\\Program.cs",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAgwF8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:56:26.855Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "DoctorEngineApp\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADQAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:53:29.263Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAOQAAAAAAAAAAAAYwOsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-31T09:52:36.877Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ITechnicianService.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Services\\Interfaces\\ITechnicianService.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Services\\Interfaces\\ITechnicianService.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Services\\Interfaces\\ITechnicianService.cs",
+              "RelativeToolTip": "DoctorEngineApp\\Services\\Interfaces\\ITechnicianService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:44:28.57Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "HomeVM.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\HomeVM.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\ViewModels\\HomeVM.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\HomeVM.cs",
+              "RelativeToolTip": "DoctorEngineApp\\ViewModels\\HomeVM.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAkwBMAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:40:20.571Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "TechnicianListVM.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Technicians\\TechnicianListVM.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\ViewModels\\Technicians\\TechnicianListVM.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Technicians\\TechnicianListVM.cs",
+              "RelativeToolTip": "DoctorEngineApp\\ViewModels\\Technicians\\TechnicianListVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:40:00.169Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "TechnicianEditVM.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Technicians\\TechnicianEditVM.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\ViewModels\\Technicians\\TechnicianEditVM.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Technicians\\TechnicianEditVM.cs",
+              "RelativeToolTip": "DoctorEngineApp\\ViewModels\\Technicians\\TechnicianEditVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:39:27.411Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "TechnicianCreateVM.cs",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Technicians\\TechnicianCreateVM.cs",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\ViewModels\\Technicians\\TechnicianCreateVM.cs",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\ViewModels\\Technicians\\TechnicianCreateVM.cs",
+              "RelativeToolTip": "DoctorEngineApp\\ViewModels\\Technicians\\TechnicianCreateVM.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-31T09:38:44.047Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

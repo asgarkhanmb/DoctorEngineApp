@@ -1,0 +1,50 @@
+﻿<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ad</th>
+            <th>Telefon</th>
+            <th>WhatsApp</th>
+            <th>Xidmət</th>
+            <th>Tarix</th>
+            <th>Qeyd</th>
+            <th>Status</th>
+            <th>Səbəb</th>
+            <th>Əməliyyat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.FullName</td>
+                <td>@r.Phone</td>
+                <td>
+                    <a href="https://wa.me/@r.WhatsApp" target="_blank">
+                        @r.WhatsApp
+                    </a>
+                </td>
+                <td>@r.ServiceName</td>
+                <td>@r.DateTime</td>
+                <td class="truncate" style="max-width:200px" title="@r.Note">
+                    @r.Note
+                </td>
+                <td>@r.Status</td>
+                <td>@r.RejectionReason</td>
+                <td>
+                    @if (r.Status == "Pending")
+                    {
+                        <a asp-action="Confirm" asp-route-id="@r.Id" class="btn btn-success btn-sm">
+                            Təsdiqlə
+                        </a>
+                        <a asp-action="Reject" asp-route-id="@r.Id" class="btn btn-warning btn-sm">
+                            İmtina et
+                        </a>
+                    }
+                    <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-danger btn-sm">
+                        Sil
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -40,6 +40,11 @@ builder.Services.AddScoped<IInformService, InformService>();
 builder.Services.AddScoped<IAboutService, AboutService>();
 builder.Services.AddScoped<ISubServiceService, SubServiceService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+
+
 
 
 

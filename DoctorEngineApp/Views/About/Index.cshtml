@@ -6,27 +6,58 @@
 <!-- Team Start -->
 <div class="container-xxl py-5">
     <div class="container">
+
         <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
             <h6 class="text-primary text-uppercase">Bizim Texniklər</h6>
             <h1 class="mb-5">Mütəxəssislərimiz</h1>
         </div>
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="team-item">
-                    <div class="position-relative overflow-hidden">
-                        <img class="img-fluid" src="~/assets/img/el1.png" alt="">
-                        <div class="team-overlay position-absolute start-0 top-0 w-100 h-100">
-                            <a class="btn btn-square mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square mx-1" href=""><i class="fa-brands fa-tiktok"></i></a>
+
+        <div class="row g-4 justify-content-center">
+
+            @foreach (var t in Model.Technicians)
+            {
+                <div class="col-lg-3 col-md-6 wow fadeInUp">
+                    <div class="team-item shadow rounded overflow-hidden">
+
+                        <div class="position-relative overflow-hidden">
+                            <img class="img-fluid w-100"
+                                 src="~/uploads/technicians/@t.Image"
+                                 style="height:300px; object-fit:cover;" />
+
+                            <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex align-items-center justify-content-center">
+
+                                @if (!string.IsNullOrEmpty(t.FacebookUrl))
+                                {
+                                    <a class="btn btn-square mx-1" href="@t.FacebookUrl" target="_blank">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                }
+
+                                @if (!string.IsNullOrEmpty(t.InstagramUrl))
+                                {
+                                    <a class="btn btn-square mx-1" href="@t.InstagramUrl" target="_blank">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                }
+
+                                @if (!string.IsNullOrEmpty(t.TiktokUrl))
+                                {
+                                    <a class="btn btn-square mx-1" href="@t.TiktokUrl" target="_blank">
+                                        <i class="fab fa-tiktok"></i>
+                                    </a>
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-light text-center p-4">
-                        <h5 class="fw-bold mb-0">Elton Əlizadə</h5>
-                        <small>Mühərrik Ustası</small>
+
+                        <div class="bg-light text-center p-4">
+                            <h5 class="fw-bold mb-0">@t.FullName</h5>
+                            <small>@t.Position</small>
+                        </div>
+
                     </div>
                 </div>
-            </div>
+            }
+
         </div>
     </div>
 </div>
