@@ -20,10 +20,6 @@ namespace DoctorEngineApp.Controllers
             _informService = informService;
             _technicianService = technicianService;
         }
-
-        // ================================
-        // ABOUT PAGE
-        // ================================
         public async Task<IActionResult> Index()
         {
             var abouts = await _aboutService.GetAllAsync();
@@ -44,8 +40,6 @@ namespace DoctorEngineApp.Controllers
                     Description = i.Description,
                     Icon = i.Icon
                 }).ToList(),
-
-                // 👇 TEAM (NULL OLMAYACAQ)
                 Technicians = technicians
             };
 

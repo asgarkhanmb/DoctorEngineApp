@@ -461,6 +461,7 @@ b, strong {
 .page-header {
     background-image: url("../images/breadcrumb-bg.jpg");
     background-size: cover;
+    background-color:blue;
     position: relative;
     border-radius: 0;
     color: #fff;
@@ -8376,7 +8377,7 @@ table tbody .border-bottom-info td {
 /*======= Main-header css end ======*/
 .pcoded .pcoded-container {
     position: relative;
-    background: #f3f3f3;
+    background:#0b2154;
     -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
     box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
 }
@@ -10902,7 +10903,7 @@ body[themebg-pattern="theme6"] {
     }
 
 .pcoded .pcoded-navbar[active-item-theme="theme1"] .pcoded-item > li.active > a {
-    background: black;
+    background: #021641;
     color: #fff !important;
 }
 
@@ -11777,7 +11778,7 @@ body[themebg-pattern="theme6"] {
 }
 
 .pcoded .pcoded-header[header-theme="theme1"] {
-    background: black;
+    background: #0b2154;
 }
 
     .pcoded .pcoded-header[header-theme="theme1"] .input-group-addon,

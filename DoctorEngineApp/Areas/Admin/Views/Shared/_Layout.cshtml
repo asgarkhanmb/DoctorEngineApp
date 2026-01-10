@@ -234,11 +234,14 @@
                                         <span class="pcoded-mcaret"></span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a asp-area="Admin" asp-controller="Contact" asp-action="Index" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
+                                        <span class="pcoded-mtext" data-i18n="nav.form-components.main">Contacts</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                </li>
                             </ul>
-
-
-
-
                         </div>
                     </nav>
                     <div class="pcoded-content">
@@ -248,16 +251,16 @@
                                 <div class="row align-items-center">
                                     <div class="col-md-8">
                                         <div class="page-header-title">
-                                            <p class="m-b-0">Welcome to Admin Panel</p>
+                                            <p class="m-b-0">Admin Panelə Xoş Gəldiz</p>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <ul class="breadcrumb-title">
                                             <li class="breadcrumb-item">
-                                                <a asp-action="Index" asp-controller="Home"> <i class="fa fa-home"></i> </a>
+                                                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"> <i class="fa fa-home"></i> </a>
                                             </li>
                                             <li class="breadcrumb-item">
-                                                <a asp-action="Index" asp-controller="Home" asp-area="Home">Go to Webiste</a>
+                                                <a asp-action="Index" asp-controller="Home" asp-area="Home">Ana Səhifəyə Keçid</a>
                                             </li>
                                         </ul>
                                     </div>

@@ -1,0 +1,63 @@
+﻿@model ContactInfoVm
+
+<h2>Edit Contact Info</h2>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="YouTube" class="form-label"></label>
+        <input asp-for="YouTube" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Facebook" class="form-label"></label>
+        <input asp-for="Facebook" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TikTok" class="form-label"></label>
+        <input asp-for="TikTok" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="WhatsApp" class="form-label"></label>
+        <input asp-for="WhatsApp" class="form-control" />
+    </div>
+
+    <h4>Opening Hours</h4>
+
+    <div class="mb-3">
+        <label asp-for="Weekdays" class="form-label"></label>
+        <input asp-for="Weekdays" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Weekend" class="form-label"></label>
+        <input asp-for="Weekend" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Changes</button>
+</form>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["Success"]</div>
+}

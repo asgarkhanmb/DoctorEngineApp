@@ -17,7 +17,7 @@ namespace DoctorEngineApp.Data
         public DbSet<Service>Services { get; set; } = null!;
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Technician> Technicians { get; set; }
-
+        public DbSet<ContactInfo> ContactInfos { get; set; }
 
     }
 }

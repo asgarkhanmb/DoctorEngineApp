@@ -90,8 +90,6 @@ namespace DoctorEngineApp.Controllers
                 {
                     Services = services
                 },
-
-                // 👇 BURASI
                 Technicians = technicians
             };
 

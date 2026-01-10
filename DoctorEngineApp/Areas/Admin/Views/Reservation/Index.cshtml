@@ -1,50 +1,72 @@
-﻿<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Ad</th>
-            <th>Telefon</th>
-            <th>WhatsApp</th>
-            <th>Xidmət</th>
-            <th>Tarix</th>
-            <th>Qeyd</th>
-            <th>Status</th>
-            <th>Səbəb</th>
-            <th>Əməliyyat</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var r in Model)
-        {
+﻿<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle table-fixed">
+        <thead class="table-light">
             <tr>
-                <td>@r.FullName</td>
-                <td>@r.Phone</td>
-                <td>
-                    <a href="https://wa.me/@r.WhatsApp" target="_blank">
-                        @r.WhatsApp
-                    </a>
-                </td>
-                <td>@r.ServiceName</td>
-                <td>@r.DateTime</td>
-                <td class="truncate" style="max-width:200px" title="@r.Note">
-                    @r.Note
-                </td>
-                <td>@r.Status</td>
-                <td>@r.RejectionReason</td>
-                <td>
-                    @if (r.Status == "Pending")
-                    {
-                        <a asp-action="Confirm" asp-route-id="@r.Id" class="btn btn-success btn-sm">
-                            Təsdiqlə
-                        </a>
-                        <a asp-action="Reject" asp-route-id="@r.Id" class="btn btn-warning btn-sm">
-                            İmtina et
-                        </a>
-                    }
-                    <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-danger btn-sm">
-                        Sil
-                    </a>
-                </td>
+                <th>Ad</th>
+                <th>Telefon</th>
+                <th>WhatsApp</th>
+                <th>Xidmət</th>
+                <th>Tarix</th>
+                <th class="note-col">Qeyd</th>
+                <th>Status</th>
+                <th class="note-col">Səbəb</th>
+                <th>Əməliyyat</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.FullName</td>
+                    <td>@r.Phone</td>
+
+                    <!-- WhatsApp link -->
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(r.WhatsApp))
+                        {
+                            <a href="https://wa.me/@r.WhatsApp.Replace("+", "").Replace(" ", "")?text=Salam" target="_blank">
+                                @r.WhatsApp
+                            </a>
+                        }
+                        else
+                        {
+                            <span>@r?.WhatsApp</span>
+                        }
+                    </td>
+
+
+                    <td>@r.ServiceName</td>
+                    <td>@r.DateTime.ToString("dd.MM.yyyy HH:mm")</td>
+
+                    <!-- Qeyd -->
+                    <td class="note-td">
+                        <textarea class="form-control note-textarea" readonly>@r.Note</textarea>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <span class="badge @(r.Status == "Pending" ? "bg-warning" : r.Status == "Confirmed" ? "bg-success" : "bg-danger")">
+                            @r.Status
+                        </span>
+                    </td>
+
+                    <!-- Səbəb -->
+                    <td class="note-td">
+                        <textarea class="form-control note-textarea" readonly>@r.RejectionReason</textarea>
+                    </td>
+
+                    <!-- Əməliyyat -->
+                    <td>
+                        @if (r.Status == "Pending")
+                        {
+                            <a asp-action="Confirm" asp-route-id="@r.Id" class="btn btn-success btn-sm mb-1">Təsdiqlə</a>
+                            <a asp-action="Reject" asp-route-id="@r.Id" class="btn btn-warning btn-sm mb-1">İmtina et</a>
+                        }
+
+                        <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-danger btn-sm" onclick="return confirm('Silmək istədiyinizə əminsiniz?')">Sil</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

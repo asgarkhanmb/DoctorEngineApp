@@ -1,0 +1,46 @@
+﻿@model ContactInfoVm
+
+<h2>Create Contact Info</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Address" class="form-label"></label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="YouTube" class="form-label"></label>
+        <input asp-for="YouTube" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Facebook" class="form-label"></label>
+        <input asp-for="Facebook" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="TikTok" class="form-label"></label>
+        <input asp-for="TikTok" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="WhatsApp" class="form-label"></label>
+        <input asp-for="WhatsApp" class="form-control" />
+    </div>
+
+    <h4>Opening Hours</h4>
+    <div class="mb-3">
+        <label asp-for="Weekdays" class="form-label">Monday - Friday</label>
+        <input asp-for="Weekdays" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Weekend" class="form-label">Saturday - Sunday</label>
+        <input asp-for="Weekend" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
