@@ -106,5 +106,4 @@
                 .catch(console.error);
         });
     }
-
 })();

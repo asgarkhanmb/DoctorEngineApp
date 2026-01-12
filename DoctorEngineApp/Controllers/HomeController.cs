@@ -59,7 +59,6 @@ namespace DoctorEngineApp.Controllers
                     Name = s.Name
                 }).ToListAsync();
 
-            // 👇 TEXNİKLƏR
             var technicians = await _db.Technicians
                 .Where(t => !t.IsDeleted)
                 .ToListAsync();
@@ -99,19 +98,69 @@ namespace DoctorEngineApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReservation(
-       [Bind(Prefix = "Reservation")] ReservationCreateVM model)
+         [Bind(Prefix = "Reservation")] ReservationCreateVM model)
         {
+            bool alreadyExists = await _reservationService.ExistsAsync(
+                model.Phone,
+                model.ServiceId,
+                model.DateTime
+            );
+
+            if (alreadyExists)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Bu rezervasiya artıq mövcuddur."
+                });
+            }
+
             if (!ModelState.IsValid)
-                return Json(new { success = false, message = "Bütün sahələri doldurun!" });
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Bütün sahələri düzgün doldurun!"
+                });
+            }
+
+            // Keçmiş tarix
+            if (model.DateTime < DateTime.Now)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Keçmiş tarix üçün rezervasiya edilə bilməz."
+                });
+            }
+
+            // İş saatları: 10:00 – 20:00
+            if (model.DateTime.Hour < 10 || model.DateTime.Hour >= 20)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Rezervasiya yalnız 10:00 – 20:00 arası mümkündür."
+                });
+            }
+
+            // Maksimum 10 gün qabaqcadan
+            if (model.DateTime > DateTime.Now.AddDays(10))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Rezervasiya maksimum 10 gün öncədən edilə bilər."
+                });
+            }
 
             try
             {
-                // AZ vaxtı
-                var azTime = TimeZoneInfo.ConvertTime(
+                // 🇦🇿 Azərbaycan vaxtına çevirmə
+                model.DateTime = TimeZoneInfo.ConvertTime(
                     model.DateTime,
                     TimeZoneInfo.FindSystemTimeZoneById("Azerbaijan Standard Time")
                 );
-                model.DateTime = azTime;
 
                 await _reservationService.CreateAsync(model);
 
@@ -121,15 +170,16 @@ namespace DoctorEngineApp.Controllers
                     message = "Rezervasiya qəbul edildi. WhatsApp üzərindən əlaqə saxlanılacaq."
                 });
             }
-            catch (InvalidOperationException ex)
+            catch (Exception)
             {
-                return Json(new { success = false, message = ex.Message });
-            }
-            catch
-            {
-                return Json(new { success = false, message = "Xəta baş verdi. Yenidən cəhd edin." });
+                return Json(new
+                {
+                    success = false,
+                    message = "Xəta baş verdi. Yenidən cəhd edin."
+                });
             }
         }
+
 
 
     }

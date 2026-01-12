@@ -1,4 +1,6 @@
-﻿namespace DoctorEngineApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DoctorEngineApp.Models
 {
     public class Reservation:BaseEntity
     {
@@ -8,7 +10,7 @@
 
         public int ServiceId { get; set; }
         public Service Service { get; set; }
-
+        [Required]
         public DateTime DateTime { get; set; }
         public string Note { get; set; }
 

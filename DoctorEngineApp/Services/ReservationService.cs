@@ -115,6 +115,7 @@ namespace DoctorEngineApp.Services
         }
 
         public async Task RejectAsync(int id, string reason)
+
         {
             var reservation = await _context.Reservations
                 .Include(r => r.Service)
@@ -138,5 +139,14 @@ namespace DoctorEngineApp.Services
                 }
             }
         }
+        public async Task<bool> ExistsAsync(string phone, int serviceId, DateTime dateTime)
+        {
+            return await _context.Reservations.AnyAsync(r =>
+                r.Phone == phone &&
+                r.ServiceId == serviceId &&
+                r.DateTime == dateTime
+            );
+        }
+
     }
 }

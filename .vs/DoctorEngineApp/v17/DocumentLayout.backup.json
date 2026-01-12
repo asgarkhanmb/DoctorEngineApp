@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|c:\\users\\\u0259sg\u0259rxan\\desktop\\doctorengineapp\\doctorengineapp\\views\\contact\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FEB40BDA-A649-4A39-AA20-0F7D91EE1D3B}|DoctorEngineApp\\DoctorEngineApp.csproj|solutionrelative:doctorengineapp\\views\\contact\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\Contact\\Index.cshtml",
+              "RelativeDocumentMoniker": "DoctorEngineApp\\Views\\Contact\\Index.cshtml",
+              "ToolTip": "C:\\Users\\\u018Fsg\u0259rxan\\Desktop\\DoctorEngineApp\\DoctorEngineApp\\Views\\Contact\\Index.cshtml",
+              "RelativeToolTip": "DoctorEngineApp\\Views\\Contact\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-01-11T21:54:37.006Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

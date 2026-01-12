@@ -1,4 +1,5 @@
 ﻿using DoctorEngineApp.ViewModels.Reservations;
+using Microsoft.EntityFrameworkCore;
 
 namespace DoctorEngineApp.Services.Interfaces
 {
@@ -9,5 +10,8 @@ namespace DoctorEngineApp.Services.Interfaces
         Task DeleteAsync(int id);
         Task ConfirmAsync(int id);
         Task RejectAsync(int id, string reason);
+        Task<bool> ExistsAsync(string phone, int serviceId, DateTime dateTime);
+
+
     }
 }

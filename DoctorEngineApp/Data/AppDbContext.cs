@@ -18,6 +18,7 @@ namespace DoctorEngineApp.Data
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Technician> Technicians { get; set; }
         public DbSet<ContactInfo> ContactInfos { get; set; }
+        public DbSet<ContactPhone>ContactPhones { get; set; }
 
     }
 }

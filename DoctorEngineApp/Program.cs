@@ -1,6 +1,7 @@
 using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services;
+using DoctorEngineApp.Services.Implementations;
 using DoctorEngineApp.Services.Interfaces;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
@@ -44,6 +45,7 @@ builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<ITechnicianService, TechnicianService>();
 builder.Services.AddScoped<IContactInfoService, ContactInfoService>();
+builder.Services.AddScoped<IContactPhoneService,ContactPhoneService>();
 
 
 

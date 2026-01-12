@@ -1,0 +1,22 @@
+﻿@model List<ContactPhoneVM>
+
+<a asp-action="Create">Create</a>
+
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Title</td>
+            <td>@item.PhoneNumber</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
