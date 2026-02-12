@@ -6,6 +6,7 @@ using DoctorEngineApp.Services.Interfaces;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +47,9 @@ builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<ITechnicianService, TechnicianService>();
 builder.Services.AddScoped<IContactInfoService, ContactInfoService>();
 builder.Services.AddScoped<IContactPhoneService,ContactPhoneService>();
+builder.Services.AddScoped<IMapService, MapService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+builder.Services.AddScoped<IWarrantyService, WarrantyService>();
 
 
 
@@ -68,6 +72,11 @@ builder.Services.Configure<FormOptions>(options =>
 // HttpContext
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+
+RotativaConfiguration.Setup(
+    Directory.GetCurrentDirectory(),
+    "wwwroot/Rotativa"
+);
 var app = builder.Build();
 
 // Middleware pipeline

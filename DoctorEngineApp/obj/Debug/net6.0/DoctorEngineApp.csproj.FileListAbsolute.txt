@@ -277,3 +277,5 @@ C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\ref
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\DoctorEngineApp.pdb
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\DoctorEngineApp.genruntimeconfig.cache
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\ref\DoctorEngineApp.dll
+C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Debug\net6.0\Rotativa.AspNetCore.dll
+C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\DoctorEngineApp.MvcApplicationPartsAssemblyInfo.cs

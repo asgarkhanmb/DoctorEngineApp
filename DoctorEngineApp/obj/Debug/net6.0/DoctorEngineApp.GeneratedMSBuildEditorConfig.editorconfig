@@ -52,6 +52,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQ2F0ZWdvcnlcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/ContactMessage/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQ29udGFjdE1lc3NhZ2VcRGV0YWlsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/ContactMessage/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQ29udGFjdE1lc3NhZ2VcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/ContactPhone/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQ29udGFjdFBob25lXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -94,6 +102,18 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Inform/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcSW5mb3JtXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Map/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcTWFwXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Map/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcTWFwXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Map/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcTWFwXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Reservation/Index.cshtml]
@@ -158,6 +178,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Technician/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcVGVjaG5pY2lhblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Warranty/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2FycmFudHlcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Warranty/CreateJob.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2FycmFudHlcQ3JlYXRlSm9iLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Warranty/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2FycmFudHlcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Warranty/Pdf.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2FycmFudHlcUGRmLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/_ViewImports.cshtml]

@@ -1,0 +1,18 @@
+﻿@model MapVM
+
+<form method="post">
+    <div class="mb-3">
+        <label>Ünvan</label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Google Map Embed URL</label>
+        <textarea asp-for="MapUrl" class="form-control" rows="4"></textarea>
+        <small>
+            Google Maps → Share → Embed → iframe src
+        </small>
+    </div>
+
+    <button class="btn btn-primary">Create</button>
+</form>

@@ -1,0 +1,33 @@
+﻿@model List<Warranty>
+
+<h2>Zəmanətlər</h2>
+
+<a asp-action="Create" class="btn btn-success">+ Yeni Zəmanət</a>
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Müştəri</th>
+            <th>Maşın</th>
+            <th>Tarix</th>
+            <th>Əməliyyat</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var w in Model)
+        {
+            <tr>
+                <td>@w.Id</td>
+                <td>@w.CustomerName</td>
+                <td>@w.Brand @w.Model (@w.Year)</td>
+                <td>@w.CreatedDate.ToString("dd.MM.yyyy")</td>
+                <td>
+                    <a asp-action="Pdf" asp-route-id="@w.Id"
+                       class="btn btn-primary btn-sm">PDF / Çap</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

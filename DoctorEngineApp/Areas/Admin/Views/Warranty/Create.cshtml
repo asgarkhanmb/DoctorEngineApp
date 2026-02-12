@@ -1,0 +1,52 @@
+﻿@model WarrantyCreateVM
+
+<h2>Yeni Zəmanət Talonu</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <h4>Müştəri</h4>
+    <input asp-for="CustomerName" class="form-control mb-2" placeholder="Ad Soyad" />
+    <input asp-for="Phone" class="form-control mb-2" placeholder="Telefon" />
+
+    <h4>Avtomobil</h4>
+    <input asp-for="Brand" class="form-control mb-2" placeholder="Marka" />
+    <input asp-for="Model" class="form-control mb-2" placeholder="Model" />
+    <input asp-for="Year" class="form-control mb-2" placeholder="İl" />
+
+    <h4>Logo</h4>
+    <select asp-for="WarrantyLogoId"
+            asp-items="Model.Logos"
+            class="form-control mb-2">
+        <option value="">— Mövcud logo seç —</option>
+    </select>
+
+    <input asp-for="LogoFile" type="file" class="form-control mb-3" />
+
+    <h4>Görülən İşlər</h4>
+
+    @for (int i = 0; i < Model.Jobs.Count; i++)
+    {
+        <div class="border p-2 mb-2">
+
+            <input type="hidden" asp-for="Jobs[i].JobId" />
+
+            <div class="form-check">
+                <input class="form-check-input"
+                       asp-for="Jobs[i].IsSelected" />
+
+                <label class="form-check-label">
+                    @Model.Jobs[i].Name
+                </label>
+            </div>
+
+            <input asp-for="Jobs[i].WarrantyMonths"
+                   class="form-control mt-2"
+                   placeholder="Zəmanət (ay)" />
+        </div>
+    }
+
+
+    <button type="submit" class="btn btn-success mt-3">
+        Yarat və PDF Aç
+    </button>
+</form>

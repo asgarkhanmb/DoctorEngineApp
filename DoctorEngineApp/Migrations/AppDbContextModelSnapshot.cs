@@ -184,6 +184,41 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("ContactInfos");
                 });
 
+            modelBuilder.Entity("DoctorEngineApp.Models.ContactMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContactMessages");
+                });
+
             modelBuilder.Entity("DoctorEngineApp.Models.ContactPhone", b =>
                 {
                     b.Property<int>("Id")
@@ -248,6 +283,59 @@ namespace DoctorEngineApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Informs");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.JobCatalog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DefaultWarrantyMonths")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobCatalogs");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.Map", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MapUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Maps");
                 });
 
             modelBuilder.Entity("DoctorEngineApp.Models.Reservation", b =>
@@ -469,6 +557,65 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("Technicians");
                 });
 
+            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyJob", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("JobCatalogId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WarrantyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarrantyMonths")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobCatalogId");
+
+                    b.HasIndex("WarrantyId");
+
+                    b.ToTable("WarrantiesJobs");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyLogo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WarrantyLogos");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -602,6 +749,61 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Warranty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Fuel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Master")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Terms")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("WarrantyLogoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WarrantyLogoId");
+
+                    b.ToTable("Warranties");
+                });
+
             modelBuilder.Entity("DoctorEngineApp.Models.Reservation", b =>
                 {
                     b.HasOne("DoctorEngineApp.Models.Service", "Service")
@@ -622,6 +824,25 @@ namespace DoctorEngineApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyJob", b =>
+                {
+                    b.HasOne("DoctorEngineApp.Models.JobCatalog", "JobCatalog")
+                        .WithMany()
+                        .HasForeignKey("JobCatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Warranty", "Warranty")
+                        .WithMany("Jobs")
+                        .HasForeignKey("WarrantyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobCatalog");
+
+                    b.Navigation("Warranty");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -675,6 +896,15 @@ namespace DoctorEngineApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Warranty", b =>
+                {
+                    b.HasOne("DoctorEngineApp.Models.WarrantyLogo", "WarrantyLogo")
+                        .WithMany()
+                        .HasForeignKey("WarrantyLogoId");
+
+                    b.Navigation("WarrantyLogo");
+                });
+
             modelBuilder.Entity("DoctorEngineApp.Models.Service", b =>
                 {
                     b.Navigation("Reservations");
@@ -683,6 +913,11 @@ namespace DoctorEngineApp.Migrations
             modelBuilder.Entity("DoctorEngineApp.Models.ServiceCategory", b =>
                 {
                     b.Navigation("SubServices");
+                });
+
+            modelBuilder.Entity("Warranty", b =>
+                {
+                    b.Navigation("Jobs");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,16 @@
+﻿@model ContactMessage
+
+<h2>Mesaj Detalı</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><b>Ad:</b> @Model.FullName</p>
+        <p><b>Email:</b> @Model.Email</p>
+        <p><b>Mövzu:</b> @Model.Subject</p>
+        <p><b>Mesaj:</b></p>
+        <p>@Model.Message</p>
+        <p><b>Tarix:</b> @Model.CreatedDate</p>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>

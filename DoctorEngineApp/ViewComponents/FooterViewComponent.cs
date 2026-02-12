@@ -18,14 +18,10 @@ namespace DoctorEngineApp.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            // Contact info götür
+          
             var contactInfo = await _contactInfoService.GetFirstAsync();
-
-            // ContactInfo null gələrsə obyekt yarat
             if (contactInfo == null)
                 contactInfo = new();
-
-            // Services database-dən doldur
             contactInfo.Services = (await _serviceService.GetAllAsync())?.ToList();
 
             return View(contactInfo);
