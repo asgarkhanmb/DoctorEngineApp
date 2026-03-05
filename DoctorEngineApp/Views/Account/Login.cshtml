@@ -1,0 +1,68 @@
+﻿@model DoctorEngineApp.ViewModels.Accounts.LoginVM
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<link rel="stylesheet" href="~/css/auth.css" />
+
+<body>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <form asp-action="Login" asp-controller="Account" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <h3>Giriş</h3>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <label>İstifadəçi</label>
+        <input asp-for="EmailOrUsername" placeholder="E-poçt və ya istifadəçi adı" />
+        <span asp-validation-for="EmailOrUsername" class="text-danger"></span>
+
+        <label>Parol</label>
+        <input asp-for="Password" type="password" id="loginPassword" placeholder="Şifrə" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+        <div class="show-password">
+            <input type="checkbox" onclick="toggleLoginPassword()" />
+            <label>Şifrəni göstər</label>
+        </div>
+
+        <div>
+            <input asp-for="RememberMe" type="checkbox" />
+            <label asp-for="RememberMe">Məni xatırla</label>
+        </div>
+
+        <div>
+            <a asp-action="ForgotPassword" asp-controller="Account">
+                Şifrəni unutmusan?
+            </a>
+        </div>
+
+        <button type="submit">Daxil Ol</button>
+
+        <div>
+            Hesabın yoxdur?
+            <a asp-action="Register" asp-controller="Account">Qeydiyyat</a>
+        </div>
+
+        <div>
+            <a asp-controller="Home" asp-action="Index">Ana Səhifə</a>
+        </div>
+    </form>
+</body>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleLoginPassword() {
+            var input = document.getElementById("loginPassword");
+            input.type = input.type === "password" ? "text" : "password";
+        }
+    </script>
+}

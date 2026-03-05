@@ -344,8 +344,12 @@ wwwroot\assets\scss\bootstrap\scss\_transitions.scss
 wwwroot\assets\scss\bootstrap\scss\_type.scss
 wwwroot\assets\scss\bootstrap\scss\_utilities.scss
 wwwroot\assets\scss\bootstrap\scss\_variables.scss
+wwwroot\css\auth.css
+wwwroot\css\forgot.css
+wwwroot\css\signup.css
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\js\auth.js
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map

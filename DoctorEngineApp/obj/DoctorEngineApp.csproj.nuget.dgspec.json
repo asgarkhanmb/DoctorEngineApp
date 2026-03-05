@@ -86,6 +86,10 @@
               "target": "Package",
               "version": "[6.0.18, )"
             },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.14.0, )"
+            },
             "Rotativa.AspNetCore": {
               "target": "Package",
               "version": "[1.4.0, )"

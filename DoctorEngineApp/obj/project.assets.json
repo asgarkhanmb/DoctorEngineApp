@@ -11496,6 +11496,7 @@
       "Microsoft.EntityFrameworkCore.SqlServer >= 6.0.36",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.36",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.18",
+      "MimeKit >= 4.14.0",
       "Rotativa.AspNetCore >= 1.4.0"
     ]
   },
@@ -11584,6 +11585,10 @@
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
             "target": "Package",
             "version": "[6.0.18, )"
+          },
+          "MimeKit": {
+            "target": "Package",
+            "version": "[4.14.0, )"
           },
           "Rotativa.AspNetCore": {
             "target": "Package",

@@ -1,0 +1,72 @@
+﻿@model DoctorEngineApp.ViewModels.Accounts.RegisterVM
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Register";
+}
+
+<link rel="stylesheet" href="~/css/signup.css" />
+
+<body>
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <form asp-action="Register" asp-controller="Account" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <h3>Qeydiyyat</h3>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <label>Ad Soyad</label>
+        <input asp-for="FullName" placeholder="Ad Soyad" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+
+        <label>İstifadəçi adı</label>
+        <input asp-for="UserName" placeholder="İstifadəçi adı" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+
+        <label>Email</label>
+        <input asp-for="Email" placeholder="E-poçt" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <label>Parol</label>
+        <input asp-for="Password" type="password" id="registerPassword" placeholder="Şifrə" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+        <label>Parolu təsdiqlə</label>
+        <input asp-for="ConfirmPassword" type="password" id="confirmPassword" placeholder="Şifrəni təkrar yaz" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+        <div class="show-password">
+            <input type="checkbox" onclick="toggleRegisterPassword()" />
+            <label>Şifrələri göstər</label>
+        </div>
+
+        <button type="submit">Qeydiyyat ol</button>
+
+        <div>
+            Artıq hesabın var?
+            <a asp-action="Login" asp-controller="Account">Daxil Ol</a>
+        </div>
+
+        <div>
+            <a asp-controller="Home" asp-action="Index">Ana Səhifə</a>
+        </div>
+    </form>
+</body>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleRegisterPassword() {
+            var pass = document.getElementById("registerPassword");
+            var confirm = document.getElementById("confirmPassword");
+
+            pass.type = pass.type === "password" ? "text" : "password";
+            confirm.type = confirm.type === "password" ? "text" : "password";
+        }
+    </script>
+}
