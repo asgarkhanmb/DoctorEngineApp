@@ -1,0 +1,38 @@
+﻿
+@{
+    Layout = null;
+    ViewData["Title"] = "Email Təsdiqi";
+}
+
+<link rel="stylesheet" href="~/css/auth.css" />
+
+<body>
+
+    <div class="background">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <form>
+
+        <h3>Emailinizi Təsdiqləyin</h3>
+
+        <p style="text-align:center; font-size:14px; margin-top:10px;">
+            Qeydiyyat uğurla tamamlandı.
+            <br /><br />
+            Email ünvanınıza təsdiq linki göndərildi.
+            <br />
+            Zəhmət olmasa mailinizi yoxlayın və linkə klik edin.
+        </p>
+        <div class="footer">
+            <a asp-controller="Account" asp-action="Login">
+                Daxil Ol
+            </a>
+        </div>
+        <div style="margin-top:20px; text-align:center;">
+            <a asp-controller="Home" asp-action="Index">Ana Səhifəyə Qayıt</a>
+        </div>
+
+    </form>
+
+</body>

@@ -1,9 +1,11 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ContactMessageController : Controller
     {
         private readonly IContactMessageService _contactMessageService;

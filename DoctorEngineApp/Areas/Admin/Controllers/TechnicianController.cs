@@ -1,8 +1,10 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Technicians;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class TechnicianController : Controller
 {
     private readonly ITechnicianService _service;

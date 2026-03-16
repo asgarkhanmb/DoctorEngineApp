@@ -1,10 +1,12 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Maps;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class MapController : Controller
     {
         private readonly IMapService _service;

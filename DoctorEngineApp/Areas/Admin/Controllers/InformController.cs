@@ -2,11 +2,13 @@
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Infroms;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class InformController : Controller
     {
         private readonly AppDbContext _context;

@@ -1,75 +1,25 @@
-﻿@model ContactInfoVm
+﻿@model DoctorEngineApp.Models.WhatsappSetting
 
-@{
-    ViewData["Title"] = "Contact Info Dashboard";
-}
+<div class="container mt-4">
 
-<h2>Contact Info Dashboard</h2>
+    <h3>WhatsApp Ayarları</h3>
 
-@if (Model == null)
-{
-    <!-- Əgər hələ ContactInfo yaradılmayıbsa -->
-    <a asp-action="Create" class="btn btn-primary mb-3">Create Contact Info</a>
-    <p>Hələ heç bir Contact Info yaradılmayıb.</p>
-}
-else
-{
-    <!-- Əgər ContactInfo varsa -->
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-success mb-3">Edit Contact Info</a>
+    <form asp-action="Index" method="post">
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Address</h5>
-            <p>@Model.Address</p>
-
-            <h5 class="card-title">Phone</h5>
-            <p>@Model.Phone</p>
-
-            <h5 class="card-title">Email</h5>
-            <p>@Model.Email</p>
-
-            <h5 class="card-title">Social Links</h5>
-            @{
-                string whatsappLink = null;
-
-                if (!string.IsNullOrEmpty(Model.WhatsApp))
-                {
-                    whatsappLink = "https://wa.me/" + Model.WhatsApp.Replace("+", "").Replace(" ", "") + "?text=Salam";
-                }
-            }
-
-            <div class="d-flex">
-                @if (!string.IsNullOrEmpty(Model.YouTube))
-                {
-                    <a href="@Model.YouTube" target="_blank" class="btn btn-outline-secondary me-2">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                }
-
-                @if (!string.IsNullOrEmpty(Model.Facebook))
-                {
-                    <a href="@Model.Facebook" target="_blank" class="btn btn-outline-secondary me-2">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                }
-
-                @if (!string.IsNullOrEmpty(Model.TikTok))
-                {
-                    <a href="@Model.TikTok" target="_blank" class="btn btn-outline-secondary me-2">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
-                }
-
-                @if (!string.IsNullOrEmpty(whatsappLink))
-                {
-                    <a href="@whatsappLink" target="_blank" class="btn btn-outline-success">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
-                }
-            </div>
-            <h5 class="card-title mt-3">Opening Hours</h5>
-            <p>Monday - Friday: @Model.Weekdays</p>
-            <p>Saturday - Sunday: @Model.Weekend</p>
+        <div class="mb-3">
+            <label class="form-label">Telefon Nömrəsi</label>
+            <input asp-for="PhoneNumber" class="form-control" placeholder="994501234567" />
         </div>
-    </div>
-}
+
+        <div class="mb-3">
+            <label class="form-label">Default Mesaj</label>
+            <input asp-for="Message" class="form-control" placeholder="Salam servis haqqında məlumat almaq istəyirəm" />
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Yadda Saxla
+        </button>
+
+    </form>
+
+</div>

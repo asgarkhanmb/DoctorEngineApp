@@ -1,9 +1,11 @@
 ﻿using DoctorEngineApp.Data;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class SubServiceController : Controller
 {
     private readonly ISubServiceService _service;

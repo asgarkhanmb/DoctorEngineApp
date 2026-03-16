@@ -61,7 +61,7 @@ builder.Services.AddScoped<IMapService, MapService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 builder.Services.AddScoped<IWarrantyService, WarrantyService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
+builder.Services.AddScoped<IWhatsappService, WhatsappService>();
 
 // Upload limit (2GB)
 builder.WebHost.ConfigureKestrel(o =>

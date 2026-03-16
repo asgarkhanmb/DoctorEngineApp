@@ -1,5 +1,8 @@
-﻿@using Microsoft.AspNetCore.Mvc.Routing
+﻿@using DoctorEngineApp.Services.Interfaces
+@using Microsoft.AspNetCore.Mvc.Routing
 @inject IHttpContextAccessor HttpContextAccessor
+@inject IWhatsappService WhatsAppService
+
 
 <header class="s-header">
 
@@ -23,20 +26,92 @@
                 <a asp-controller="About" asp-action="Index" class="nav-item nav-link @(IsActive("About", "Index"))">Haqqımızda</a>
                 <a asp-controller="Service" asp-action="Index" class="nav-item nav-link @(IsActive("Service", "Index"))">Xidmətlər</a>
                 <a asp-controller="Reservation" asp-action="Index" class="nav-item nav-link @(IsActive("Reservation", "Index"))">Rezervasiya</a>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                       href="#"
+                       id="userDropdown"
+                       role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false">
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @User.Identity.Name
+                        }
+                        else
+                        {
+                            @:Giriş
+                        }
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li>
+                                <form method="post" asp-controller="Account" asp-action="Logout">
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        Çıxış
+                                    </button>
+                                </form>
+                            </li>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li>
+                                    <a asp-area="Admin"
+                                       asp-controller="Dashboard"
+                                       asp-action="Index"
+                                       class="dropdown-item text-success">
+                                        Admin Panel
+                                    </a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                               <li>
+                                <a asp-controller="Account"
+                                   asp-action="Login"
+                                   class="dropdown-item">
+                                    Daxil Ol
+                                </a>
+                            </li>
+                            <li>
+                                <a asp-controller="Account"
+                                   asp-action="Register"
+                                   class="dropdown-item">
+                                    Qeydiyyat
+                                </a>
+                            </li>
+
+                         
+                        }
+
+                    </ul>
+                </div>
                 <a asp-controller="Contact" asp-action="Index" class="nav-item nav-link @(IsActive("Contact", "Index"))">Əlaqə</a>
 
                 <!-- Login Button -->
-                <a asp-controller="Account" asp-action="Login" class="btn btn-primary ms-lg-4 mt-3 mt-lg-0 py-2 px-3 px-lg-5 py-lg-3">
-                    Daxil Ol <i class="fa fa-arrow-right ms-2"></i>
-                </a>
+
             </div>
         </div>
     </nav>
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/994501112233" class="whatsapp-btn" target="_blank">
-        <i class="bi bi-whatsapp"></i>
-    </a>
+    @{
+        var whatsapp = await WhatsAppService.GetAsync();
+    }
+
+    @if (whatsapp != null)
+    {
+        <a href="https://wa.me/@whatsapp.PhoneNumber?text=@Uri.EscapeDataString(whatsapp.Message ?? "")"
+           class="whatsapp-btn"
+           target="_blank">
+
+            <i class="bi bi-whatsapp"></i>
+        </a>
+    }
     <!-- Navbar End -->
 </header>
 

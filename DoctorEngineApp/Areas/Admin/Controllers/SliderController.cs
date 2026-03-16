@@ -1,10 +1,12 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Sliders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class SliderController : Controller
     {
         private readonly ISliderService _service;

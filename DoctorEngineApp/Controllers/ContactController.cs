@@ -21,7 +21,6 @@ namespace DoctorEngineApp.Controllers
             _contactMessageService = contactMessageService;
         }
 
-        // GET: /Contact
         public async Task<IActionResult> Index()
         {
             return View(new ContactPageVM
@@ -55,7 +54,6 @@ namespace DoctorEngineApp.Controllers
             }
             catch (Exception ex)
             {
-                // 🔥 SERVICE ERROR → MODELSTATE
                 ModelState.AddModelError(string.Empty, ex.Message);
             }
 

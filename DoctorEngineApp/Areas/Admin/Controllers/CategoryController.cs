@@ -1,8 +1,10 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Categories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class CategoryController : Controller
 {
     private readonly ICategoryService _service;

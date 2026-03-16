@@ -1,0 +1,33 @@
+﻿@model DoctorEngineApp.Models.WhatsappSetting
+
+<div class="container mt-4">
+
+    <h3 class="mb-4">WhatsApp Ayarını Dəyiş</h3>
+
+    <form asp-action="Edit" method="post">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label">Telefon Nömrəsi</label>
+            <input asp-for="PhoneNumber" class="form-control" placeholder="994501234567" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mesaj</label>
+            <input asp-for="Message" class="form-control" placeholder="Salam servis haqqında məlumat almaq istəyirəm" />
+            <span asp-validation-for="Message" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Yadda Saxla
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Geri
+        </a>
+
+    </form>
+
+</div>

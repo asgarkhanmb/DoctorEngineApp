@@ -4,13 +4,6 @@
 
 <head>
     <title>Admin Panel</title>
-    <!-- HTML5 Shim and Respond.js IE10 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 10]>
-      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-      <![endif]-->
-    <!-- Meta -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -170,8 +163,12 @@
                                         <span class="pcoded-mtext" data-i18n="nav.dash.main">Dashboard</span>
                                         <span class="pcoded-mcaret"></span>
                                     </a>
+                                 
+                                </li>
+                                <br />
+                                <li class="active">
                                     <a asp-area="Admin" asp-controller="Warranty" asp-action="Index" class="waves-effect waves-dark">
-                                        <span class="pcoded-micon"><i class="ti-home"></i><b>D</b></span>
+                                        <span class="pcoded-micon"><i class="ti-layers"></i><b>D</b></span>
                                         <span class="pcoded-mtext" data-i18n="nav.dash.main">Warranties</span>
                                         <span class="pcoded-mcaret"></span>
                                     </a>
@@ -179,8 +176,6 @@
 
                             </ul>
 
-                            </li>
-                            </ul>
                             <div class="pcoded-navigation-label" data-i18n="nav.category.forms">Tables</div>
                             <ul class="pcoded-item pcoded-left-item">
                                 <li>
@@ -264,6 +259,20 @@
                                     <a asp-area="Admin" asp-controller="ContactMessage" asp-action="Index" class="waves-effect waves-dark">
                                         <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
                                         <span class="pcoded-mtext" data-i18n="nav.form-components.main">ContactMessages</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-area="Admin" asp-controller="User" asp-action="Index" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
+                                        <span class="pcoded-mtext" data-i18n="nav.form-components.main">Users</span>
+                                        <span class="pcoded-mcaret"></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-area="Admin" asp-controller="Whatsapp" asp-action="Index" class="waves-effect waves-dark">
+                                        <span class="pcoded-micon"><i class="ti-layers"></i><b>FC</b></span>
+                                        <span class="pcoded-mtext" data-i18n="nav.form-components.main">WhatsApp</span>
                                         <span class="pcoded-mcaret"></span>
                                     </a>
                                 </li>

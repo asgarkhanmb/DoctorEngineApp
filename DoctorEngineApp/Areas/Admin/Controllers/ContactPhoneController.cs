@@ -1,10 +1,12 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.ContactPhones;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace YourProject.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ContactPhoneController : Controller
     {
         private readonly IContactPhoneService _service;

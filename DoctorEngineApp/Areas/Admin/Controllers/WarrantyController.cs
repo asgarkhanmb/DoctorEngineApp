@@ -2,11 +2,13 @@
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Warranties;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class WarrantyController : Controller
 {
     private readonly AppDbContext _db;

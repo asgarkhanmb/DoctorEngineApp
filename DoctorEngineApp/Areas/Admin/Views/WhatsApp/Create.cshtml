@@ -1,0 +1,17 @@
+﻿@model DoctorEngineApp.Models.WhatsappSetting
+
+<form asp-action="Create" method="post">
+
+    <div class="mb-3">
+        <label>Telefon nömrəsi</label>
+        <input asp-for="PhoneNumber" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Mesaj</label>
+        <input asp-for="Message" class="form-control" />
+    </div>
+
+    <button class="btn btn-success">Yadda saxla</button>
+
+</form>

@@ -180,6 +180,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcVGVjaG5pY2lhblxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/User/AddRole.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcVXNlclxBZGRSb2xlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/User/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcVXNlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Warranty/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2FycmFudHlcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -194,6 +202,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/Warranty/Pdf.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2FycmFudHlcUGRmLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/WhatsApp/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2hhdHNBcHBcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/WhatsApp/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2hhdHNBcHBcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/WhatsApp/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2hhdHNBcHBcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/WhatsApp/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcV2hhdHNBcHBcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Areas/Admin/Views/_ViewImports.cshtml]
@@ -218,6 +242,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Views/Account/ResetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Views/Account/VerifyEmail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxWZXJpZnlFbWFpbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Əsgərxan/Desktop/DoctorEngineApp/DoctorEngineApp/Views/Contact/Index.cshtml]

@@ -1,7 +1,9 @@
 ﻿using DoctorEngineApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class ReservationController : Controller
 {
     private readonly IReservationService _reservationService;

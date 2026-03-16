@@ -25,7 +25,8 @@ namespace DoctorEngineApp.Data
         public DbSet<Warranty> Warranties { get; set; }
         public DbSet<WarrantyJob> WarrantiesJobs { get; set; }
         public DbSet<WarrantyLogo>WarrantyLogos { get; set; }
+        public DbSet<WhatsappSetting> WhatsappSettings { get; set; }
 
 
-}
+    }
 }
