@@ -1,9 +1,10 @@
 using DoctorEngineApp.Data;
+using DoctorEngineApp.Helpers;
+using DoctorEngineApp.Hubs;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services;
 using DoctorEngineApp.Services.Implementations;
 using DoctorEngineApp.Services.Interfaces;
-using DoctorEngineApp.Helpers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,8 @@ builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 builder.Services.AddScoped<IWarrantyService, WarrantyService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IWhatsappService, WhatsappService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddSignalR();
 
 // Upload limit (2GB)
 builder.WebHost.ConfigureKestrel(o =>
@@ -104,6 +107,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<ChatHub>("/chatHub");
 
 // Area routing
 app.MapControllerRoute(

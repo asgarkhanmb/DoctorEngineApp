@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "Delete",
+    "RelativePath": "api/chat/delete/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "Edit",
+    "RelativePath": "api/chat/edit",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "vm",
+        "Type": "DoctorEngineApp.ViewModels.Chats.EditMessageVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "Send",
+    "RelativePath": "api/chat/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "vm",
+        "Type": "DoctorEngineApp.ViewModels.Chats.ChatMessageVM",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

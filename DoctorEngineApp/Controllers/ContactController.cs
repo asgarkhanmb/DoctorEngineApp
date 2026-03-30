@@ -10,27 +10,35 @@ namespace DoctorEngineApp.Controllers
         private readonly IContactInfoService _contactInfoService;
         private readonly IMapService _mapService;
         private readonly IContactMessageService _contactMessageService;
+        private readonly IChatService _chatService; // ✅ ƏLAVƏ OLUNDU
 
         public ContactController(
             IContactInfoService contactInfoService,
             IMapService mapService,
-            IContactMessageService contactMessageService)
+            IContactMessageService contactMessageService,
+            IChatService chatService) // ✅ BURDA DA ƏLAVƏ OLUNDU
         {
             _contactInfoService = contactInfoService;
             _mapService = mapService;
             _contactMessageService = contactMessageService;
+            _chatService = chatService; // ✅ ASSIGN
         }
 
+        // ================= GET =================
         public async Task<IActionResult> Index()
         {
-            return View(new ContactPageVM
+            ContactPageVM model = new ContactPageVM
             {
                 Contact = await _contactInfoService.GetFirstAsync(),
                 Map = await _mapService.GetFirstAsync(),
+                ChatMessages = await _chatService.GetAllAsync(), // ✅ CHAT
                 Message = new ContactMessageCreateVM()
-            });
+            };
+
+            return View(model);
         }
 
+        // ================= POST =================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendMessage(ContactPageVM model)
@@ -39,6 +47,8 @@ namespace DoctorEngineApp.Controllers
             {
                 model.Contact = await _contactInfoService.GetFirstAsync();
                 model.Map = await _mapService.GetFirstAsync();
+                model.ChatMessages = await _chatService.GetAllAsync(); // ⚠️ UNUTMA
+
                 return View("Index", model);
             }
 
@@ -57,14 +67,12 @@ namespace DoctorEngineApp.Controllers
                 ModelState.AddModelError(string.Empty, ex.Message);
             }
 
+            // ⚠️ HƏR HALDA YENİDƏN DOLDUR
             model.Contact = await _contactInfoService.GetFirstAsync();
             model.Map = await _mapService.GetFirstAsync();
+            model.ChatMessages = await _chatService.GetAllAsync(); // ✅ VACİB
 
             return View("Index", model);
         }
-
-
-
-
     }
 }
