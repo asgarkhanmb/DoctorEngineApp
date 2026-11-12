@@ -1,17 +1,20 @@
-﻿namespace DoctorEngineApp.ViewModels.Technicians
+﻿using System.ComponentModel.DataAnnotations;
+using DoctorEngineApp.Helpers;
+namespace DoctorEngineApp.ViewModels.Technicians
 {
     public class TechnicianEditVM
     {
         public int Id { get; set; }
 
-        public string FullName { get; set; }
-        public string Position { get; set; }
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Ad Soyadı daxil edin")] public string FullName { get; set; } = string.Empty;
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Vəzifəni daxil edin")] public string Position { get; set; } = string.Empty;
 
-        public string ExistingImage { get; set; }
-        public IFormFile Photo { get; set; }
+        public string? ExistingImage { get; set; }
+        [AllowedUpload(UploadKind.Image)]
+        public IFormFile? Photo { get; set; }
 
-        public string FacebookUrl { get; set; }
-        public string InstagramUrl { get; set; }
-        public string TiktokUrl { get; set; }
+        [System.ComponentModel.DataAnnotations.Url(ErrorMessage = "Link düzgün deyil (https:// ilə başlamalıdır)")] public string? FacebookUrl { get; set; }
+        [System.ComponentModel.DataAnnotations.Url(ErrorMessage = "Link düzgün deyil (https:// ilə başlamalıdır)")] public string? InstagramUrl { get; set; }
+        [System.ComponentModel.DataAnnotations.Url(ErrorMessage = "Link düzgün deyil (https:// ilə başlamalıdır)")] public string? TiktokUrl { get; set; }
     }
 }

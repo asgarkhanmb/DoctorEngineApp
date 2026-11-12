@@ -1,29 +1,58 @@
 ﻿@model SubServiceEditVM
-<form asp-action="Edit" enctype="multipart/form-data" method="post">
-    <input asp-for="Id" type="hidden" />
-    <div class="mb-3"><label>Title</label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger"></span></div>
-    <div class="mb-3"><label>Description</label><textarea asp-for="Description" class="form-control"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
-    <div class="mb-2">
-        Current Video:<br />
-        @if (!string.IsNullOrEmpty(Model.ExistingVideo))
-        {
-            <video width="300" controls>
-                <source src="~/uploads/subvideos/@Model.ExistingVideo" />
-            </video>
-        }
-    </div>
-    <div class="mb-3"><label>New Video (optional)</label><input asp-for="VideoFile" type="file" class="form-control" /></div>
-    <div class="mb-3">
-        <label>Category</label>
-        <select asp-for="CategoryId" class="form-control">
-            <option value="0">-- choose --</option>
-            @foreach (var c in (List<ServiceCategory>)ViewBag.Categories)
-            {
-                <option value="@c.Id">@c.Name</option>
-            }
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
+@{ ViewData["Title"] = "Videonu redaktə et"; }
 
-    </div>
-    <button class="btn btn-primary">Save</button>
-</form>
+<partial name="_PageHead" model='new AdminPageHead("Videonu redaktə et", "Kateqoriya siyahısında yalnız boş kateqoriyalar və videonun öz kateqoriyası var.", BackAction: "Index")' />
+
+<div class="adm-card" style="max-width:820px">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="adm-form">
+        <div class="adm-card__body">
+            <input asp-for="Id" type="hidden" /><input asp-for="ExistingVideo" type="hidden" />
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-7">
+                    <label asp-for="Title" class="form-label">Başlıq</label>
+                    <input asp-for="Title" class="form-control" placeholder="Məs: Mühərrik diaqnostikası və təmiri" />
+                    <span asp-validation-for="Title"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="CategoryId" class="form-label">Kateqoriya</label>
+                    <select asp-for="CategoryId" class="form-select">
+                        <option value="">— seçin —</option>
+                        @foreach (var c in (List<ServiceCategory>)ViewBag.Categories)
+                        {
+                            <option value="@c.Id" selected="@(c.Id == Model?.CategoryId)">@c.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Təsvir</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description"></span>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.ExistingVideo))
+            {
+                <div class="mb-3">
+                    <label class="form-label">Mövcud video</label>
+                    <partial name="_VideoFrame" model='new VideoFrame(Url.Content($"~/uploads/subvideos/{Model.ExistingVideo}"), "compact")' />
+                </div>
+            }
+            <div class="adm-upload">
+                <div class="adm-upload__preview" id="videoPreview"><i class="fa-solid fa-film"></i></div>
+                <div class="adm-upload__body">
+                    <label asp-for="VideoFile" class="form-label">Yeni video <small class="text-muted">(ixtiyari)</small></label>
+                    <input asp-for="VideoFile" type="file" class="form-control" accept="video/mp4,video/webm,video/quicktime" data-preview="#videoPreview" />
+                    <div class="form-text">MP4 tövsiyə olunur, maksimum 1 GB.</div>
+                    <span asp-validation-for="VideoFile"></span>
+                </div>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yadda saxla</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

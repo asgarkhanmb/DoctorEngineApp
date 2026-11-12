@@ -1,67 +1,92 @@
 ﻿@model DoctorEngineApp.ViewModels.Accounts.RegisterVM
 
 @{
-    Layout = null;
-    ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Qeydiyyat";
 }
 
-<link rel="stylesheet" href="~/css/signup.css" />
+<div class="auth-head">
+    <div class="auth-head__icon"><i class="fa-solid fa-user-plus"></i></div>
+    <h1>Hesab yaradın</h1>
+    <p>Bir dəqiqəyə qeydiyyatdan keçin — usta ilə yazışın və rezervasiya edin.</p>
+</div>
 
-<body>
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
+<form asp-action="Register" asp-controller="Account" method="post"
+      class="auth-form" novalidate data-loading-text="Hesab yaradılır…">
+
+    <div asp-validation-summary="ModelOnly" role="alert"></div>
+
+    <div class="auth-field">
+        <label asp-for="FullName">Ad Soyad</label>
+        <div class="auth-input">
+            <i class="fa-regular fa-id-card"></i>
+            <input asp-for="FullName" autocomplete="off" autofocus placeholder="Əli Məmmədov" />
+        </div>
+        <span asp-validation-for="FullName"></span>
     </div>
 
-    <form asp-action="Register" asp-controller="Account" method="post" novalidate>
-        @Html.AntiForgeryToken()
-
-        <h3>Qeydiyyat</h3>
-
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <label for="FullName">Ad Soyad</label>
-        <input asp-for="FullName" id="FullName" placeholder="Ad Soyad" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
-
-        <label for="UserName">İstifadəçi adı</label>
-        <input asp-for="UserName" id="UserName" placeholder="İstifadəçi adı" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
-
-        <label for="Email">Email</label>
-        <input asp-for="Email" id="Email" placeholder="E-poçt" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-
-        <label for="registerPassword">Parol</label>
-        <input asp-for="Password" type="password" id="registerPassword" placeholder="Şifrə" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-
-        <label for="confirmPassword">Parolu təsdiqlə</label>
-        <input asp-for="ConfirmPassword" type="password" id="confirmPassword" placeholder="Şifrəni təkrar yaz" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-
-        <button type="submit">Qeydiyyat ol</button>
-
-        <div>
-            <br />
-            Artıq hesabın var?
-            <a asp-action="Login" asp-controller="Account">Daxil Ol</a>
+    <div class="auth-row">
+        <div class="auth-field">
+            <label asp-for="UserName">İstifadəçi adı</label>
+            <div class="auth-input">
+                <i class="fa-solid fa-at"></i>
+                <input asp-for="UserName" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ali.m" />
+            </div>
+            <span asp-validation-for="UserName"></span>
         </div>
-        <br />
-        <div>
-            <a asp-controller="Home" asp-action="Index">Ana Səhifə</a>
-        </div>
-    </form>
-</body>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        function toggleRegisterPassword() {
-            var pass = document.getElementById("registerPassword");
-            var confirm = document.getElementById("confirmPassword");
-            pass.type = pass.type === "password" ? "text" : "password";
-            confirm.type = confirm.type === "password" ? "text" : "password";
-        }
-    </script>
-}
+        <div class="auth-field">
+            <label asp-for="Email">Email</label>
+            <div class="auth-input">
+                <i class="fa-regular fa-envelope"></i>
+                <input asp-for="Email" type="email" autocomplete="off" placeholder="ad@numune.az" />
+            </div>
+            <span asp-validation-for="Email"></span>
+        </div>
+    </div>
+
+    <div class="auth-field">
+        <label asp-for="Password">Şifrə</label>
+        <div class="auth-input auth-input--password">
+            <i class="fa-solid fa-lock"></i>
+            <input asp-for="Password" autocomplete="new-password" placeholder="Güclü şifrə yaradın" />
+            <button type="button" class="auth-eye" data-toggle-password="Password" aria-label="Şifrəni göstər" aria-pressed="false">
+                <i class="fa-regular fa-eye"></i>
+            </button>
+        </div>
+        <span asp-validation-for="Password"></span>
+        <small class="auth-caps" data-caps-for="Password"><i class="fa-solid fa-triangle-exclamation"></i> Caps Lock açıqdır</small>
+
+        <div class="auth-meter" data-meter-for="Password" data-level="0" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <ul class="auth-rules" data-password-rules="Password" aria-label="Şifrə tələbləri">
+            <li data-rule="length">Minimum 6 simvol</li>
+            <li data-rule="upper">Böyük hərf (A–Z)</li>
+            <li data-rule="lower">Kiçik hərf (a–z)</li>
+            <li data-rule="digit">Rəqəm (0–9)</li>
+            <li data-rule="symbol">Xüsusi simvol (! @@ # $)</li>
+        </ul>
+    </div>
+
+    <div class="auth-field">
+        <label asp-for="ConfirmPassword">Şifrə təkrarı</label>
+        <div class="auth-input auth-input--password">
+            <i class="fa-solid fa-lock"></i>
+            <input asp-for="ConfirmPassword" autocomplete="new-password" placeholder="Şifrəni təkrar yazın" />
+            <button type="button" class="auth-eye" data-toggle-password="ConfirmPassword" aria-label="Şifrəni göstər" aria-pressed="false">
+                <i class="fa-regular fa-eye"></i>
+            </button>
+        </div>
+        <span asp-validation-for="ConfirmPassword"></span>
+        <small class="auth-match" data-match-for="ConfirmPassword" data-match-with="Password"><i></i><span></span></small>
+    </div>
+
+    <button type="submit" class="auth-btn">
+        Qeydiyyatdan keç <i class="fa-solid fa-arrow-right"></i>
+    </button>
+</form>
+
+<div class="auth-switch">
+    Artıq hesabınız var? <a asp-action="Login" asp-controller="Account">Daxil olun</a>
+</div>

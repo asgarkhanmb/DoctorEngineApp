@@ -1,46 +1,81 @@
-﻿@model ContactInfoVm
+@model ContactInfoVm
+@{ ViewData["Title"] = "Əlaqə məlumatları"; }
 
-<h2>Create Contact Info</h2>
+<partial name="_PageHead" model='new AdminPageHead("Əlaqə məlumatları", "Footer və Əlaqə səhifəsində göstərilən ünvan, telefon, email, iş saatları və sosial şəbəkələr.")' />
 
-<form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label asp-for="Address" class="form-label"></label>
-        <input asp-for="Address" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Phone" class="form-label"></label>
-        <input asp-for="Phone" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="YouTube" class="form-label"></label>
-        <input asp-for="YouTube" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Facebook" class="form-label"></label>
-        <input asp-for="Facebook" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="TikTok" class="form-label"></label>
-        <input asp-for="TikTok" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="WhatsApp" class="form-label"></label>
-        <input asp-for="WhatsApp" class="form-control" />
-    </div>
+<div class="adm-card" style="max-width:900px">
+    <form asp-action="Create" method="post" class="adm-form">
+        <div class="adm-card__body">
+            
+            <div asp-validation-summary="ModelOnly"></div>
 
-    <h4>Opening Hours</h4>
-    <div class="mb-3">
-        <label asp-for="Weekdays" class="form-label">Monday - Friday</label>
-        <input asp-for="Weekdays" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="Weekend" class="form-label">Saturday - Sunday</label>
-        <input asp-for="Weekend" class="form-control" />
-    </div>
+            <div class="adm-form-section">
+                <h3>Əlaqə</h3>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Address" class="form-label">Ünvan</label>
+                        <input asp-for="Address" class="form-control" placeholder="AZ1000, Bakı, Nərimanov r., …" />
+                        <span asp-validation-for="Address"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label">Telefon</label>
+                        <input asp-for="Phone" type="tel" class="form-control" placeholder="+994 77 305 13 19" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="info@numune.az" />
+                        <span asp-validation-for="Email"></span>
+                    </div>
+                </div>
+            </div>
 
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
+            <div class="adm-form-section">
+                <h3>İş saatları</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Weekdays" class="form-label">Bazar ertəsi – Cümə</label>
+                        <input asp-for="Weekdays" class="form-control" placeholder="10:00 - 20:00" />
+                        <span asp-validation-for="Weekdays"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Weekend" class="form-label">Şənbə – Bazar</label>
+                        <input asp-for="Weekend" class="form-control" placeholder="11:00 - 18:00" />
+                        <span asp-validation-for="Weekend"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adm-form-section">
+                <h3>Sosial şəbəkələr <small class="text-muted text-lowercase">(ixtiyari — boş qalanlar saytda göstərilmir)</small></h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="WhatsApp" class="form-label"><i class="fa-brands fa-whatsapp me-1"></i> WhatsApp nömrəsi</label>
+                        <input asp-for="WhatsApp" class="form-control" placeholder="+994 77 305 13 19" />
+                        <span asp-validation-for="WhatsApp"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="YouTube" class="form-label"><i class="fa-brands fa-youtube me-1"></i> YouTube</label>
+                        <input asp-for="YouTube" type="url" class="form-control" placeholder="https://youtube.com/@@…" />
+                        <span asp-validation-for="YouTube"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Facebook" class="form-label"><i class="fa-brands fa-facebook me-1"></i> Facebook</label>
+                        <input asp-for="Facebook" type="url" class="form-control" placeholder="https://facebook.com/…" />
+                        <span asp-validation-for="Facebook"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="TikTok" class="form-label"><i class="fa-brands fa-tiktok me-1"></i> TikTok</label>
+                        <input asp-for="TikTok" type="url" class="form-control" placeholder="https://tiktok.com/@@…" />
+                        <span asp-validation-for="TikTok"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yarat</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

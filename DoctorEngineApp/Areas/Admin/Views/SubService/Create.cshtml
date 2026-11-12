@@ -1,18 +1,63 @@
 ﻿@model SubServiceCreateVM
-<form asp-action="Create" enctype="multipart/form-data" method="post">
-    <div class="mb-3"><label>Title</label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger"></span></div>
-    <div class="mb-3"><label>Description</label><textarea asp-for="Description" class="form-control"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
-    <div class="mb-3">
-        <label>Category</label>
-        <select asp-for="CategoryId" class="form-control">
-            <option value="">-- choose --</option>
-            @foreach (var c in (List<ServiceCategory>)ViewBag.Categories)
-            {
-                <option value="@c.Id">@c.Name</option>
-            }
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-    <div class="mb-3"><label>Video (max 1GB)</label><input asp-for="VideoFile" type="file" class="form-control" /></div>
-    <button class="btn btn-success">Create</button>
-</form>
+@{
+    ViewData["Title"] = "Yeni video";
+    var freeCategories = (List<ServiceCategory>)ViewBag.Categories;
+}
+
+<partial name="_PageHead" model='new AdminPageHead("Boş kateqoriyaya video", "Yalnız videosu olmayan kateqoriyalar göstərilir.", BackAction: "Index")' />
+
+@if (!freeCategories.Any())
+{
+    <div class="adm-card" style="max-width:820px"><div class="adm-empty"><i class="fa-solid fa-circle-check"></i><strong>Bütün kateqoriyaların videosu var</strong>Mövcud videonu dəyişmək üçün <a asp-controller="Category" asp-action="Index">kateqoriyanı redaktə edin</a>, ya da <a asp-controller="Category" asp-action="Create">yeni kateqoriya yaradın</a>.</div></div>
+}
+else
+{
+<div class="adm-card" style="max-width:820px">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="adm-form">
+        <div class="adm-card__body">
+            
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-7">
+                    <label asp-for="Title" class="form-label">Başlıq</label>
+                    <input asp-for="Title" class="form-control" placeholder="Məs: Mühərrik diaqnostikası və təmiri" />
+                    <span asp-validation-for="Title"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="CategoryId" class="form-label">Kateqoriya</label>
+                    <select asp-for="CategoryId" class="form-select">
+                        <option value="">— seçin —</option>
+                        @foreach (var c in freeCategories)
+                        {
+                            <option value="@c.Id" selected="@(c.Id == Model?.CategoryId)">@c.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="CategoryId"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Təsvir</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description"></span>
+            </div>
+            
+            <div class="adm-upload">
+                <div class="adm-upload__preview" id="videoPreview"><i class="fa-solid fa-film"></i></div>
+                <div class="adm-upload__body">
+                    <label asp-for="VideoFile" class="form-label">Video *</label>
+                    <input asp-for="VideoFile" type="file" class="form-control" accept="video/mp4,video/webm,video/quicktime" data-preview="#videoPreview" />
+                    <div class="form-text">MP4 tövsiyə olunur, maksimum 1 GB.</div>
+                    <span asp-validation-for="VideoFile"></span>
+                </div>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Əlavə et</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
+
+}
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

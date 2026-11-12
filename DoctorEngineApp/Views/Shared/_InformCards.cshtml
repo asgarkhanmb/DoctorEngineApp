@@ -1,0 +1,31 @@
+@* Xüsusiyyət kartları (Keyfiyyətli Xidmət, Ekspert İşçilər ...) — Ana səhifə, Haqqımızda, Rezervasiya *@
+@using DoctorEngineApp.ViewModels.Infroms
+@model List<InformVM>
+
+@if (Model != null && Model.Any())
+{
+    <div class="container-xxl py-5">
+        <div class="container">
+            <div class="row g-4">
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var item = Model[i];
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="@($"{i * 0.12 + 0.1:0.00}s")">
+                        <div class="de-feature">
+                            @if (!string.IsNullOrEmpty(item.Icon))
+                            {
+                                <div class="de-feature__icon">
+                                    <img src="@item.Icon" alt="" loading="lazy" />
+                                </div>
+                            }
+                            <div>
+                                <h5>@item.Title</h5>
+                                <p>@item.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

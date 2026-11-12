@@ -1,16 +1,24 @@
-﻿@model ContactMessage
+@model ContactMessage
+@{
+    ViewData["Title"] = "Mesaj";
+}
 
-<h2>Mesaj Detalı</h2>
+<partial name="_PageHead" model='new AdminPageHead(Model.Subject, $"{Model.FullName} · {Model.CreatedDate:dd.MM.yyyy HH:mm}", BackAction: "Index")' />
 
-<div class="card">
-    <div class="card-body">
-        <p><b>Ad:</b> @Model.FullName</p>
-        <p><b>Email:</b> @Model.Email</p>
-        <p><b>Mövzu:</b> @Model.Subject</p>
-        <p><b>Mesaj:</b></p>
-        <p>@Model.Message</p>
-        <p><b>Tarix:</b> @Model.CreatedDate</p>
+<div class="adm-card" style="max-width:820px">
+    <div class="adm-card__body">
+        <dl class="adm-dl mb-4">
+            <dt>Ad Soyad</dt><dd>@Model.FullName</dd>
+            <dt>Email</dt><dd><a href="mailto:@Model.Email">@Model.Email</a></dd>
+            <dt>Mövzu</dt><dd>@Model.Subject</dd>
+            <dt>Tarix</dt><dd>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</dd>
+        </dl>
+        <div class="adm-message-body">@Model.Message</div>
+    </div>
+    <div class="adm-form-actions">
+        <a href="mailto:@Model.Email?subject=@Uri.EscapeDataString("Re: " + Model.Subject)" class="btn btn-primary"><i class="fa-solid fa-reply"></i> Email ilə cavab ver</a>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="ms-auto">
+            <button type="submit" class="btn btn-light text-danger" data-confirm="Mesaj silinsin?"><i class="fa-regular fa-trash-can"></i> Sil</button>
+        </form>
     </div>
 </div>
-
-<a asp-action="Index" class="btn btn-secondary mt-3">Geri</a>

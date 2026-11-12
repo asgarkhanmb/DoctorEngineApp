@@ -1,0 +1,100 @@
+@* Rezervasiya bloku. İstifadə: <partial name="_BookingForm" for="Reservation" />
+   ("for" sahə adlarına "Reservation." prefiksini əlavə edir — controller [Bind(Prefix = "Reservation")] gözləyir) *@
+@using DoctorEngineApp.Helpers
+@model ReservationCreateVM
+@{
+    var now = AzTime.Now;
+    var min = now.ToString("yyyy-MM-ddTHH:mm");
+    var max = now.AddDays(10).ToString("yyyy-MM-ddTHH:mm");
+}
+
+<div class="container-fluid bg-secondary booking my-5">
+    <div class="container">
+        <div class="row gx-5 align-items-center">
+
+            <div class="col-lg-6 py-5 wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="text-primary text-uppercase">Onlayn rezervasiya</h6>
+                <h1 class="text-white mb-4">Etibarlı Avtomobil Təmiri Xidməti</h1>
+                <p class="text-white-50 mb-0">
+                    Müasir avadanlıqlarımız və peşəkar komandamız sayəsində mühərrikinizi sürətli, rahat və
+                    təhlükəsiz şəkildə təmir etdirə bilərsiniz. Öncədən rezerv edin — növbə gözləmədən xidmət alın.
+                </p>
+                <ul class="de-perks">
+                    <li><i class="fa-regular fa-clock"></i> İş saatları: 10:00 – 20:00</li>
+                    <li><i class="fa-brands fa-whatsapp"></i> Təsdiq WhatsApp ilə göndərilir</li>
+                    <li><i class="fa-regular fa-calendar"></i> 10 günə qədər öncədən rezerv</li>
+                </ul>
+            </div>
+
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.25s">
+                <div class="bg-primary p-5 text-center">
+
+                    <h2 class="text-white mb-1">Öncədən Rezervasiya</h2>
+                    <p class="text-white-50 mb-4">Formu doldurun, sizinlə tezliklə əlaqə saxlayaq.</p>
+
+                    <form id="reservationForm" asp-controller="Reservation" asp-action="CreateReservation" method="post" novalidate>
+
+                        <div class="row g-3 text-start">
+
+                            <div class="col-12 col-sm-6">
+                                <label class="visually-hidden" asp-for="FullName">Ad Soyad</label>
+                                <input asp-for="FullName" class="form-control" autocomplete="off" required placeholder="Ad Soyad" />
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="visually-hidden" asp-for="Phone">Telefon</label>
+                                <input asp-for="Phone" id="phoneInput" type="tel" class="form-control" autocomplete="off" required placeholder="+994 XX XXX XX XX" />
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="visually-hidden" asp-for="ServiceId">Xidmət</label>
+                                <select asp-for="ServiceId" class="form-select" required>
+                                    <option value="">Xidmət seçin</option>
+                                    @foreach (var s in Model.Services)
+                                    {
+                                        <option value="@s.Id">@s.Name</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <label class="visually-hidden" asp-for="DateTime">Tarix və saat</label>
+                                <input asp-for="DateTime" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}"
+                                       min="@min" max="@max" step="60" class="form-control" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="visually-hidden" asp-for="Note">Qeyd</label>
+                                <textarea asp-for="Note" class="form-control" rows="3"
+                                          placeholder="Əlavə qeyd (məs: avtomobil modeli, ili, mühərrik həcmi)"></textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="de-check" for="sameAsPhone">
+                                    <input type="checkbox" id="sameAsPhone" />
+                                    WhatsApp nömrəsi telefonla eyni olsun
+                                </label>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="visually-hidden" asp-for="WhatsApp">WhatsApp</label>
+                                <input asp-for="WhatsApp" id="whatsappInput" type="tel" class="form-control" required placeholder="WhatsApp: +994 XX XXX XX XX" />
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100 py-3">
+                                    <i class="fa-regular fa-calendar-check me-2"></i> Rezerv Edin
+                                </button>
+                            </div>
+
+                        </div>
+
+                        <div id="reservationMessage" class="mt-3" role="status" aria-live="polite"></div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -128,22 +128,37 @@ namespace DoctorEngineApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("AttachmentType")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EditedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsEdited")
                         .HasColumnType("bit");
 
                     b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("SenderIsAdmin")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
@@ -315,32 +330,6 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("Informs");
                 });
 
-            modelBuilder.Entity("DoctorEngineApp.Models.JobCatalog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DefaultWarrantyMonths")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("JobCatalogs");
-                });
-
             modelBuilder.Entity("DoctorEngineApp.Models.Map", b =>
                 {
                     b.Property<int>("Id")
@@ -436,10 +425,6 @@ namespace DoctorEngineApp.Migrations
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("WhatsApp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Services");
@@ -471,6 +456,39 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("ServiceCategories");
                 });
 
+            modelBuilder.Entity("DoctorEngineApp.Models.SiteSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LogoIcon")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("LogoImage")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("SiteName")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SiteSettings");
+                });
+
             modelBuilder.Entity("DoctorEngineApp.Models.Slider", b =>
                 {
                     b.Property<int>("Id")
@@ -487,7 +505,6 @@ namespace DoctorEngineApp.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image2")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("SoftDeleted")
@@ -587,7 +604,7 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("Technicians");
                 });
 
-            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyJob", b =>
+            modelBuilder.Entity("DoctorEngineApp.Models.Warranty", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -598,8 +615,43 @@ namespace DoctorEngineApp.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("JobCatalogId")
+                    b.Property<string>("CustomerFullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Terms")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VehicleModel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehicleYear")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Warranties");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PartName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("SoftDeleted")
                         .HasColumnType("bit");
@@ -607,43 +659,14 @@ namespace DoctorEngineApp.Migrations
                     b.Property<int>("WarrantyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WarrantyMonths")
+                    b.Property<int>("WarrantyMonth")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("JobCatalogId");
 
                     b.HasIndex("WarrantyId");
 
-                    b.ToTable("WarrantiesJobs");
-                });
-
-            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyLogo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImagePath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("WarrantyLogos");
+                    b.ToTable("WarrantyItems");
                 });
 
             modelBuilder.Entity("DoctorEngineApp.Models.WhatsappSetting", b =>
@@ -806,61 +829,6 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Warranty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Fuel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Master")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("SoftDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Terms")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("WarrantyLogoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WarrantyLogoId");
-
-                    b.ToTable("Warranties");
-                });
-
             modelBuilder.Entity("DoctorEngineApp.Models.Reservation", b =>
                 {
                     b.HasOne("DoctorEngineApp.Models.Service", "Service")
@@ -883,21 +851,13 @@ namespace DoctorEngineApp.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyJob", b =>
+            modelBuilder.Entity("DoctorEngineApp.Models.WarrantyItem", b =>
                 {
-                    b.HasOne("DoctorEngineApp.Models.JobCatalog", "JobCatalog")
-                        .WithMany()
-                        .HasForeignKey("JobCatalogId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Warranty", "Warranty")
-                        .WithMany("Jobs")
+                    b.HasOne("DoctorEngineApp.Models.Warranty", "Warranty")
+                        .WithMany("Items")
                         .HasForeignKey("WarrantyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("JobCatalog");
 
                     b.Navigation("Warranty");
                 });
@@ -953,15 +913,6 @@ namespace DoctorEngineApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Warranty", b =>
-                {
-                    b.HasOne("DoctorEngineApp.Models.WarrantyLogo", "WarrantyLogo")
-                        .WithMany()
-                        .HasForeignKey("WarrantyLogoId");
-
-                    b.Navigation("WarrantyLogo");
-                });
-
             modelBuilder.Entity("DoctorEngineApp.Models.Service", b =>
                 {
                     b.Navigation("Reservations");
@@ -972,9 +923,9 @@ namespace DoctorEngineApp.Migrations
                     b.Navigation("SubServices");
                 });
 
-            modelBuilder.Entity("Warranty", b =>
+            modelBuilder.Entity("DoctorEngineApp.Models.Warranty", b =>
                 {
-                    b.Navigation("Jobs");
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,27 +1,34 @@
-﻿@model UserAddRoleVM
-
-
+@model UserAddRoleVM
 @{
-    ViewData["Title"] = "AddRole";
+    ViewData["Title"] = "Rol ver";
 }
 
-<main id="main" class="main">
-    <div class="container mt-5">
-        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
-        <form method="post" asp-action="AddRole" enctype="multipart/form-data">
+<partial name="_PageHead" model='new AdminPageHead("Rol ver", "İstifadəçiyə yeni rol əlavə edin. “Admin” rolu bu panelə tam giriş verir.", BackAction: "Index")' />
 
-            <div class="form-group">
-                <label for="category">Users</label>
-                <select asp-for="UsernameId" asp-items="@ViewBag.users" class="form-control"></select>
+<div class="adm-card" style="max-width:560px">
+    <form asp-action="AddRole" method="post" class="adm-form">
+        <div class="adm-card__body">
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="mb-3">
+                <label asp-for="UsernameId" class="form-label">İstifadəçi</label>
+                <select asp-for="UsernameId" asp-items="@ViewBag.users" class="form-select">
+                    <option value="">— seçin —</option>
+                </select>
+                <span asp-validation-for="UsernameId"></span>
             </div>
-            <div class="form-group">
-                <label for="category">Roles</label>
-                <select asp-for="RoleId" asp-items="@ViewBag.roles" class="form-control"></select>
+            <div>
+                <label asp-for="RoleId" class="form-label">Rol</label>
+                <select asp-for="RoleId" asp-items="@ViewBag.roles" class="form-select">
+                    <option value="">— seçin —</option>
+                </select>
+                <span asp-validation-for="RoleId"></span>
             </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Rol ver</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
 
-
-            <button type="submit" class="btn btn-primary mr-2 mt-3">Submit</button>
-            <a asp-action="Index" class="btn btn-light mr-2 mt-3">Cancel</a>
-        </form>
-    </div>
-</main>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

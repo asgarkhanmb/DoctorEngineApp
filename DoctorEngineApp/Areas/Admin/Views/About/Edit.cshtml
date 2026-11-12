@@ -1,43 +1,49 @@
 ﻿@model AboutEditVM
+@{ ViewData["Title"] = "Haqqımızda — redaktə"; }
 
-<h2>About Düzəliş</h2>
+<partial name="_PageHead" model='new AdminPageHead("Redaktə et", BackAction: "Index")' />
 
-<form asp-action="Edit" enctype="multipart/form-data" method="post">
-    <input asp-for="Id" type="hidden" />
+<div class="adm-card" style="max-width:820px">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="adm-form">
+        <div class="adm-card__body">
+            <input asp-for="Id" type="hidden" /><input asp-for="CurrentVideo" type="hidden" />
+            <div asp-validation-summary="ModelOnly"></div>
 
-    <div class="mb-3">
-        <label>Title</label>
-        <input asp-for="Title" class="form-control" />
-    </div>
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Başlıq</label>
+                <input asp-for="Title" class="form-control" maxlength="200" placeholder="Məs: DoctorEngine Avtomobil Baxımı üçün ən yaxşı məkandır" />
+                <span asp-validation-for="Title"></span>
+            </div>
 
-    <div class="mb-3">
-        <label>Description</label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-    </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Mətn</label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description"></span>
+            </div>
 
-    <div class="mb-3">
-        <label>Mövcud Video</label><br />
-        @if (!string.IsNullOrEmpty(Model.CurrentVideo))
-        {
-            <video width="400" controls>
-                <source src="@Model.CurrentVideo" />
-            </video>
-        }
-        else
-        {
-            <p>Video yoxdur</p>
-        }
-    </div>
+            @if (!string.IsNullOrEmpty(Model.CurrentVideo))
+            {
+                <div class="mb-3">
+                    <label class="form-label">Mövcud video</label>
+                    <partial name="_VideoFrame" model='new VideoFrame(Url.Content(Model.CurrentVideo), "compact")' />
+                </div>
+            }
 
-    <div class="mb-3">
-        <label>Yeni Video yüklə (isteğe bağlı, maksimum 1GB)</label>
-        <input asp-for="VideoFile" type="file" accept="video/*" class="form-control" />
-    </div>
+            <div class="adm-upload">
+                <div class="adm-upload__preview" id="videoPreview"><i class="fa-solid fa-film"></i></div>
+                <div class="adm-upload__body">
+                    <label asp-for="VideoFile" class="form-label">Yeni video <small class="text-muted">(ixtiyari — mövcudu əvəz edir)</small></label>
+                    <input asp-for="VideoFile" type="file" class="form-control" accept="video/mp4,video/webm,video/quicktime" data-preview="#videoPreview" />
+                    <div class="form-text">MP4 tövsiyə olunur, maksimum 1 GB.</div>
+                    <span asp-validation-for="VideoFile"></span>
+                </div>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yadda saxla</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
 
-    <button class="btn btn-primary">Yadda saxla</button>
-    <a asp-action="Index" class="btn btn-secondary">Geri</a>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

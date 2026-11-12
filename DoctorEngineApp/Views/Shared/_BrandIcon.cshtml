@@ -1,0 +1,10 @@
+@* Sayt loqosu: yüklənmiş şəkil varsa o, yoxdursa seçilmiş ikon. Admin → Sayt ayarları *@
+@model DoctorEngineApp.Models.SiteSetting
+@if (!string.IsNullOrEmpty(Model.LogoImage))
+{
+    <img src="~/uploads/site/@Model.LogoImage" alt="" class="de-brand-logo" />
+}
+else
+{
+    <i class="@Model.LogoIcon" aria-hidden="true"></i>
+}

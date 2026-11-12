@@ -1,12 +1,18 @@
-﻿using DoctorEngineApp.Models;
+using DoctorEngineApp.ViewModels.Chats;
 
 namespace DoctorEngineApp.Services.Interfaces
 {
     public interface IChatService
     {
-        Task<List<ChatMessage>> GetAllAsync();
-        Task<ChatMessage> AddAsync(string message, string username);
-        Task DeleteAsync(int id, string username);
-        Task<ChatMessage> UpdateAsync(int id, string message, string username);
+        /// <summary>Son mesajlar (köhnədən yeniyə). beforeId verilərsə ondan əvvəlkilər.</summary>
+        Task<ChatPageDto> GetPageAsync(int? beforeId, int take);
+
+        Task<ChatResult> SendAsync(ChatSendVM vm, string username, bool isAdmin);
+
+        /// <summary>Yalnız mesajın sahibi redaktə edə bilər.</summary>
+        Task<ChatResult> EditAsync(ChatEditVM vm, string username);
+
+        /// <summary>Sahibi və ya admin silə bilər. Uğurlu olarsa true.</summary>
+        Task<bool> DeleteAsync(int id, string username, bool isAdmin);
     }
 }

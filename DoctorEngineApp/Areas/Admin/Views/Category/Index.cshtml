@@ -1,25 +1,67 @@
 ﻿@model List<CategoryVM>
+@{ ViewData["Title"] = "Kateqoriyalar"; }
 
-<h2>Categories</h2>
-<a asp-action="Create" class="btn btn-success mb-2">Create</a>
-<table class="table">
-    <thead><tr><th>Icon</th><th>Name</th><th>Actions</th></tr></thead>
-    <tbody>
-        @foreach (var c in Model)
-        {
-            <tr>
-                <td>
-                    @if (!string.IsNullOrEmpty(c.Icon))
+<partial name="_PageHead" model='new AdminPageHead("Kateqoriyalar", "Xidmətlər səhifəsindəki tablar. Hər kateqoriyanın bir videosu olur — videonu kateqoriyanın redaktə səhifəsindən əlavə edin və ya dəyişin.", "Yeni kateqoriya", "Create")' />
+
+<div class="adm-card">
+    @if (!Model.Any())
+    {
+        <div class="adm-empty"><i class="fa-solid fa-layer-group"></i><strong>Hələ kateqoriya yoxdur</strong></div>
+    }
+    else
+    {
+        <div class="adm-table-wrap">
+            <table class="adm-table">
+                <thead><tr><th style="width:70px">İkon</th><th>Kateqoriya</th><th>Video</th><th class="adm-actions-col"></th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model)
                     {
-                        <img src="~/uploads/categories/@c.Icon" width="50" />
+                        var video = c.SubServices.FirstOrDefault();
+                        var extra = c.SubServices.Count - 1;
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(c.Icon))
+                                {
+                                    <img src="~/uploads/categories/@c.Icon" alt="" class="adm-thumb is-square is-contain" />
+                                }
+                            </td>
+                            <td class="adm-cell-title">@c.Name</td>
+                            <td>
+                                @if (video == null)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@c.Id" class="adm-badge is-pending text-decoration-none"><i class="fa-solid fa-plus"></i> Video əlavə et</a>
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if (!string.IsNullOrEmpty(video.Video))
+                                        {
+                                            <partial name="_VideoFrame" model='new VideoFrame(Url.Content($"~/uploads/subvideos/{video.Video}"), "thumb")' />
+                                        }
+                                        <div>
+                                            <div class="adm-cell-title">@video.Title</div>
+                                            @if (extra > 0)
+                                            {
+                                                <span class="adm-badge is-rejected mt-1"><i class="fa-solid fa-triangle-exclamation"></i> +@extra artıq video — düzəldin</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="adm-badge is-confirmed mt-1"><i class="fa-solid fa-check"></i> Saytda</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </td>
+                            <td class="adm-actions-col">
+                                <div class="adm-actions">
+                                    <a asp-action="Edit" asp-route-id="@c.Id" class="adm-act" title="Redaktə et (ad, ikon, video)" aria-label="Redaktə et"><i class="fa-solid fa-pen"></i></a>
+                                    <partial name="_DeleteButton" model='new AdminDeleteButton("Delete", c.Id, $"“{c.Name}” kateqoriyası silinsin? Videosu da silinəcək.")' />
+                                </div>
+                            </td>
+                        </tr>
                     }
-                </td>
-                <td>@c.Name</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@c.Id" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

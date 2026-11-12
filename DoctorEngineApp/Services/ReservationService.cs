@@ -1,4 +1,5 @@
 ﻿using DoctorEngineApp.Data;
+using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Reservations;
@@ -15,46 +16,70 @@ namespace DoctorEngineApp.Services
             _context = context;
         }
 
-        public async Task CreateAsync(ReservationCreateVM model)
+        private const int OpeningHour = 10;
+        private const int ClosingHour = 20;
+        private const int MaxDaysAhead = 10;
+
+        public async Task<ReservationResult> TryCreateAsync(ReservationCreateVM model)
         {
+            // Formdan gələn tarix istifadəçinin seçdiyi Bakı vaxtıdır — heç bir çevirmə edilmir,
+            // müqayisə də serverin deyil, Bakının hazırkı vaxtı ilə aparılır.
+            var dateTime = DateTime.SpecifyKind(model.DateTime, DateTimeKind.Unspecified);
+            dateTime = dateTime.AddSeconds(-dateTime.Second).AddMilliseconds(-dateTime.Millisecond);
+            var now = AzTime.Now;
+
+            if (dateTime < now)
+                return ReservationResult.Fail("Keçmiş tarix üçün rezervasiya edilə bilməz.");
+
+            if (dateTime.Hour < OpeningHour || dateTime.Hour >= ClosingHour)
+                return ReservationResult.Fail($"Rezervasiya yalnız {OpeningHour}:00 – {ClosingHour}:00 arası mümkündür.");
+
+            if (dateTime > now.AddDays(MaxDaysAhead))
+                return ReservationResult.Fail($"Rezervasiya maksimum {MaxDaysAhead} gün öncədən edilə bilər.");
+
+            bool serviceExists = await _context.Services.AnyAsync(s => s.Id == model.ServiceId);
+            if (!serviceExists)
+                return ReservationResult.Fail("Seçilən xidmət tapılmadı.");
+
+            var phone = model.Phone.Trim();
+            var dayStart = dateTime.Date;
+            var dayEnd = dayStart.AddDays(1);
+
             // 1️⃣ Eyni nömrə – eyni gün
             bool phoneExists = await _context.Reservations.AnyAsync(r =>
-                r.Phone == model.Phone &&
-                r.DateTime.Date == model.DateTime.Date &&
+                r.Phone == phone &&
+                r.DateTime >= dayStart && r.DateTime < dayEnd &&
                 r.Status != "Rejected");
 
             if (phoneExists)
-                throw new InvalidOperationException(
-                    "Bu telefon nömrəsi ilə bu gün üçün artıq rezervasiya edilib.");
+                return ReservationResult.Fail("Bu telefon nömrəsi ilə bu gün üçün artıq rezervasiya edilib.");
 
-            // 2️⃣ Eyni saat – eyni xidmət
+            // 2️⃣ Eyni dəqiqə – eyni xidmət
+            var slotEnd = dateTime.AddMinutes(1);
             bool timeBusy = await _context.Reservations.AnyAsync(r =>
                 r.ServiceId == model.ServiceId &&
-                r.DateTime.Year == model.DateTime.Year &&
-                r.DateTime.Month == model.DateTime.Month &&
-                r.DateTime.Day == model.DateTime.Day &&
-                r.DateTime.Hour == model.DateTime.Hour &&
-                r.DateTime.Minute == model.DateTime.Minute &&
+                r.DateTime >= dateTime && r.DateTime < slotEnd &&
                 r.Status != "Rejected");
 
             if (timeBusy)
-                throw new InvalidOperationException(
-                    "Seçilən tarix və saat artıq rezerv olunub.");
+                return ReservationResult.Fail("Seçilən tarix və saat artıq rezerv olunub.");
 
-            Reservation reservation = new Reservation
+            var reservation = new Reservation
             {
-                FullName = model.FullName,
-                Phone = model.Phone,
-                WhatsApp = model.WhatsApp,
+                FullName = model.FullName.Trim(),
+                Phone = phone,
+                WhatsApp = model.WhatsApp.Trim(),
                 ServiceId = model.ServiceId,
-                DateTime = model.DateTime,
+                DateTime = dateTime,
                 Status = "Pending",
-                Note = model.Note,
+                Note = model.Note?.Trim() ?? string.Empty,
                 RejectionReason = ""
             };
 
             await _context.Reservations.AddAsync(reservation);
             await _context.SaveChangesAsync();
+
+            return ReservationResult.Ok("Rezervasiya qəbul edildi. WhatsApp üzərindən əlaqə saxlanılacaq.");
         }
 
 
@@ -71,7 +96,6 @@ namespace DoctorEngineApp.Services
                     Phone = r.Phone,
                     WhatsApp = r.WhatsApp,
                     ServiceName = r.Service.Name,
-                    ServiceWhatsApp = r.Service.WhatsApp,
                     DateTime = r.DateTime,
                     Note = r.Note,
                     Status = r.Status,
@@ -138,14 +162,6 @@ namespace DoctorEngineApp.Services
                     // Admin browserdə klikləyib göndərə bilər
                 }
             }
-        }
-        public async Task<bool> ExistsAsync(string phone, int serviceId, DateTime dateTime)
-        {
-            return await _context.Reservations.AnyAsync(r =>
-                r.Phone == phone &&
-                r.ServiceId == serviceId &&
-                r.DateTime == dateTime
-            );
         }
 
     }

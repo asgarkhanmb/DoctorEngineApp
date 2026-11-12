@@ -1,57 +1,27 @@
-﻿@model DoctorEngineApp.Models.WhatsappSetting
+@model DoctorEngineApp.Models.WhatsappSetting
+@{ ViewData["Title"] = "WhatsApp düyməsi"; }
 
-<div class="container mt-4">
+<partial name="_PageHead" model='new AdminPageHead("WhatsApp düyməsi", "Saytın sağ aşağı küncündəki yaşıl WhatsApp düyməsi — hansı nömrəyə və hansı hazır mesajla yazılacaq.", Model == null ? "Ayarla" : null, Model == null ? "Create" : null)' />
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>WhatsApp Ayarları</h3>
-
-        <a asp-action="Create" class="btn btn-primary">
-            Yeni Əlavə Et
-        </a>
-    </div>
-
-    @if (Model != null)
-    {
-        <table class="table table-bordered table-striped">
-
-            <thead>
-                <tr>
-                    <th>Nömrə</th>
-                    <th>Mesaj</th>
-                    <th style="width:150px">Əməliyyat</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr>
-                    <td>@Model.PhoneNumber</td>
-                    <td>@Model.Message</td>
-
-                    <td>
-
-                        <a asp-action="Edit"
-                           asp-route-id="@Model.Id"
-                           class="btn btn-warning btn-sm">
-                            Edit
-                        </a>
-
-                        <a asp-action="Delete"
-                           asp-route-id="@Model.Id"
-                           class="btn btn-danger btn-sm">
-                            Delete
-                        </a>
-                    </td>
-
-                </tr>
-            </tbody>
-
-        </table>
-    }
-    else
-    {
-        <div class="alert alert-info">
-            Hələ WhatsApp ayarı əlavə edilməyib.
+@if (Model == null)
+{
+    <div class="adm-card"><div class="adm-empty"><i class="fa-brands fa-whatsapp"></i><strong>WhatsApp düyməsi ayarlanmayıb</strong>Ayarlanmasa, saytda düymə göstərilmir.</div></div>
+}
+else
+{
+    <div class="adm-card" style="max-width:720px">
+        <div class="adm-card__body d-flex gap-3 align-items-start">
+            <span class="adm-stat__icon is-green"><i class="fa-brands fa-whatsapp"></i></span>
+            <dl class="adm-dl flex-grow-1 mb-0">
+                <dt>Nömrə</dt><dd><a href="https://wa.me/@Model.PhoneNumber.Replace("+", "").Replace(" ", "")" target="_blank" rel="noopener">@Model.PhoneNumber</a></dd>
+                <dt>Hazır mesaj</dt><dd>@(string.IsNullOrWhiteSpace(Model.Message) ? "—" : Model.Message)</dd>
+            </dl>
         </div>
-    }
-
-</div>
+        <div class="adm-form-actions">
+            <a asp-action="Edit" class="btn btn-primary"><i class="fa-solid fa-pen"></i> Redaktə et</a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="ms-auto">
+                <button type="submit" class="btn btn-light text-danger" data-confirm="WhatsApp düyməsi silinsin?" data-confirm-text="Saytda WhatsApp düyməsi görünməyəcək."><i class="fa-regular fa-trash-can"></i> Sil</button>
+            </form>
+        </div>
+    </div>
+}

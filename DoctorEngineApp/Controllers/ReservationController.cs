@@ -1,4 +1,5 @@
 ﻿using DoctorEngineApp.Data;
+using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.ContactPhones;
 using DoctorEngineApp.ViewModels.Infroms;
@@ -15,17 +16,20 @@ namespace DoctorEngineApp.Controllers
         private readonly IReservationService _reservationService;
         private readonly IContactPhoneService _contactPhoneService;
         private readonly AppDbContext _db;
+        private readonly ILogger<ReservationController> _logger;
 
         public ReservationController(
             IInformService informService,
             IReservationService reservationService,
             IContactPhoneService contactPhoneService,
-            AppDbContext db)
+            AppDbContext db,
+            ILogger<ReservationController> logger)
         {
             _informService = informService;
             _reservationService = reservationService;
             _contactPhoneService = contactPhoneService;
             _db = db;
+            _logger = logger;
         }
         public async Task<IActionResult> Index()
         {
@@ -57,7 +61,7 @@ namespace DoctorEngineApp.Controllers
                 Reservation = new ReservationCreateVM
                 {
                     Services = services,
-                    DateTime = DateTime.Now.AddHours(1)
+                    DateTime = AzTime.Now.AddHours(1)
                 },
 
                 ContactPhone = contactPhone ?? new ContactPhoneVM()
@@ -75,42 +79,24 @@ namespace DoctorEngineApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = "Məlumatları düzgün doldurun!" });
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
+
+                return Json(new { success = false, message = firstError ?? "Məlumatları düzgün doldurun!" });
             }
 
-            if (model.DateTime < DateTime.Now)
+            try
             {
-                return Json(new { success = false, message = "Keçmiş tarix olmaz!" });
+                var result = await _reservationService.TryCreateAsync(model);
+                return Json(new { success = result.Success, message = result.Message });
             }
-
-            if (model.DateTime.Hour < 10 || model.DateTime.Hour >= 20)
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Saat 10:00 – 20:00 arası mümkündür." });
+                _logger.LogError(ex, "Rezervasiya yaradılarkən xəta");
+                return Json(new { success = false, message = "Xəta baş verdi. Yenidən cəhd edin." });
             }
-
-            if (model.DateTime > DateTime.Now.AddDays(10))
-            {
-                return Json(new { success = false, message = "Maksimum 10 gün öncədən olar." });
-            }
-
-            bool exists = await _reservationService.ExistsAsync(
-                model.Phone,
-                model.ServiceId,
-                model.DateTime
-            );
-
-            if (exists)
-            {
-                return Json(new { success = false, message = "Bu rezervasiya artıq var." });
-            }
-
-            await _reservationService.CreateAsync(model);
-
-            return Json(new
-            {
-                success = true,
-                message = "Rezervasiya qəbul edildi. WhatsApp ilə əlaqə saxlanılacaq."
-            });
         }
     }
 }

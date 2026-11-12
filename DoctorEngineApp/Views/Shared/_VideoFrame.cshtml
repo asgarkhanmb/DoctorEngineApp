@@ -1,0 +1,19 @@
+@* Vahid video çərçivəsi: 16:9, kəsilmir, şaquli videoların yanları bulanıq fonla dolur.
+   İstifadə: <partial name="_VideoFrame" model='new VideoFrame(Url.Content("~/uploads/..."))' /> *@
+@model DoctorEngineApp.ViewModels.VideoFrame
+@{
+    var thumb = Model.Variant == "thumb";
+    // #t=0.5 — ilk qara kadr yerinə videonun əvvəlindən bir kadr görünsün
+    var src = Model.Src.Contains('#') ? Model.Src : Model.Src + "#t=0.5";
+}
+<div class="@(string.IsNullOrEmpty(Model.Variant) ? "de-video" : "de-video is-" + Model.Variant)">
+    <canvas class="de-video__backdrop" aria-hidden="true"></canvas>
+    @if (thumb)
+    {
+        <video class="de-video__player" src="@src" preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
+    }
+    else
+    {
+        <video class="de-video__player" id="@Model.Id" src="@src" controls preload="metadata" playsinline></video>
+    }
+</div>

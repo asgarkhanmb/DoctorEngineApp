@@ -1,38 +1,29 @@
-﻿
-@{
-    Layout = null;
-    ViewData["Title"] = "Email Təsdiqi";
+﻿@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Emaili təsdiqləyin";
 }
 
-<link rel="stylesheet" href="~/css/auth.css" />
+<div class="auth-head">
+    <div class="auth-head__icon"><i class="fa-regular fa-envelope-open"></i></div>
+    <h1>Emailinizi yoxlayın</h1>
+    <p>Qeydiyyat uğurla tamamlandı! Email ünvanınıza təsdiq linki göndərdik.</p>
+</div>
 
-<body>
-
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
+<div class="auth-form">
+    <div class="auth-alert auth-alert--ok" role="status">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Məktubdakı <strong>“Təsdiqlə”</strong> linkinə klik edin, sonra hesabınıza daxil ola bilərsiniz.</span>
     </div>
 
-    <form>
+    <small class="auth-hint">
+        <i class="fa-regular fa-lightbulb"></i>
+        Məktubu görmürsünüz? “Spam” və ya “Promotions” qovluğunu yoxlayın.
+    </small>
 
-        <h3>Emailinizi Təsdiqləyin</h3>
-
-        <p style="text-align:center; font-size:14px; margin-top:10px;">
-            Qeydiyyat uğurla tamamlandı.
-            <br /><br />
-            Email ünvanınıza təsdiq linki göndərildi.
-            <br />
-            Zəhmət olmasa mailinizi yoxlayın və linkə klik edin.
-        </p>
-        <div class="footer">
-            <a asp-controller="Account" asp-action="Login">
-                Daxil Ol
-            </a>
-        </div>
-        <div style="margin-top:20px; text-align:center;">
-            <a asp-controller="Home" asp-action="Index">Ana Səhifəyə Qayıt</a>
-        </div>
-
-    </form>
-
-</body>
+    <a asp-controller="Account" asp-action="Login" class="auth-btn">
+        Daxil ol <i class="fa-solid fa-arrow-right"></i>
+    </a>
+    <a asp-controller="Home" asp-action="Index" class="auth-btn auth-btn--ghost">
+        Ana səhifəyə qayıt
+    </a>
+</div>

@@ -1,28 +1,55 @@
 ﻿@model List<SubServiceVM>
-<h2>SubServices</h2>
-<a asp-action="Create" class="btn btn-success mb-2">Create</a>
-<table class="table">
-    <thead><tr><th>Title</th><th>Category</th><th>Video</th><th>Actions</th></tr></thead>
-    <tbody>
-        @foreach (var s in Model)
-        {
-            <tr>
-                <td>@s.Title</td>
-                <td>@s.CategoryName</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(s.Video))
+@{ ViewData["Title"] = "Kateqoriya videoları"; }
+
+<partial name="_PageHead" model='new AdminPageHead("Kateqoriya videoları", "Hər kateqoriyada bir video göstərilir. Videonu kateqoriyanın öz səhifəsindən də dəyişə bilərsiniz.", "Boş kateqoriyaya video", "Create")' />
+
+<div class="adm-card">
+    @if (!Model.Any())
+    {
+        <div class="adm-empty"><i class="fa-solid fa-film"></i><strong>Hələ video yoxdur</strong>Kateqoriyanı redaktə edərək ona video əlavə edin.</div>
+    }
+    else
+    {
+        <div class="adm-table-wrap">
+            <table class="adm-table">
+                <thead><tr><th style="width:70px">Video</th><th>Başlıq</th><th>Kateqoriya</th><th>Saytda</th><th class="adm-actions-col"></th></tr></thead>
+                <tbody>
+                    @foreach (var s in Model)
                     {
-                        <video width="200" controls>
-                            <source src="~/uploads/subvideos/@s.Video" />
-                            Your browser does not support video tag.
-                        </video>
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(s.Video))
+                                {
+                                    <partial name="_VideoFrame" model='new VideoFrame(Url.Content($"~/uploads/subvideos/{s.Video}"), "thumb")' />
+                                }
+                            </td>
+                            <td>
+                                <div class="adm-cell-title">@s.Title</div>
+                                <div class="adm-clamp">@s.Description</div>
+                            </td>
+                            <td><a asp-controller="Category" asp-action="Edit" asp-route-id="@s.CategoryId" class="adm-badge is-neutral text-decoration-none">@s.CategoryName</a></td>
+                            <td>
+                                @if (s.IsExtra)
+                                {
+                                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@s.CategoryId" class="adm-badge is-rejected text-decoration-none" title="Bu kateqoriyada başqa video göstərilir — köçürün və ya silin">
+                                        <i class="fa-solid fa-eye-slash"></i> Görünmür — artıq video
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="adm-badge is-confirmed"><i class="fa-solid fa-check"></i> Göstərilir</span>
+                                }
+                            </td>
+                            <td class="adm-actions-col">
+                                <div class="adm-actions">
+                                    <a asp-action="Edit" asp-route-id="@s.Id" class="adm-act" title="Redaktə et" aria-label="Redaktə et"><i class="fa-solid fa-pen"></i></a>
+                                    <partial name="_DeleteButton" model='new AdminDeleteButton("Delete", s.Id, $"“{s.Title}” videosu silinsin?")' />
+                                </div>
+                            </td>
+                        </tr>
                     }
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -17,11 +17,7 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
         }
 
         // Dashboard / list (if needed)
-        public async Task<IActionResult> Index()
-        {
-            var model = await _service.GetFirstAsync();
-            return View(model); // null if not created yet
-        }
+        public IActionResult Index() => RedirectToAction(nameof(Edit));   // əvvəl səhv view (WhatsApp) göstərirdi → 500
 
         // GET: Create
         public async Task<IActionResult> Create()
@@ -40,7 +36,7 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
             if (!ModelState.IsValid) return View(model);
 
             await _service.CreateAsync(model);
-            TempData["Success"] = "Contact info yaradıldı!";
+            TempData["Success"] = "Əlaqə məlumatları yaradıldı.";
             return RedirectToAction("Edit");
         }
 
@@ -62,7 +58,7 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
 
             await _service.UpdateAsync(model);
 
-            TempData["Success"] = "Contact info yeniləndi!";
+            TempData["Success"] = "Əlaqə məlumatları yeniləndi.";
             return RedirectToAction("Edit");
         }
 

@@ -1,0 +1,159 @@
+@model SiteSettingVM
+@{
+    ViewData["Title"] = "Sayt ayarları";
+    var logoUrl = string.IsNullOrEmpty(Model.ExistingLogo) ? null : Url.Content($"~/uploads/site/{Model.ExistingLogo}");
+}
+
+<partial name="_PageHead" model='new AdminPageHead("Sayt ayarları", "Saytın adı və loqosu — header, footer, giriş səhifələri, brauzer tabı və admin panelində göstərilir.")' />
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="adm-card">
+            <form asp-action="Index" method="post" enctype="multipart/form-data" class="adm-form" novalidate>
+                <div class="adm-card__body">
+                    <div asp-validation-summary="ModelOnly"></div>
+
+                    <div class="adm-form-section">
+                        <h3>Ad</h3>
+                        <label asp-for="SiteName" class="form-label">Saytın adı</label>
+                        <input asp-for="SiteName" class="form-control" maxlength="60" id="siteName" placeholder="DoctorEngine.Az" />
+                        <div class="form-text">Header-də, footer-də və brauzer tabında görünür.</div>
+                        <span asp-validation-for="SiteName"></span>
+                    </div>
+
+                    <div class="adm-form-section">
+                        <h3>Loqo şəkli <small class="text-muted text-lowercase">(ixtiyari)</small></h3>
+                        <div class="adm-upload">
+                            <div class="adm-upload__preview is-contain" id="logoThumb" style="@(logoUrl != null ? $"background-image:url('{logoUrl}')" : "")">
+                                @if (logoUrl == null) { <i class="fa-regular fa-image"></i> }
+                            </div>
+                            <div class="adm-upload__body">
+                                <input asp-for="LogoFile" type="file" class="form-control" accept="image/png,image/webp,image/jpeg" id="logoFile" />
+                                <div class="form-text">Şəffaf fonlu PNG tövsiyə olunur (hündürlük ən azı 96 px). Şəkil seçilsə, aşağıdakı ikonun yerinə göstərilir.</div>
+                                <span asp-validation-for="LogoFile"></span>
+                                @if (logoUrl != null)
+                                {
+                                    <label class="form-check mt-2 mb-0">
+                                        <input asp-for="RemoveLogo" type="checkbox" class="form-check-input" id="removeLogo" />
+                                        <span class="form-check-label">Loqo şəklini sil, ikondan istifadə et</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="adm-form-section">
+                        <h3>İkon</h3>
+                        <p class="form-text mt-0 mb-2" id="iconHint" hidden="@(logoUrl == null)">Loqo şəkli olduğu üçün ikon göstərilmir. İkondan istifadə üçün şəkli silin.</p>
+                        <div class="adm-icon-grid @(logoUrl != null ? "is-disabled" : "")" id="iconGrid" role="radiogroup" aria-label="İkon">
+                            @foreach (var (css, label) in SiteDefaults.Icons)
+                            {
+                                <label class="adm-icon-opt" title="@label">
+                                    <input type="radio" name="LogoIcon" value="@css" checked="@(css == Model.LogoIcon)" />
+                                    <span><i class="@css" aria-hidden="true"></i>@label</span>
+                                </label>
+                            }
+                        </div>
+                        <span asp-validation-for="LogoIcon"></span>
+                    </div>
+                </div>
+                <div class="adm-form-actions">
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yadda saxla</button>
+                    <button type="button" class="btn btn-light ms-auto" id="resetDefaults" title="DoctorEngine.Az + maşın ikonu">
+                        <i class="fa-solid fa-rotate-left"></i> Standarta qaytar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-xl-5">
+        <div class="adm-card adm-card__body" style="position:sticky;top:84px">
+            <h6 class="text-muted mb-3">Header-də belə görünəcək:</h6>
+            <div class="adm-brand-preview">
+                <div class="adm-brand-preview__brand">
+                    <span class="adm-brand-preview__icon @(logoUrl != null ? "has-image" : "")" id="pvIcon">
+                        @if (logoUrl != null)
+                        {
+                            <img src="@logoUrl" alt="" />
+                        }
+                        else
+                        {
+                            <i class="@Model.LogoIcon"></i>
+                        }
+                    </span>
+                    <span id="pvName">@Model.SiteName</span>
+                </div>
+                <div class="adm-brand-preview__nav"><span>Ana səhifə</span><span>Xidmətlər</span></div>
+            </div>
+            <p class="form-text mt-3 mb-0"><i class="fa-solid fa-circle-info me-1"></i> Dəyişiklik yadda saxlanan kimi bütün səhifələrdə görünür.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const nameInput = document.getElementById("siteName");
+            const pvName = document.getElementById("pvName");
+            const pvIcon = document.getElementById("pvIcon");
+            const grid = document.getElementById("iconGrid");
+            const hint = document.getElementById("iconHint");
+            const fileInput = document.getElementById("logoFile");
+            const thumb = document.getElementById("logoThumb");
+            const removeLogo = document.getElementById("removeLogo");
+            const existingLogo = @Json.Serialize(logoUrl);
+            let newLogoUrl = null;
+
+            function currentIcon() {
+                const checked = grid.querySelector("input:checked");
+                return checked ? checked.value : "fa-solid fa-car";
+            }
+
+            // Önizləməni yenilə: şəkil (yeni / mövcud) və ya ikon
+            function render() {
+                pvName.textContent = nameInput.value.trim() || "Sayt adı";
+                const logo = newLogoUrl || (existingLogo && !(removeLogo && removeLogo.checked) ? existingLogo : null);
+                pvIcon.replaceChildren();
+                pvIcon.classList.toggle("has-image", !!logo);
+                if (logo) {
+                    const img = document.createElement("img");
+                    img.src = logo;
+                    img.alt = "";
+                    pvIcon.appendChild(img);
+                } else {
+                    const i = document.createElement("i");
+                    i.className = currentIcon();
+                    pvIcon.appendChild(i);
+                }
+                grid.classList.toggle("is-disabled", !!logo);
+                if (hint) hint.hidden = !logo;
+            }
+
+            nameInput.addEventListener("input", render);
+            grid.addEventListener("change", render);
+            if (removeLogo) removeLogo.addEventListener("change", render);
+
+            fileInput.addEventListener("change", () => {
+                const f = fileInput.files[0];
+                if (newLogoUrl) URL.revokeObjectURL(newLogoUrl);
+                newLogoUrl = f ? URL.createObjectURL(f) : null;
+                thumb.replaceChildren();
+                thumb.style.backgroundImage = newLogoUrl ? "url('" + newLogoUrl + "')" : (existingLogo ? "url('" + existingLogo + "')" : "");
+                if (newLogoUrl && removeLogo) removeLogo.checked = false;
+                render();
+            });
+
+            document.getElementById("resetDefaults").addEventListener("click", () => {
+                nameInput.value = "DoctorEngine.Az";
+                const car = grid.querySelector('input[value="fa-solid fa-car"]');
+                if (car) car.checked = true;
+                fileInput.value = "";
+                if (newLogoUrl) { URL.revokeObjectURL(newLogoUrl); newLogoUrl = null; }
+                if (removeLogo) removeLogo.checked = true;
+                render();
+            });
+        })();
+    </script>
+}

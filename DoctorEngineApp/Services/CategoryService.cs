@@ -1,76 +1,170 @@
-﻿using DoctorEngineApp.Data;
+﻿using DoctorEngineApp.ViewModels.Services;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Categories;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoctorEngineApp.Services
 {
-    public class CategoryService :ICategoryService
+    /// <summary>
+    /// Kateqoriyalar. Qayda: hər kateqoriyanın BİR videosu olur (SubService).
+    /// Video kateqoriyanın öz formasından əlavə olunur / dəyişdirilir / silinir.
+    /// </summary>
+    public class CategoryService : ICategoryService
     {
         private readonly AppDbContext _ctx;
         private readonly IWebHostEnvironment _env;
-        public CategoryService(AppDbContext ctx, IWebHostEnvironment env) { _ctx = ctx; _env = env; }
+        private readonly ILogger<CategoryService> _logger;
+
+        public CategoryService(AppDbContext ctx, IWebHostEnvironment env, ILogger<CategoryService> logger)
+        {
+            _ctx = ctx;
+            _env = env;
+            _logger = logger;
+        }
+
+        private string IconFolder => Path.Combine(_env.WebRootPath, "uploads", "categories");
+        private string VideoFolder => Path.Combine(_env.WebRootPath, "uploads", "subvideos");
+
+        // ================= OXU =================
 
         public async Task<List<CategoryVM>> GetAllAsync()
         {
             return await _ctx.ServiceCategories
-                .Select(x => new CategoryVM { Id = x.Id, Name = x.Name, Icon = x.Icon })
+                .OrderBy(x => x.Id)
+                .Select(x => new CategoryVM
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Icon = x.Icon,
+                    SubServices = x.SubServices.OrderBy(s => s.Id)
+                        .Select(s => new SubServiceVM { Id = s.Id, Title = s.Title, Description = "", Video = s.Video })
+                        .ToList()
+                })
                 .ToListAsync();
         }
 
         public async Task<CategoryEditVM?> GetForEditAsync(int id)
         {
-            var e = await _ctx.ServiceCategories.FindAsync(id);
+            var e = await _ctx.ServiceCategories
+                .Include(c => c.SubServices)
+                .FirstOrDefaultAsync(c => c.Id == id);
             if (e == null) return null;
-            return new CategoryEditVM { Id = e.Id, Name = e.Name, ExistingIcon = e.Icon };
+
+            var subs = e.SubServices.OrderBy(s => s.Id).ToList();
+            var primary = subs.FirstOrDefault();
+
+            var vm = new CategoryEditVM
+            {
+                Id = e.Id,
+                Name = e.Name,
+                ExistingIcon = e.Icon,
+                VideoId = primary?.Id,
+                VideoTitle = primary?.Title,
+                VideoDescription = primary?.Description,
+                ExistingVideo = primary?.Video,
+                ExtraVideos = subs.Skip(1).Select(s => new ExtraVideoVM { Id = s.Id, Title = s.Title, Video = s.Video }).ToList()
+            };
+
+            await FillEmptyCategoriesAsync(vm);
+            return vm;
         }
+
+        /// <summary>Formanı yenidən göstərmək üçün (xəta olanda) köməkçi siyahıları doldurur.</summary>
+        public async Task FillEmptyCategoriesAsync(CategoryEditVM vm)
+        {
+            vm.EmptyCategories = await _ctx.ServiceCategories
+                .Where(c => c.Id != vm.Id && !c.SubServices.Any())
+                .OrderBy(c => c.Id)
+                .Select(c => new SelectListItem(c.Name, c.Id.ToString()))
+                .ToListAsync();
+
+            if (!vm.ExtraVideos.Any())
+            {
+                vm.ExtraVideos = await _ctx.SubServices
+                    .Where(s => s.CategoryId == vm.Id)
+                    .OrderBy(s => s.Id)
+                    .Skip(1)
+                    .Select(s => new ExtraVideoVM { Id = s.Id, Title = s.Title, Video = s.Video })
+                    .ToListAsync();
+            }
+        }
+
+        // ================= YAZ =================
 
         public async Task CreateAsync(CategoryCreateVM vm)
         {
-            string fileName = "";
-            if (vm.IconFile != null)
+            var entity = new ServiceCategory
             {
-                var folder = Path.Combine(_env.WebRootPath, "uploads", "categories");
-                Directory.CreateDirectory(folder);
-                fileName = Guid.NewGuid().ToString() + Path.GetExtension(vm.IconFile.FileName);
-                var fullPath = Path.Combine(folder, fileName);
-                using var stream = new FileStream(fullPath, FileMode.Create);
-                await vm.IconFile.CopyToAsync(stream);
+                Name = vm.Name.Trim(),
+                Icon = vm.IconFile != null ? await SaveFileAsync(vm.IconFile, IconFolder) : ""
+            };
+
+            if (vm.VideoFile != null)
+            {
+                entity.SubServices.Add(new SubService
+                {
+                    Title = vm.VideoTitle!.Trim(),
+                    Description = vm.VideoDescription!.Trim(),
+                    Video = await SaveFileAsync(vm.VideoFile, VideoFolder)
+                });
             }
 
-            var entity = new ServiceCategory { Name = vm.Name, Icon = fileName };
             _ctx.ServiceCategories.Add(entity);
             await _ctx.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(CategoryEditVM vm)
         {
-            var entity = await _ctx.ServiceCategories.FindAsync(vm.Id);
-            if (entity == null) throw new Exception("Category not found");
+            var entity = await _ctx.ServiceCategories
+                .Include(c => c.SubServices)
+                .FirstOrDefaultAsync(c => c.Id == vm.Id)
+                ?? throw new InvalidOperationException("Kateqoriya tapılmadı");
 
+            var oldFiles = new List<string>();
+
+            // --- Ad və ikon ---
+            entity.Name = vm.Name.Trim();
             if (vm.IconFile != null)
             {
-                // save new
-                var folder = Path.Combine(_env.WebRootPath, "uploads", "categories");
-                Directory.CreateDirectory(folder);
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(vm.IconFile.FileName);
-                var fullPath = Path.Combine(folder, fileName);
-                using var stream = new FileStream(fullPath, FileMode.Create);
-                await vm.IconFile.CopyToAsync(stream);
-
-                // delete old if exists
-                if (!string.IsNullOrEmpty(entity.Icon))
-                {
-                    var old = Path.Combine(folder, entity.Icon);
-                    if (System.IO.File.Exists(old)) System.IO.File.Delete(old);
-                }
-                entity.Icon = fileName;
+                if (!string.IsNullOrEmpty(entity.Icon)) oldFiles.Add(Path.Combine(IconFolder, entity.Icon));
+                entity.Icon = await SaveFileAsync(vm.IconFile, IconFolder);
             }
 
-            entity.Name = vm.Name;
-            _ctx.ServiceCategories.Update(entity);
+            // --- Video (əsas = ən köhnə qeyd) ---
+            var primary = entity.SubServices.OrderBy(s => s.Id).FirstOrDefault();
+
+            if (primary != null && vm.RemoveVideo)
+            {
+                if (!string.IsNullOrEmpty(primary.Video)) oldFiles.Add(Path.Combine(VideoFolder, primary.Video));
+                _ctx.SubServices.Remove(primary);
+            }
+            else if (primary != null)
+            {
+                primary.Title = (vm.VideoTitle ?? primary.Title).Trim();
+                primary.Description = (vm.VideoDescription ?? primary.Description).Trim();
+                if (vm.VideoFile != null)
+                {
+                    if (!string.IsNullOrEmpty(primary.Video)) oldFiles.Add(Path.Combine(VideoFolder, primary.Video));
+                    primary.Video = await SaveFileAsync(vm.VideoFile, VideoFolder);
+                }
+            }
+            else if (vm.VideoFile != null)
+            {
+                entity.SubServices.Add(new SubService
+                {
+                    Title = vm.VideoTitle!.Trim(),
+                    Description = vm.VideoDescription!.Trim(),
+                    Video = await SaveFileAsync(vm.VideoFile, VideoFolder)
+                });
+            }
+
             await _ctx.SaveChangesAsync();
+
+            // Köhnə fayllar yalnız baza uğurla yeniləndikdən sonra silinir
+            oldFiles.ForEach(DeleteFile);
         }
 
         public async Task DeleteAsync(int id)
@@ -78,27 +172,39 @@ namespace DoctorEngineApp.Services
             var entity = await _ctx.ServiceCategories.Include(c => c.SubServices).FirstOrDefaultAsync(x => x.Id == id);
             if (entity == null) return;
 
-            // delete related subservice videos from disk
-            var videoFolder = Path.Combine(_env.WebRootPath, "uploads", "subvideos");
-            foreach (var s in entity.SubServices)
-            {
-                if (!string.IsNullOrEmpty(s.Video))
-                {
-                    var vpath = Path.Combine(videoFolder, s.Video);
-                    if (System.IO.File.Exists(vpath)) System.IO.File.Delete(vpath);
-                }
-            }
-
-            // delete icon
-            var iconFolder = Path.Combine(_env.WebRootPath, "uploads", "categories");
-            if (!string.IsNullOrEmpty(entity.Icon))
-            {
-                var ipath = Path.Combine(iconFolder, entity.Icon);
-                if (System.IO.File.Exists(ipath)) System.IO.File.Delete(ipath);
-            }
+            var files = entity.SubServices
+                .Where(s => !string.IsNullOrEmpty(s.Video))
+                .Select(s => Path.Combine(VideoFolder, s.Video))
+                .ToList();
+            if (!string.IsNullOrEmpty(entity.Icon)) files.Add(Path.Combine(IconFolder, entity.Icon));
 
             _ctx.ServiceCategories.Remove(entity);
             await _ctx.SaveChangesAsync();
+
+            files.ForEach(DeleteFile);
+        }
+
+        // ================= FAYLLAR =================
+
+        private static async Task<string> SaveFileAsync(IFormFile file, string folder)
+        {
+            Directory.CreateDirectory(folder);
+            var name = Guid.NewGuid() + Path.GetExtension(file.FileName).ToLowerInvariant();
+            await using var stream = new FileStream(Path.Combine(folder, name), FileMode.CreateNew);
+            await file.CopyToAsync(stream);
+            return name;
+        }
+
+        private void DeleteFile(string path)
+        {
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Fayl silinə bilmədi: {Path}", path);
+            }
         }
     }
 }

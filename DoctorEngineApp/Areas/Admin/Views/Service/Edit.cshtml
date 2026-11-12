@@ -1,26 +1,24 @@
 ﻿@model ServiceVM
+@{ ViewData["Title"] = "Xidməti redaktə et"; }
 
-<h2>Xidmət Düzəlişi</h2>
+<partial name="_PageHead" model='new AdminPageHead("Xidməti redaktə et", BackAction: "Index")' />
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+<div class="adm-card" style="max-width:640px">
+    <form asp-action="Edit" method="post" class="adm-form">
+        <div class="adm-card__body">
+            <input asp-for="Id" type="hidden" />
+            <div asp-validation-summary="ModelOnly"></div>
+            <div>
+                <label asp-for="Name" class="form-label">Xidmətin adı</label>
+                <input asp-for="Name" class="form-control" placeholder="Məs: Mühərrik diaqnostikası" />
+                <span asp-validation-for="Name"></span>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yadda saxla</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Ad</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="WhatsApp" class="form-label">WhatsApp nömrəsi</label>
-        <input asp-for="WhatsApp" class="form-control" placeholder="+99450xxxxxxx" />
-        <span asp-validation-for="WhatsApp" class="text-danger"></span>
-    </div>
-
-    <button class="btn btn-success">Yadda saxla</button>
-    <a asp-action="Index" class="btn btn-secondary">Geri</a>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

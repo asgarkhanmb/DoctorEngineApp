@@ -2,333 +2,153 @@
 
 @{
     ViewData["Title"] = "Əlaqə";
+    var phone = Model.Contact?.Phone;
+    var email = Model.Contact?.Email;
 }
 
-<div class="container-xxl py-5">
+<partial name="_PageHeader" model='("Əlaqə", "Sualınız var? Usta ilə canlı yazışın, zəng edin və ya mesaj göndərin.")' />
+
+<!-- ===================================================== -->
+<!-- CANLI ÇAT -->
+<!-- ===================================================== -->
+
+<div class="container-xxl py-5" id="chat">
     <div class="container">
 
-        <!-- Başlıq -->
-        <div class="text-center mb-4">
+        <div class="text-center mb-4 wow fadeInUp" data-wow-delay="0.1s">
             <h6 class="text-primary text-uppercase">Canlı Əlaqə</h6>
             <h2 class="mb-3">Usta ilə Birbaşa Yazışın</h2>
+            <p class="mb-0">Probleminizi yazın, şəkil və ya video göndərin — ustalarımız tezliklə cavab verəcək.</p>
         </div>
 
-        <div class="d-flex justify-content-center">
-            <div class="chat-widget">
+        <partial name="_ChatWidget" />
 
-                <!-- Chat Başlıq -->
-                <div class="chat-header">
-                    🔧 Canlı Usta Dəstəyi
-                </div>
-
-                <!-- Chat Bədəni -->
-                <div class="chat-body" id="chatBody">
-                    @foreach (var msg in Model.ChatMessages)
-                    {
-                        var isMe = msg.UserName == User.Identity.Name;
-                        <div class="msg @(isMe ? "user" : "admin")" id="msg-@msg.Id">
-                            <div class="bubble">
-                                <strong>@msg.UserName</strong>
-                                <span class="text">@msg.Message</span>
-                                @if (msg.IsEdited) { <small>(edit)</small> }
-                                @if (isMe)
-                                {
-                                    <div class="actions">
-                                        <button onclick="editMessage(@msg.Id)">✏️</button>
-                                        <button onclick="deleteMessage(@msg.Id)">🗑️</button>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <!-- Chat Footer -->
-                <div class="chat-footer">
-                    <input id="chatInput" placeholder="Mesaj yaz..." />
-                    <button id="sendBtn">Göndər</button>
-                </div>
-
-            </div>
-        </div>
     </div>
 </div>
 
-<!-- CSS -->
-<style>
-.chat-widget {
-    max-width: 420px;
-    width: 100%;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.12);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.chat-header {
-    background: #dc3545;
-    color: #fff;
-    padding: 12px;
-    text-align: center;
-}
-.chat-body {
-    height: 300px;
-    overflow-y: auto;
-    padding: 15px;
-    background: #f8f9fa;
-}
-.msg {
-    display: flex;
-    margin-bottom: 10px;
-    transition: .3s;
-}
-.msg.user { justify-content: flex-end; }
-.bubble {
-    max-width: 75%;
-    background: #e9ecef;
-    padding: 10px;
-    border-radius: 12px;
-    position: relative;
-}
-.msg.user .bubble { background: #0d6efd; color: #fff; }
-.bubble strong { display: block; font-size: 12px; margin-bottom: 4px; }
-.text { display: block; word-break: break-word; }
+<!-- ===================================================== -->
+<!-- ƏLAQƏ MƏLUMATLARI -->
+<!-- ===================================================== -->
 
-/* Actions */
-.actions {
-    display: none;
-    position: absolute;
-    top: -10px;
-    right: 0;
-    gap: 5px;
-}
-.msg.user:hover .actions { display: flex; }
-.actions button {
-    border: none;
-    background: #fff;
-    border-radius: 50%;
-    padding: 4px 6px;
-    cursor: pointer;
-}
-
-/* Delete Animation */
-.msg.removing {
-    opacity: 0;
-    transform: translateX(40px);
-}
-
-/* Edit Input */
-.edit-input {
-    width: 100%;
-    border: none;
-    padding: 6px;
-    border-radius: 6px;
-}
-
-/* Footer */
-.chat-footer {
-    display: flex;
-    border-top: 1px solid #dee2e6;
-    padding: 8px;
-    gap: 8px;
-    background: #fff;
-}
-.chat-footer input {
-    flex: 1;
-    border: 1px solid #ddd;
-    padding: 10px 14px;
-    border-radius: 20px;
-    outline: none;
-    font-size: 14px;
-}
-.chat-footer button {
-    border: none;
-    padding: 0 18px;
-    background: #dc3545;
-    color: #fff;
-    border-radius: 20px;
-    font-weight: 500;
-    cursor: pointer;
-}
-.chat-footer button:hover { background: #bb2d3b; }
-</style>
-
-<!-- JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-<script>
-const input = document.getElementById("chatInput");
-const body = document.getElementById("chatBody");
-const sendBtn = document.getElementById("sendBtn");
-
-// Login yoxlaması
-const isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
-
-// SignalR connection
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chatHub")
-    .build();
-
-connection.start();
-
-// Yeni mesaj gəldikdə
-connection.on("ReceiveMessage", function (user, message, id) {
-    let isMe = user === "@User.Identity.Name";
-    let html = `
-    <div class="msg ${isMe ? "user" : "admin"}" id="msg-${id}">
-        <div class="bubble">
-            <strong>${user}</strong>
-            <span class="text">${message}</span>
-            ${isMe ? `
-            <div class="actions">
-                <button onclick="editMessage(${id})">✏️</button>
-                <button onclick="deleteMessage(${id})">🗑️</button>
-            </div>` : ""}
-        </div>
-    </div>
-    `;
-    body.insertAdjacentHTML("beforeend", html);
-    body.scrollTop = body.scrollHeight;
-});
-
-// Send düyməsi
-sendBtn.onclick = sendMessage;
-
-// Enter ilə göndərmə
-input.addEventListener("keypress", function(e){
-    if(e.key === "Enter") sendMessage();
-});
-
-// Mesaj göndərmə funksiyası
-function sendMessage(){
-    if(!isAuthenticated){
-        window.location.href = "/Account/Login";
-        return;
-    }
-
-    let text = input.value.trim();
-    if(!text) return;
-
-    fetch("/api/chat/send", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({message:text})
-    });
-
-    input.value="";
-}
-
-// Silmə
-function deleteMessage(id){
-    let el = document.getElementById("msg-"+id);
-    el.classList.add("removing");
-
-    setTimeout(()=>{
-        fetch(`/api/chat/delete/${id}`, {method:"POST"});
-    },300);
-}
-
-connection.on("DeleteMessage", id=>{
-    document.getElementById("msg-"+id)?.remove();
-});
-
-// Redaktə
-function editMessage(id){
-    let msg = document.getElementById("msg-"+id);
-    if(msg.classList.contains("editing")) return;
-    msg.classList.add("editing");
-
-    let textSpan = msg.querySelector(".text");
-    let oldText = textSpan.innerText;
-
-    textSpan.innerHTML = `<input class="edit-input" value="${oldText}">`;
-    let inputEdit = textSpan.querySelector("input");
-    inputEdit.focus();
-
-    inputEdit.addEventListener("keydown", function(e){
-        if(e.key === "Enter"){
-            fetch("/api/chat/edit",{
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify({id:id,message:inputEdit.value})
-            });
-            msg.classList.remove("editing");
-        }
-        if(e.key === "Escape"){
-            textSpan.innerText = oldText;
-            msg.classList.remove("editing");
-        }
-    });
-}
-
-connection.on("EditMessage", (id,message)=>{
-    let msg=document.getElementById("msg-"+id);
-    let span=msg.querySelector(".text");
-    if(span) span.innerText=message;
-});
-</script>
 <div class="container-xxl py-5">
     <div class="container">
 
-        <div class="text-center mb-4">
+        <div class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
             <h6 class="text-primary text-uppercase">Bizimlə Əlaqə</h6>
-            <h1>İstənilən sual üçün əlaqə saxlayın</h1>
+            <h1 class="mb-0">İstənilən sual üçün əlaqə saxlayın</h1>
+        </div>
+
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="de-contact-card">
+                    <span class="de-contact-card__icon"><i class="fa-solid fa-location-dot"></i></span>
+                    <div>
+                        <h5>Ünvan</h5>
+                        <p>@(Model.Contact?.Address ?? "—")</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="de-contact-card">
+                    <span class="de-contact-card__icon"><i class="fa-solid fa-phone"></i></span>
+                    <div>
+                        <h5>Telefon</h5>
+                        @if (!string.IsNullOrEmpty(phone))
+                        {
+                            <a href="tel:@phone.Replace(" ", "")">@phone</a>
+                        }
+                        else
+                        {
+                            <p>—</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="de-contact-card">
+                    <span class="de-contact-card__icon"><i class="fa-solid fa-envelope"></i></span>
+                    <div>
+                        <h5>Email</h5>
+                        @if (!string.IsNullOrEmpty(email))
+                        {
+                            <a href="mailto:@email">@email</a>
+                        }
+                        else
+                        {
+                            <p>—</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="row g-4">
 
-            <!-- CONTACT INFO -->
-            <div class="col-md-4">
-                <div class="bg-light p-4">
-                    <h5>Ünvan</h5>
-                    <p>@Model.Contact?.Address</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="bg-light p-4">
-                    <h5>Telefon</h5>
-                    <p>@Model.Contact?.Phone</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="bg-light p-4">
-                    <h5>Email</h5>
-                    <p>@Model.Contact?.Email</p>
-                </div>
-            </div>
-
-            <!-- MAP -->
-            <div class="col-md-6">
+            <!-- Xəritə -->
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
                 @if (Model.Map != null)
                 {
-                    <iframe class="w-100" style="height:250px"
-                            src="@Model.Map.MapUrl"></iframe>
+                    <iframe class="de-map" src="@Model.Map.MapUrl" title="Xəritə: @Model.Map.Address"
+                            loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                 }
             </div>
 
-            <!-- FORM -->
-            <div class="col-md-6">
-                <form asp-action="SendMessage" method="post">
+            <!-- Mesaj formu -->
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.2s" id="contact-form">
+                <div class="de-form-card">
+                    <h4>Mesaj göndərin</h4>
+                    <p class="lead-sm">Formu doldurun, ən qısa zamanda sizinlə əlaqə saxlayacağıq.</p>
 
-                    <input asp-for="Message.FullName" class="form-control mb-2" placeholder="Ad Soyad" />
-                    <input asp-for="Message.Email" class="form-control mb-2" placeholder="Email" />
-                    <input asp-for="Message.Subject" class="form-control mb-2" placeholder="Mövzu" />
-                    <textarea asp-for="Message.Message" class="form-control mb-2"></textarea>
+                    <form asp-action="SendMessage" asp-fragment="contact-form" method="post" novalidate data-de-loading="Göndərilir…">
 
-                    <button class="btn btn-primary w-100">Göndər</button>
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success d-flex align-items-center gap-2" role="status">
+                                <i class="fa-solid fa-circle-check"></i> @TempData["SuccessMessage"]
+                            </div>
+                        }
 
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success mt-2">
-                            @TempData["SuccessMessage"]
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3" role="alert"></div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label asp-for="Message.FullName">Ad Soyad</label>
+                                <input asp-for="Message.FullName" class="form-control" autocomplete="off" placeholder="Adınız" />
+                                <span asp-validation-for="Message.FullName" class="text-danger"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="Message.Email">Email</label>
+                                <input asp-for="Message.Email" type="email" class="form-control" autocomplete="off" placeholder="ad@numune.az" />
+                                <span asp-validation-for="Message.Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Message.Subject">Mövzu</label>
+                                <input asp-for="Message.Subject" class="form-control" placeholder="Məs: Mühərrik diaqnostikası" />
+                                <span asp-validation-for="Message.Subject" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Message.Message">Mesaj</label>
+                                <textarea asp-for="Message.Message" class="form-control" rows="4" placeholder="Mesajınızı yazın…"></textarea>
+                                <span asp-validation-for="Message.Message" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary w-100 py-3">
+                                    <i class="fa-regular fa-paper-plane me-2"></i> Göndər
+                                </button>
+                            </div>
                         </div>
-                    }
-
-                </form>
+                    </form>
+                </div>
             </div>
 
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

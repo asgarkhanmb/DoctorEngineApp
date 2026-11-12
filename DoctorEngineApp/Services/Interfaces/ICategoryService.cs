@@ -9,5 +9,6 @@ namespace DoctorEngineApp.Services.Interfaces
         Task CreateAsync(CategoryCreateVM vm);
         Task UpdateAsync(CategoryEditVM vm);
         Task DeleteAsync(int id);
+        Task FillEmptyCategoriesAsync(CategoryEditVM vm);
     }
 }

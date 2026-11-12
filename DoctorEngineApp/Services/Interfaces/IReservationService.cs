@@ -1,17 +1,17 @@
-﻿using DoctorEngineApp.ViewModels.Reservations;
-using Microsoft.EntityFrameworkCore;
+using DoctorEngineApp.ViewModels.Reservations;
 
 namespace DoctorEngineApp.Services.Interfaces
 {
     public interface IReservationService
     {
-        Task CreateAsync(ReservationCreateVM model);
+        /// <summary>
+        /// Rezervasiyanı yoxlayır (tarix, iş saatları, təkrar) və uğurlu olarsa yaradır.
+        /// Daxil edilən tarix Bakı vaxtı kimi qəbul olunur.
+        /// </summary>
+        Task<ReservationResult> TryCreateAsync(ReservationCreateVM model);
         Task<List<ReservationAdminVM>> GetAllAsync();
         Task DeleteAsync(int id);
         Task ConfirmAsync(int id);
         Task RejectAsync(int id, string reason);
-        Task<bool> ExistsAsync(string phone, int serviceId, DateTime dateTime);
-
-
     }
 }

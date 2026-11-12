@@ -1,0 +1,44 @@
+@model Warranty
+@{ ViewData["Title"] = "Zəmanət"; }
+
+<partial name="_PageHead" model='new AdminPageHead(Model.CustomerFullName, $"{Model.VehicleModel} ({Model.VehicleYear}) · {Model.CreatedDate:dd.MM.yyyy}", BackAction: "Index")' />
+
+<div class="adm-card" style="max-width:900px">
+    <div class="adm-card__body">
+        <dl class="adm-dl mb-4">
+            <dt>Müştəri</dt><dd>@Model.CustomerFullName</dd>
+            <dt>Avtomobil</dt><dd>@Model.VehicleModel</dd>
+            <dt>Buraxılış ili</dt><dd>@Model.VehicleYear</dd>
+            <dt>Tarix</dt><dd>@Model.CreatedDate.ToString("dd.MM.yyyy")</dd>
+        </dl>
+
+        <h3 class="h6 text-muted text-uppercase mb-2">Zəmanətli detallar</h3>
+        <div class="adm-table-wrap mb-4 border rounded-3">
+            <table class="adm-table">
+                <thead><tr><th>Detal</th><th class="is-num">Müddət</th><th class="is-num">Bitmə tarixi</th></tr></thead>
+                <tbody>
+                    @foreach (var item in Model.Items ?? new())
+                    {
+                        <tr>
+                            <td>@item.PartName</td>
+                            <td class="is-num">@item.WarrantyMonth ay</td>
+                            <td class="is-num">@Model.CreatedDate.AddMonths(item.WarrantyMonth).ToString("dd.MM.yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Terms))
+        {
+            <h3 class="h6 text-muted text-uppercase mb-2">Şərtlər</h3>
+            <div class="adm-message-body">@Model.Terms</div>
+        }
+    </div>
+    <div class="adm-form-actions">
+        <a asp-action="Print" asp-route-id="@Model.Id" class="btn btn-primary" target="_blank"><i class="fa-regular fa-file-pdf"></i> PDF yüklə</a>
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="ms-auto">
+            <button type="submit" class="btn btn-light text-danger" data-confirm="Zəmanət sənədi silinsin?"><i class="fa-regular fa-trash-can"></i> Sil</button>
+        </form>
+    </div>
+</div>

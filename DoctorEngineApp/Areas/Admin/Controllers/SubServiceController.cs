@@ -1,108 +1,131 @@
-﻿using DoctorEngineApp.Data;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-[Area("Admin")]
-[Authorize(Roles = "Admin")]
-public class SubServiceController : Controller
+namespace DoctorEngineApp.Areas.Admin.Controllers
 {
-    private readonly ISubServiceService _service;
-    private readonly AppDbContext _ctx;
-
-    public SubServiceController(ISubServiceService service, AppDbContext ctx)
+    /// <summary>
+    /// Kateqoriya videoları. Qayda: hər kateqoriyada bir video —
+    /// yeni video yalnız boş kateqoriyaya əlavə oluna / köçürülə bilər.
+    /// </summary>
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
+    public class SubServiceController : Controller
     {
-        _service = service;
-        _ctx = ctx;
-    }
+        private readonly ISubServiceService _service;
+        private readonly AppDbContext _ctx;
 
-    public async Task<IActionResult> Index()
-    {
-        var list = await _service.GetAllAsync();
-        return View(list);
-    }
-
-    public IActionResult Create()
-    {
-        ViewBag.Categories = _ctx.ServiceCategories.ToList();
-        return View();
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(SubServiceCreateVM model)
-    {
-        ViewBag.Categories = _ctx.ServiceCategories.ToList();
-        if (!ModelState.IsValid) return View(model);
-
-        // VALIDATE video: max 1GB and video/* content type
-        const long maxSize = 1_000_000_000;
-        if (model.VideoFile != null)
+        public SubServiceController(ISubServiceService service, AppDbContext ctx)
         {
-            if (model.VideoFile.Length > maxSize)
+            _service = service;
+            _ctx = ctx;
+        }
+
+        public async Task<IActionResult> Index() => View(await _service.GetAllAsync());
+
+        public async Task<IActionResult> Create(int? categoryId = null)
+        {
+            await FillCategoriesAsync(null);
+            return View(new SubServiceCreateVM { CategoryId = categoryId ?? 0 });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(SubServiceCreateVM model)
+        {
+            await CheckCategoryIsFreeAsync(model.CategoryId, exceptSubServiceId: null);
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("VideoFile", "Video maksimum 1GB ola bilər.");
+                await FillCategoriesAsync(null);
                 return View(model);
             }
-            if (!model.VideoFile.ContentType.StartsWith("video/"))
+
+            await _service.CreateAsync(model);
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var vm = await _service.GetForEditAsync(id);
+            if (vm == null) return NotFound();
+            await FillCategoriesAsync(vm.CategoryId);
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(SubServiceEditVM model)
+        {
+            var current = await _service.GetForEditAsync(model.Id);
+            if (current == null) return NotFound();
+
+            if (model.CategoryId != current.CategoryId)
+                await CheckCategoryIsFreeAsync(model.CategoryId, exceptSubServiceId: model.Id);
+
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("VideoFile", "Yalnız video formatları qəbul edilir.");
+                model.ExistingVideo = current.ExistingVideo;
+                await FillCategoriesAsync(current.CategoryId);
                 return View(model);
             }
-        }
-        await _service.CreateAsync(model);
-        return RedirectToAction(nameof(Index));
-    }
 
-    public async Task<IActionResult> Edit(int id)
-    {
-        var vm = await _service.GetForEditAsync(id);
-        if (vm == null) return NotFound();
-        ViewBag.Categories = _ctx.ServiceCategories.ToList();
-        return View(vm);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(SubServiceEditVM model)
-    {
-        ViewBag.Categories = _ctx.ServiceCategories.ToList();
-
-        // 🔴 Category seçilməyibsə
-        if (model.CategoryId == 0)
-        {
-            ModelState.AddModelError("CategoryId", "Category seçilməlidir.");
+            await _service.UpdateAsync(model);
+            return RedirectToAction(nameof(Index));
         }
 
-        // 🔴 Video yoxlamaları
-        const long maxSize = 1_000_000_000; // 1GB
-        if (model.VideoFile != null)
+        /// <summary>Videonu boş kateqoriyaya köçürür (təkrarlanan videoları düzəltmək üçün).</summary>
+        [HttpPost]
+        public async Task<IActionResult> Move(int id, int categoryId, string? returnUrl = null)
         {
-            if (model.VideoFile.Length > maxSize)
+            var entity = await _ctx.SubServices.FindAsync(id);
+            if (entity == null) return NotFound();
+
+            var target = await _ctx.ServiceCategories.Include(c => c.SubServices).FirstOrDefaultAsync(c => c.Id == categoryId);
+            if (target == null)
+                TempData["Error"] = "Kateqoriya tapılmadı.";
+            else if (target.SubServices.Any())
+                TempData["Error"] = $"“{target.Name}” kateqoriyasının artıq videosu var.";
+            else
             {
-                ModelState.AddModelError("VideoFile", "Video maksimum 1GB ola bilər.");
+                entity.CategoryId = categoryId;
+                await _ctx.SaveChangesAsync();
+                TempData["Success"] = $"Video “{target.Name}” kateqoriyasına köçürüldü.";
             }
-            else if (!model.VideoFile.ContentType.StartsWith("video/"))
-            {
-                ModelState.AddModelError("VideoFile", "Yalnız video formatları qəbul edilir.");
-            }
+
+            return Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl!) : RedirectToAction(nameof(Index));
         }
 
-        // 🔴 ƏGƏR YUXARIDA ERROR VARSA
-        if (!ModelState.IsValid)
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id, string? returnUrl = null)
         {
-            return View(model);
+            await _service.DeleteAsync(id);
+            if (Url.IsLocalUrl(returnUrl)) { TempData["Success"] = "Video silindi."; return LocalRedirect(returnUrl!); }
+            return RedirectToAction(nameof(Index));
         }
 
-        await _service.UpdateAsync(model);
-        return RedirectToAction(nameof(Index));
-    }
+        // ================= KÖMƏKÇİLƏR =================
 
+        /// <summary>Seçim üçün: videosu olmayan kateqoriyalar (+ redaktə olunan videonun öz kateqoriyası).</summary>
+        private async Task FillCategoriesAsync(int? currentCategoryId)
+        {
+            ViewBag.Categories = await _ctx.ServiceCategories
+                .Where(c => !c.SubServices.Any() || c.Id == currentCategoryId)
+                .OrderBy(c => c.Id)
+                .ToListAsync();
+        }
 
-    public async Task<IActionResult> Delete(int id)
-    {
-        await _service.DeleteAsync(id);
-        return RedirectToAction(nameof(Index));
+        private async Task CheckCategoryIsFreeAsync(int categoryId, int? exceptSubServiceId)
+        {
+            if (categoryId <= 0)
+            {
+                ModelState.AddModelError("CategoryId", "Kateqoriya seçin");
+                return;
+            }
+
+            var busy = await _ctx.SubServices.AnyAsync(s => s.CategoryId == categoryId && s.Id != exceptSubServiceId);
+            if (busy)
+                ModelState.AddModelError("CategoryId", "Bu kateqoriyanın artıq videosu var. Hər kateqoriyada bir video ola bilər — mövcud videonu kateqoriyanın səhifəsindən dəyişin.");
+        }
     }
 }

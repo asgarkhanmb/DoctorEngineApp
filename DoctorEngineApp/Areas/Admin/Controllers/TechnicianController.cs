@@ -54,10 +54,21 @@ public class TechnicianController : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(TechnicianEditVM vm)
     {
+        if (!ModelState.IsValid)
+        {
+            // Forma yenidən göstəriləndə mövcud şəkil itməsin
+            var current = await _service.GetByIdAsync(vm.Id);
+            if (current == null) return NotFound();
+            vm.ExistingImage = current.Image;
+            return View(vm);
+        }
+
         await _service.EditAsync(vm);
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
         await _service.DeleteAsync(id);

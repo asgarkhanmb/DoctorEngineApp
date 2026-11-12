@@ -3,7 +3,7 @@ using DoctorEngineApp.ViewModels.ContactPhones;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace YourProject.Controllers
+namespace DoctorEngineApp.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin")]
@@ -60,15 +60,6 @@ namespace YourProject.Controllers
 
             await _service.UpdateAsync(model);
             return RedirectToAction(nameof(Index));
-        }
-
-        // ✅ DELETE (GET)
-        public async Task<IActionResult> Delete(int id)
-        {
-            var model = await _service.GetByIdAsync(id);
-            if (model == null) return NotFound();
-
-            return View(model);
         }
 
         // ✅ DELETE (POST)

@@ -1,28 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.ViewModels.Warranties
 {
     public class WarrantyCreateVM
     {
-        public string CustomerName { get; set; }
-        public string Phone { get; set; }
+        [Required(ErrorMessage = "Müştərinin adını daxil edin")]
+        [StringLength(100)]
+        public string CustomerFullName { get; set; } = string.Empty;
 
-        public string Brand { get; set; }
-        public string Model { get; set; }
-        public int Year { get; set; }
-        public string Fuel { get; set; }
+        [Required(ErrorMessage = "Avtomobil modelini daxil edin")]
+        [StringLength(100)]
+        public string VehicleModel { get; set; } = string.Empty;
 
-        public string Master { get; set; }
-        public string Terms { get; set; }
+        [Range(1950, 2100, ErrorMessage = "İl düzgün deyil")]
+        public int VehicleYear { get; set; } = DateTime.Now.Year;
 
-        // SEÇİLMİŞ LOGO (DB üçün)
-        public int? WarrantyLogoId { get; set; }
+        [Required(ErrorMessage = "Zəmanət şərtlərini daxil edin")]
+        public string Terms { get; set; } = string.Empty;
 
-        // YENİ LOGO YÜKLƏMƏ (FORM üçün)
-        public IFormFile LogoFile { get; set; }
-
-        public List<JobVM> Jobs { get; set; }
-        public List<SelectListItem> Logos { get; set; }
-
+        [MinLength(1, ErrorMessage = "Ən azı bir detal əlavə edin")]
+        public List<WarrantyItemVM> Items { get; set; } = new List<WarrantyItemVM>();
     }
 }

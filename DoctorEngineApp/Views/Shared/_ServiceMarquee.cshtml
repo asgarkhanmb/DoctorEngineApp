@@ -1,0 +1,39 @@
+@* Slayderin altında axan xidmətlər lenti (real kateqoriyalardan). Hər biri xidmətin tabını açır. *@
+@using DoctorEngineApp.ViewModels.Categories
+@model List<CategoryVM>
+@{
+    var items = (Model ?? new()).Where(c => !string.IsNullOrWhiteSpace(c.Name)).ToList();
+}
+@if (items.Any())
+{
+    // Lent fasiləsiz axsın deyə siyahı ən azı 8 elementə qədər təkrarlanır, sonra 2 nüsxə olur
+    var repeated = new List<CategoryVM>();
+    while (repeated.Count < 8) repeated.AddRange(items);
+
+    <section class="de-marquee" aria-label="Xidmətlərimiz">
+        <div class="de-marquee__track">
+            @for (int copy = 0; copy < 2; copy++)
+            {
+                <ul class="de-marquee__group" aria-hidden="@(copy == 1 ? "true" : "false")">
+                    @foreach (var c in repeated)
+                    {
+                        <li>
+                            <a asp-controller="Service" asp-action="Index" asp-fragment="cat-@c.Id" tabindex="@(copy == 1 ? "-1" : "0")">
+                                @if (!string.IsNullOrEmpty(c.Icon))
+                                {
+                                    <img src="@Url.Content($"~/uploads/categories/{c.Icon}")" alt="" width="26" height="26" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>
+                                }
+                                <span>@c.Name</span>
+                            </a>
+                        </li>
+                        <li class="de-marquee__sep" aria-hidden="true"><i class="fa-solid fa-gear"></i></li>
+                    }
+                </ul>
+            }
+        </div>
+    </section>
+}

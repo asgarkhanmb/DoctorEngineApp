@@ -1,0 +1,22 @@
+@model DoctorEngineApp.ViewModels.Admin.AdminPageHead
+<div class="adm-page-head">
+    <div>
+        @if (Model.BackAction != null)
+        {
+            <a asp-action="@Model.BackAction" class="adm-back"><i class="fa-solid fa-arrow-left"></i> @Model.BackText</a>
+        }
+        <h1>@Model.Title</h1>
+        @if (!string.IsNullOrEmpty(Model.Subtitle))
+        {
+            <p>@Model.Subtitle</p>
+        }
+    </div>
+    @if (Model.PrimaryAction != null)
+    {
+        <div class="adm-page-head__actions">
+            <a asp-action="@Model.PrimaryAction" asp-all-route-data="@(Model.PrimaryRoute as Dictionary<string, string> ?? new())" class="btn btn-primary">
+                <i class="@Model.PrimaryIcon"></i> @Model.PrimaryText
+            </a>
+        </div>
+    }
+</div>

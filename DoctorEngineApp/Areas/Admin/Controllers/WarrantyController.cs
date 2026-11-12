@@ -1,120 +1,76 @@
-﻿using DoctorEngineApp.Data;
-using DoctorEngineApp.Models;
-using DoctorEngineApp.Services.Interfaces;
+﻿using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Warranties;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
 
-[Area("Admin")]
-[Authorize(Roles = "Admin")]
-public class WarrantyController : Controller
+namespace DoctorEngineApp.Areas.Admin.Controllers
 {
-    private readonly AppDbContext _db;
-    private readonly IWebHostEnvironment _env;
-    private readonly IWarrantyService _service;
+    [Area("Admin")]
+    [Authorize(Roles = "Admin")]
+    public class WarrantyController : Controller
+    {
+        private readonly IWarrantyService _service;
 
-    public WarrantyController(
-        AppDbContext db,
-        IWebHostEnvironment env,
-        IWarrantyService service)
-    {
-        _db = db;
-        _env = env;
-        _service = service;
-    }
-    public async Task<IActionResult> Index()
-    {
-        var list = await _service.GetAllAsync();
-        return View(list);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateJob(WarrantyCreateVM model)
-    {
-        if (!ModelState.IsValid)
+        public WarrantyController(IWarrantyService service)
         {
-            model.Logos = await _db.WarrantyLogos
-                .Select(l => new SelectListItem
-                {
-                    Value = l.Id.ToString(),
-                    Text = l.Name
-                }).ToListAsync();
-
-            return View(model);
+            _service = service;
         }
 
-        var selectedJobs = model.Jobs
-            .Where(j => j.IsSelected)
-            .ToList();
-
-        // burada DB-yə save edəcəksən
-
-        return RedirectToAction("Index");
-    }
-
-
-    [HttpPost]
-    public async Task<IActionResult> Create(WarrantyCreateVM vm)
-    {
-        if (!ModelState.IsValid)
+        public async Task<IActionResult> Index()
         {
-            // ❗ ƏN VACİB HİSSƏ
-            vm.Jobs = await _db.JobCatalogs
-                .Select(j => new JobVM
-                {
-                    JobId = j.Id,
-                    Name = j.Name,
-                    WarrantyMonths = j.DefaultWarrantyMonths
-                })
-                .ToListAsync();
-
-            vm.Logos = await _db.WarrantyLogos
-                .Select(l => new SelectListItem
-                {
-                    Value = l.Id.ToString(),
-                    Text = l.Name
-                })
-                .ToListAsync();
-
-            return View(vm);
+            var warranties = await _service.GetAllAsync();
+            return View(warranties);
         }
 
-        // 🔹 LOGO UPLOAD
-        if (vm.LogoFile != null)
+        public async Task<IActionResult> Detail(int id)
         {
-            var uploadsRoot = Path.Combine(_env.WebRootPath, "uploads", "logos");
+            var warranty = await _service.GetByIdAsync(id);
+            if (warranty == null) return NotFound();
+            return View(warranty);
+        }
 
-            if (!Directory.Exists(uploadsRoot))
-                Directory.CreateDirectory(uploadsRoot);
+        public IActionResult Create()
+        {
+            return View(new WarrantyCreateVM { Items = { new WarrantyItemVM() } });
+        }
 
-            var fileName = Guid.NewGuid() + Path.GetExtension(vm.LogoFile.FileName);
-            var fullPath = Path.Combine(uploadsRoot, fileName);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(WarrantyCreateVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+            await _service.CreateAsync(model);
+            return RedirectToAction(nameof(Index));
+        }
 
-            using var fs = new FileStream(fullPath, FileMode.Create);
-            await vm.LogoFile.CopyToAsync(fs);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _service.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
 
-            var logo = new WarrantyLogo
+        public async Task<IActionResult> Print(int id)
+        {
+            var warranty = await _service.GetByIdAsync(id);
+
+            if (warranty == null)
+                return NotFound();
+
+            return new ViewAsPdf("Print", warranty)
             {
-                Name = "Custom Logo",
-                ImagePath = "/uploads/logos/" + fileName
+                FileName = $"zemanet_{id}.pdf",
+
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+
+                PageMargins = new Rotativa.AspNetCore.Options.Margins(10, 10, 10, 10)
             };
-
-            _db.WarrantyLogos.Add(logo);
-            await _db.SaveChangesAsync();
-
-            vm.WarrantyLogoId = logo.Id;
         }
 
-        await _service.CreateAsync(vm);
-        return RedirectToAction("Index");
-    }
 
-    public async Task<IActionResult> Pdf(int id)
-    {
-        var data = await _service.GetAsync(id);
-        return new Rotativa.AspNetCore.ViewAsPdf("Pdf", data);
     }
 }

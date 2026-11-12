@@ -4,6 +4,7 @@ using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Accounts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Encodings.Web;
 
 namespace DoctorEngineApp.Controllers
 {
@@ -66,9 +67,10 @@ namespace DoctorEngineApp.Controllers
                                  new { userId = user.Id, token },
                                  Request.Scheme);
 
-            string html = $"<h3>Xoş Gəlmisiniz {user.FullName}</h3>" +
+            // İstifadəçi daxil etdiyi məlumat HTML-ə encode olunaraq yazılır
+            string html = $"<h3>Xoş Gəlmisiniz {HtmlEncoder.Default.Encode(user.FullName)}</h3>" +
                           $"<p>Emailinizi təsdiqləyin:</p>" +
-                          $"<a href='{url}'>Təsdiqlə</a>";
+                          $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Təsdiqlə</a>";
 
             await _emailService.SendAsync(user.Email, "Email Confirmation", html);
 
@@ -103,7 +105,7 @@ namespace DoctorEngineApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginVM model)
+        public async Task<IActionResult> Login(LoginVM model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -111,28 +113,43 @@ namespace DoctorEngineApp.Controllers
             var user = await _userManager.FindByEmailAsync(model.EmailOrUsername)
                        ?? await _userManager.FindByNameAsync(model.EmailOrUsername);
 
+            // Eyni ümumi mesaj: hansı hesabın mövcud olduğunu bildirmirik
+            const string invalidLogin = "İstifadəçi adı/email və ya şifrə yanlışdır";
+
             if (user == null)
             {
-                ModelState.AddModelError("", "İstifadəçi tapılmadı");
+                ModelState.AddModelError("", invalidLogin);
                 return View(model);
             }
 
-            if (!user.EmailConfirmed)
-            {
-                ModelState.AddModelError("", "Email təsdiqlənməyib");
-                return View(model);
-            }
-
+            // Şifrə əvvəlcə yoxlanılır; lockoutOnFailure: true -> brute-force qoruması
             var result = await _signInManager.PasswordSignInAsync(user,
                                                                   model.Password,
                                                                   model.RememberMe,
-                                                                  false);
+                                                                  lockoutOnFailure: true);
+
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelError("", "Çox sayda uğursuz cəhd. Hesab müvəqqəti bloklanıb, bir neçə dəqiqə sonra yenidən cəhd edin.");
+                return View(model);
+            }
+
+            // RequireConfirmedEmail aktiv olduğu üçün təsdiqlənməmiş email IsNotAllowed qaytarır
+            // (yalnız şifrə düzgün olduqda bura çatır)
+            if (result.IsNotAllowed)
+            {
+                ModelState.AddModelError("", "Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.");
+                return View(model);
+            }
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", "Şifrə yanlışdır");
+                ModelState.AddModelError("", invalidLogin);
                 return View(model);
             }
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return LocalRedirect(returnUrl);
 
             return RedirectToAction("Index", "Home");
         }
@@ -169,7 +186,7 @@ namespace DoctorEngineApp.Controllers
 
                 string html = $"<h3>Şifrəni yenilə</h3>" +
                               $"<p>Yeni şifrə təyin etmək üçün aşağıdakı linkə klik edin:</p>" +
-                              $"<a href='{url}'>Şifrəni dəyiş</a>";
+                              $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Şifrəni dəyiş</a>";
 
                 await _emailService.SendAsync(user.Email, "Reset Password", html);
             }
@@ -218,6 +235,10 @@ namespace DoctorEngineApp.Controllers
 
                 return View(model);
             }
+
+            // Şifrə yeniləndikdən sonra uğursuz cəhdlər və blok sıfırlanır
+            await _userManager.ResetAccessFailedCountAsync(user);
+            await _userManager.SetLockoutEndDateAsync(user, null);
 
             // Avtomatik login
             await _signInManager.SignInAsync(user, false);

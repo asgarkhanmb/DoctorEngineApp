@@ -1,39 +1,35 @@
-﻿@model List<Technician>
+@model List<Technician>
+@{ ViewData["Title"] = "Ustalar"; }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Technicians</h2>
-        <a asp-action="Create" class="btn btn-primary">+ Add Technician</a>
+<partial name="_PageHead" model='new AdminPageHead("Ustalar", "Ana səhifə və Haqqımızda səhifəsindəki “Mütəxəssislərimiz” bölməsi.", "Yeni usta", "Create")' />
+
+@if (!Model.Any())
+{
+    <div class="adm-card"><div class="adm-empty"><i class="fa-solid fa-user-gear"></i><strong>Hələ usta əlavə olunmayıb</strong></div></div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var t in Model)
+        {
+            <div class="col-sm-6 col-lg-4 col-xxl-3">
+                <div class="adm-card h-100 overflow-hidden">
+                    <img src="~/uploads/technicians/@t.Image" alt="@t.FullName" class="w-100" style="height:220px;object-fit:cover;background:#eef1f6" loading="lazy" />
+                    <div class="adm-card__body">
+                        <div class="adm-cell-title fs-6">@t.FullName</div>
+                        <div class="adm-cell-sub mb-3">@t.Position</div>
+                        <div class="d-flex align-items-center gap-2">
+                            @if (!string.IsNullOrEmpty(t.FacebookUrl)) { <a href="@t.FacebookUrl" target="_blank" rel="noopener" class="adm-act" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a> }
+                            @if (!string.IsNullOrEmpty(t.InstagramUrl)) { <a href="@t.InstagramUrl" target="_blank" rel="noopener" class="adm-act" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a> }
+                            @if (!string.IsNullOrEmpty(t.TiktokUrl)) { <a href="@t.TiktokUrl" target="_blank" rel="noopener" class="adm-act" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a> }
+                            <div class="adm-actions ms-auto">
+                                <a asp-action="Edit" asp-route-id="@t.Id" class="adm-act" title="Redaktə et" aria-label="Redaktə et"><i class="fa-solid fa-pen"></i></a>
+                                <partial name="_DeleteButton" model='new AdminDeleteButton("Delete", t.Id, $"{t.FullName} silinsin?")' />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Full Name</th>
-                <th>Position</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var t in Model)
-            {
-                <tr>
-                    <td>
-                        <img src="~/uploads/technicians/@t.Image"
-                             width="80" height="80"
-                             style="object-fit:cover;border-radius:8px;" />
-                    </td>
-                    <td>@t.FullName</td>
-                    <td>@t.Position</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-warning">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@t.Id"
-                           onclick="return confirm('Are you sure?')"
-                           class="btn btn-sm btn-danger">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+}

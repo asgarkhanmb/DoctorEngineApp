@@ -1,17 +1,30 @@
-﻿@model DoctorEngineApp.Models.WhatsappSetting
+@model DoctorEngineApp.Models.WhatsappSetting
+@{ ViewData["Title"] = "WhatsApp düyməsi"; }
 
-<form asp-action="Create" method="post">
+<partial name="_PageHead" model='new AdminPageHead("WhatsApp düyməsini ayarla", BackAction: "Index", BackText: "Geri")' />
 
-    <div class="mb-3">
-        <label>Telefon nömrəsi</label>
-        <input asp-for="PhoneNumber" class="form-control" />
-    </div>
+<div class="adm-card" style="max-width:640px">
+    <form asp-action="Create" method="post" class="adm-form">
+        <div class="adm-card__body">
+            
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="mb-3">
+                <label asp-for="PhoneNumber" class="form-label">WhatsApp nömrəsi</label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="994773051319" />
+                <div class="form-text">Ölkə kodu ilə, boşluqsuz (məs: 994501234567).</div>
+                <span asp-validation-for="PhoneNumber"></span>
+            </div>
+            <div>
+                <label asp-for="Message" class="form-label">Hazır mesaj</label>
+                <input asp-for="Message" class="form-control" placeholder="Salam, servis haqqında məlumat almaq istəyirəm" />
+                <span asp-validation-for="Message"></span>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yadda saxla</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
 
-    <div class="mb-3">
-        <label>Mesaj</label>
-        <input asp-for="Message" class="form-control" />
-    </div>
-
-    <button class="btn btn-success">Yadda saxla</button>
-
-</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

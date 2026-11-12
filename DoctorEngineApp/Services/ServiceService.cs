@@ -21,8 +21,7 @@ namespace DoctorEngineApp.Services
                 .Select(s => new ServiceVM
                 {
                     Id = s.Id,
-                    Name = s.Name,
-                    WhatsApp = s.WhatsApp
+                    Name = s.Name
                 }).ToListAsync();
         }
 
@@ -34,8 +33,7 @@ namespace DoctorEngineApp.Services
             return new ServiceVM
             {
                 Id = service.Id,
-                Name = service.Name,
-                WhatsApp = service.WhatsApp
+                Name = service.Name
             };
         }
 
@@ -43,8 +41,7 @@ namespace DoctorEngineApp.Services
         {
             var service = new Service
             {
-                Name = model.Name,
-                WhatsApp = model.WhatsApp
+                Name = model.Name
             };
 
             await _context.Services.AddAsync(service);
@@ -57,7 +54,6 @@ namespace DoctorEngineApp.Services
             if (service == null) throw new InvalidOperationException("Service not found");
 
             service.Name = model.Name;
-            service.WhatsApp = model.WhatsApp;
 
             await _context.SaveChangesAsync();
         }

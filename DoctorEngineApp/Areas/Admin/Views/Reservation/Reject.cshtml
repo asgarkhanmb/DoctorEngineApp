@@ -1,8 +1,21 @@
-﻿<form asp-action="Reject" method="post">
-    <input type="hidden" name="id" value="@ViewBag.Id" />
-    <div class="mb-3">
-        <label>İmtina səbəbini yazın</label>
-        <textarea name="reason" class="form-control" placeholder="İmtina səbəbi"></textarea>
-    </div>
-    <button class="btn btn-danger">Qeydi Yadda Saxla</button>
-</form>
+﻿@{
+    ViewData["Title"] = "Rezervasiyanı rədd et";
+}
+
+<partial name="_PageHead" model='new AdminPageHead("Rezervasiyanı rədd et", "Səbəb müştəriyə WhatsApp mesajında göstəriləcək.", BackAction: "Index")' />
+
+<div class="adm-card" style="max-width:640px">
+    <form asp-action="Reject" method="post" class="adm-form">
+        <div class="adm-card__body">
+            <input type="hidden" name="id" value="@ViewBag.Id" />
+            <div asp-validation-summary="All"></div>
+            <label for="reason" class="form-label">İmtina səbəbi</label>
+            <textarea id="reason" name="reason" class="form-control" rows="4" maxlength="500" required
+                      placeholder="Məs: Seçdiyiniz saatda bütün ustalar məşğuldur. Zəhmət olmasa başqa vaxt seçin.">@ViewBag.Reason</textarea>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-ban"></i> Rədd et</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>

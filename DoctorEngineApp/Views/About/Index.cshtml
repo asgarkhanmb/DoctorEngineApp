@@ -3,134 +3,102 @@
 @{
     ViewData["Title"] = "Haqqımızda";
 }
-<!-- Team Start -->
+
+<partial name="_PageHeader" model='("Haqqımızda", "Mühərrik təmirində təcrübə, müasir avadanlıq və hər müştəriyə fərdi yanaşma.")' />
+
+<!-- Haqqımızda -->
 <div class="container-xxl py-5">
     <div class="container">
+        <div class="row g-5 align-items-center">
 
-        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h6 class="text-primary text-uppercase">Bizim Texniklər</h6>
-            <h1 class="mb-5">Mütəxəssislərimiz</h1>
-        </div>
-
-        <div class="row g-4 justify-content-center">
-
-            @foreach (var t in Model.Technicians)
-            {
-                <div class="col-lg-3 col-md-6 wow fadeInUp">
-                    <div class="team-item shadow rounded overflow-hidden">
-
-                        <div class="position-relative overflow-hidden">
-                            <img class="img-fluid w-100"
-                                 src="~/uploads/technicians/@t.Image"
-                                 style="height:300px; object-fit:cover;" />
-
-                            <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex align-items-center justify-content-center">
-
-                                @if (!string.IsNullOrEmpty(t.FacebookUrl))
-                                {
-                                    <a class="btn btn-square mx-1" href="@t.FacebookUrl" target="_blank">
-                                        <i class="fab fa-facebook-f"></i>
-                                    </a>
-                                }
-
-                                @if (!string.IsNullOrEmpty(t.InstagramUrl))
-                                {
-                                    <a class="btn btn-square mx-1" href="@t.InstagramUrl" target="_blank">
-                                        <i class="fab fa-instagram"></i>
-                                    </a>
-                                }
-
-                                @if (!string.IsNullOrEmpty(t.TiktokUrl))
-                                {
-                                    <a class="btn btn-square mx-1" href="@t.TiktokUrl" target="_blank">
-                                        <i class="fab fa-tiktok"></i>
-                                    </a>
-                                }
-                            </div>
-                        </div>
-
-                        <div class="bg-light text-center p-4">
-                            <h5 class="fw-bold mb-0">@t.FullName</h5>
-                            <small>@t.Position</small>
-                        </div>
-
-                    </div>
-                </div>
-            }
-
-        </div>
-    </div>
-</div>
-<!-- Team End -->
-<!-- INFORM START -->
-<div class="container-xxl py-5">
-    <div class="container">
-        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h6 class="text-primary text-uppercase">Xidmətlərimiz</h6>
-             <br />
-              
-        </div>
-        <div class="row g-4">
-
-            @for (int i = 0; i < Model.Informs.Count; i++)
-            {
-                var item = Model.Informs[i];
-                var delay = (i * 0.2) + 0.1;
-
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="@($"{delay:0.0}s")">
-                    <div class="d-flex py-5 px-4 align-items-center bg-light">
-                        @if (!string.IsNullOrEmpty(item.Icon))
-                        {
-                            <img src="@item.Icon"
-                                 style="width:50px;height:50px;object-fit:contain;" />
-                        }
-                        <div class="ps-4">
-                            <h5>@item.Title</h5>
-                            <p>@item.Description</p>
-                        </div>
-                    </div>
-                </div>
-            }
-
-        </div>
-    </div>
-</div>
-<!-- INFORM END -->
-<!-- ABOUT START -->
-<div class="container-xxl py-5">
-    <div class="container">
-        <div class="row g-5">
-
-            <!-- VIDEO -->
-            <div class="col-lg-6">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
                 @if (!string.IsNullOrEmpty(Model.VideoPath))
                 {
-                    <video class="w-100"
-                           style="max-height:600px;object-fit:cover;border-radius:20px;"
-                           controls>
-                        <source src="@Url.Content(Model.VideoPath)" type="video/mp4" />
-                    </video>
+                    <partial name="_VideoFrame" model='new VideoFrame(Url.Content(Model.VideoPath))' />
                 }
             </div>
 
-            <!-- TEXT -->
-            <div class="col-lg-6">
-                <h6 class="text-primary text-uppercase">HAQQIMIZDA</h6>
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.25s">
+                <h6 class="text-primary text-uppercase">Haqqımızda</h6>
                 <h1 class="mb-4">@Model.Title</h1>
-                <p>@Model.Description</p>
-                <div class="row g-4 mb-3 pb-3">
-                    @for (int i = 0; i < Model.Informs.Count; i++)
-                    {
-                        <div class="col-12">
-                            <h6>@Model.Informs[i].Title</h6>
-                            <span>@Model.Informs[i].Description</span>
-                        </div>
-                    }
-                </div>
+                <p class="mb-4">@Model.Description</p>
+
+                @if (Model.Informs != null && Model.Informs.Any())
+                {
+                    <ul class="de-checklist mb-4">
+                        @foreach (var inf in Model.Informs)
+                        {
+                            <li><div><h6>@inf.Title</h6><span>@inf.Description</span></div></li>
+                        }
+                    </ul>
+                }
+
+                <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary py-3 px-5">
+                    Rezervasiya et <i class="fa fa-arrow-right ms-2"></i>
+                </a>
             </div>
 
         </div>
     </div>
 </div>
-<!-- ABOUT END -->
 
+<!-- Üstünlüklər -->
+<div class="container-xxl pt-4">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="text-primary text-uppercase">Niyə biz?</h6>
+            <h1 class="mb-0">Üstünlüklərimiz</h1>
+        </div>
+    </div>
+</div>
+<partial name="_InformCards" model="Model.Informs" />
+
+<!-- Komanda -->
+@if (Model.Technicians != null && Model.Technicians.Any())
+{
+    <div class="container-xxl py-5">
+        <div class="container">
+
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="text-primary text-uppercase">Bizim Texniklər</h6>
+                <h1 class="mb-5">Mütəxəssislərimiz</h1>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                @foreach (var t in Model.Technicians)
+                {
+                    <div class="col-lg-3 col-md-6 wow fadeInUp">
+                        <div class="team-item shadow rounded overflow-hidden">
+
+                            <div class="position-relative overflow-hidden">
+                                <img class="img-fluid w-100" src="~/uploads/technicians/@t.Image" alt="@t.FullName"
+                                     loading="lazy" style="height:300px; object-fit:cover;" />
+
+                                <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                    @if (!string.IsNullOrEmpty(t.FacebookUrl))
+                                    {
+                                        <a class="btn btn-square mx-1" href="@t.FacebookUrl" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(t.InstagramUrl))
+                                    {
+                                        <a class="btn btn-square mx-1" href="@t.InstagramUrl" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                                    }
+                                    @if (!string.IsNullOrEmpty(t.TiktokUrl))
+                                    {
+                                        <a class="btn btn-square mx-1" href="@t.TiktokUrl" target="_blank" rel="noopener" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="bg-light text-center p-4">
+                                <h5 class="fw-bold mb-0">@t.FullName</h5>
+                                <small>@t.Position</small>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}

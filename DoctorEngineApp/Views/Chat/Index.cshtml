@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Canlı Çat";
+}
+
+<partial name="_PageHeader" model='("Canlı Çat", "Usta ilə birbaşa yazışın — şəkil və video da göndərə bilərsiniz.")' />
+
+<div class="container-xxl pb-4">
+    <div class="container">
+        <partial name="_ChatWidget" view-data='new ViewDataDictionary(ViewData) { ["ChatFullPage"] = true }' />
+    </div>
+</div>

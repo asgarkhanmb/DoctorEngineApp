@@ -14,16 +14,25 @@ namespace DoctorEngineApp.Services
 
         public async Task<List<SubServiceVM>> GetAllAsync()
         {
-            return await _ctx.SubServices
+            var list = await _ctx.SubServices
                 .Include(s => s.Category)
+                .OrderBy(s => s.CategoryId).ThenBy(s => s.Id)
                 .Select(x => new SubServiceVM
                 {
                     Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
                     Video = x.Video,
+                    CategoryId = x.CategoryId,
                     CategoryName = x.Category != null ? x.Category.Name : ""
                 }).ToListAsync();
+
+            // Hər kateqoriyada yalnız birinci video saytda göstərilir — qalanlarını işarələ
+            foreach (var group in list.GroupBy(s => s.CategoryId))
+                foreach (var extra in group.Skip(1))
+                    extra.IsExtra = true;
+
+            return list;
         }
 
         public async Task<SubServiceEditVM?> GetForEditAsync(int id)

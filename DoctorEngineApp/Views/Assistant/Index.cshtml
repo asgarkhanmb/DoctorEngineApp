@@ -1,0 +1,155 @@
+@using DoctorEngineApp.Services
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    ViewData["Title"] = "AI Köməkçi";
+    var configured = ViewBag.AiConfigured as bool? ?? false;
+    var quota = ViewBag.AiQuota as AiQuota ?? new AiQuota(0, 0);
+    var config = new
+    {
+        token = Antiforgery.GetAndStoreTokens(Context).RequestToken,
+        maxLength = AiAssistantService.MaxUserMessageLength,
+        configured,
+        remaining = quota.Remaining,
+        limit = quota.Limit
+    };
+    var suggestions = new[]
+    {
+        ("fa-solid fa-gauge-high", "Mühərrik soyuqda çətin işə düşür, səbəbi nə ola bilər?"),
+        ("fa-solid fa-oil-can", "Yağ təzyiqi lampası yanır, sürmək olarmı?"),
+        ("fa-regular fa-clock", "İş saatlarınız və ünvanınız nədir?"),
+        ("fa-regular fa-calendar-check", "Necə rezervasiya edə bilərəm?"),
+        ("fa-solid fa-screwdriver-wrench", "Hansı xidmətləri göstərirsiniz?"),
+        ("fa-solid fa-smog", "İşlənmiş qazdan qara tüstü çıxır, nədir?")
+    };
+}
+
+@section css {
+    <link rel="stylesheet" href="~/css/assistant.css" asp-append-version="true" />
+}
+
+<partial name="_PageHeader" model='("AI Köməkçi", "Mühərrik problemləri, xidmətlər, iş saatları və rezervasiya barədə suallarınıza dərhal cavab — günün istənilən vaxtı.")' />
+
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- ================= SÖHBƏT ================= -->
+            <div class="col-lg-8">
+                <section class="ai" id="ai" aria-label="AI köməkçi ilə söhbət">
+
+                    <header class="ai__head">
+                        <span class="ai__avatar" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                        <div class="ai__title">
+                            <h2>DoctorEngine Köməkçi</h2>
+                            <span class="ai__status @(configured ? "is-on" : "is-off")">
+                                <span class="ai__dot"></span>
+                                @(configured ? "Süni intellekt · adətən bir neçə saniyəyə cavab verir" : "Tezliklə aktiv olacaq")
+                            </span>
+                        </div>
+                        <button type="button" class="ai__icon-btn" data-ai-reset title="Yeni söhbət" aria-label="Yeni söhbət" hidden>
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </header>
+
+                    <div class="ai__body" role="log" aria-live="polite">
+
+                        <div class="ai__welcome">
+                            <div class="ai__welcome-icon" aria-hidden="true"><i class="fa-solid fa-robot"></i></div>
+                            <h3>Salam! Mən DoctorEngine-in AI köməkçisiyəm 👋</h3>
+                            <p>Mühərrikinizdə nə problem var? Əlaməti yazın — mümkün səbəbləri izah edim, xidmətlərimiz və rezervasiya barədə məlumat verim.</p>
+
+                            <div class="ai__suggestions">
+                                @foreach (var (icon, text) in suggestions)
+                                {
+                                    <button type="button" class="ai__chip" data-ai-suggest="@text" disabled="@(!configured || quota.Remaining <= 0)">
+                                        <i class="@icon" aria-hidden="true"></i><span>@text</span>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="ai__list"></div>
+                    </div>
+
+                    @if (configured)
+                    {
+                        <div class="ai__limit" data-ai-limit-box hidden="@(quota.Remaining > 0)">
+                            <i class="fa-regular fa-hourglass-half"></i>
+                            <span>Bugünkü <b>@quota.Limit</b> pulsuz sual limitiniz doldu — sabah yenidən yaza bilərsiniz. Təcili sualınız varsa, <a asp-controller="Contact" asp-action="Index" asp-fragment="chat">usta ilə canlı çatda</a> yazın.</span>
+                        </div>
+                        <form class="ai__composer" novalidate hidden="@(quota.Remaining <= 0)">
+                            <div class="ai__input-wrap">
+                                <textarea class="ai__input" rows="1" maxlength="@AiAssistantService.MaxUserMessageLength"
+                                          placeholder="Sualınızı yazın… (məs: mühərrikdən tıqqıltı səsi gəlir)" aria-label="Sual"></textarea>
+                                <button type="submit" class="ai__send" title="Göndər" aria-label="Göndər" disabled>
+                                    <i class="fa-solid fa-arrow-up"></i>
+                                </button>
+                                <button type="button" class="ai__stop" title="Dayandır" aria-label="Dayandır" hidden>
+                                    <i class="fa-solid fa-stop"></i>
+                                </button>
+                            </div>
+                            <div class="ai__hint">
+                                <span class="ai__quota" title="Gündəlik pulsuz limit. Bakı vaxtı ilə gecə yarısı yenilənir.">
+                                    <i class="fa-solid fa-bolt"></i> Bu gün <b data-ai-remaining>@quota.Remaining</b> / @quota.Limit sual qalıb
+                                </span>
+                                <span class="ai__counter" aria-hidden="true"></span>
+                                <span class="ai__privacy"><i class="fa-solid fa-shield-halved"></i> Şəxsi məlumat yazmayın</span>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="ai__offline">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>AI köməkçi tezliklə aktiv olacaq. Hələlik <a asp-controller="Contact" asp-action="Index" asp-fragment="chat">usta ilə canlı çatda</a> yazın.</span>
+                        </div>
+                    }
+                </section>
+            </div>
+
+            <!-- ================= YAN PANEL ================= -->
+            <div class="col-lg-4">
+                <aside class="ai-side">
+
+                    <div class="ai-card ai-card--accent">
+                        <h3><i class="fa-solid fa-user-gear"></i> Usta ilə danışın</h3>
+                        <p>Dəqiq diaqnoz və qiymət üçün ustalarımızla birbaşa əlaqə saxlayın.</p>
+                        <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="btn btn-light w-100 mb-2">
+                            <i class="fa-regular fa-comments me-2"></i> Canlı çat
+                        </a>
+                        <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary w-100">
+                            <i class="fa-regular fa-calendar-check me-2"></i> Rezervasiya et
+                        </a>
+                    </div>
+
+                    <div class="ai-card">
+                        <h3><i class="fa-solid fa-route"></i> Necə işləyir?</h3>
+                        <ol class="ai-steps">
+                            <li><b>Problemi təsvir edin</b><span>Əlaməti, maşının modelini və ilini yazın.</span></li>
+                            <li><b>AI izah edir</b><span>Mümkün səbəblər və nə etməli olduğunuz.</span></li>
+                            <li><b>Ustaya gəlin</b><span>Rezervasiya edin — dəqiq diaqnozu ustalar qoyur.</span></li>
+                        </ol>
+                    </div>
+
+                    <div class="ai-card ai-card--note">
+                        <h3><i class="fa-solid fa-circle-exclamation"></i> Bilməli olduğunuz</h3>
+                        <ul>
+                            <li>AI səhv edə bilər — cavablar məlumat xarakterlidir, diaqnoz deyil.</li>
+                            <li>Qiymət diaqnostikadan sonra müəyyən olunur.</li>
+                            <li>Hər istifadəçi gündə <b>@quota.Limit</b> sual verə bilər — qeydiyyat lazım deyil.</li>
+                            <li>Şəxsi məlumat (FİN, kart, parol) yazmayın.</li>
+                            <li>Söhbət yalnız bu brauzer pəncərəsində saxlanılır.</li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script id="aiConfig" type="application/json">@Json.Serialize(config)</script>
+
+@section Scripts {
+    <script src="~/js/assistant.js" asp-append-version="true"></script>
+}

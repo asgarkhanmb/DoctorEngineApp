@@ -1,0 +1,70 @@
+﻿@* Giriş / Qeydiyyat / Şifrə səhifələri üçün layout — saytın brend rəngləri ilə *@
+@inject DoctorEngineApp.Services.Interfaces.ISiteSettingService SiteSettings
+@{ var site = await SiteSettings.GetAsync(); }
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0B2154" />
+    <meta name="robots" content="noindex" />
+    <title>@ViewData["Title"] — @site.SiteName</title>
+
+    <link href="~/assets/img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body>
+
+    <div class="auth-shell">
+
+        <!-- Brend paneli (desktop) -->
+        <aside class="auth-aside" aria-hidden="true">
+            <a asp-controller="Home" asp-action="Index" class="auth-brand auth-brand--light" tabindex="-1">
+                <span class="auth-brand__icon"><partial name="_BrandIcon" model="site" /></span>
+                @site.SiteName
+            </a>
+
+            <div class="auth-aside__content">
+                <span class="auth-aside__eyebrow">Mühərrik təmiri mərkəzi</span>
+                <h2>Mühərrikiniz<br />etibarlı əllərdə.</h2>
+                <p>Hesabınızla usta ilə canlı yazışın, şəkil və video göndərin, rezervasiyalarınızı rahat idarə edin.</p>
+
+                <ul class="auth-perks">
+                    <li><i class="fa-regular fa-comments"></i><span><strong>Canlı usta çatı</strong>Suallarınıza real vaxtda cavab</span></li>
+                    <li><i class="fa-regular fa-images"></i><span><strong>Şəkil və video</strong>Problemi göstərin — daha dəqiq diaqnoz</span></li>
+                    <li><i class="fa-regular fa-calendar-check"></i><span><strong>Onlayn rezervasiya</strong>Növbə gözləmədən xidmət</span></li>
+                </ul>
+            </div>
+
+            <small class="auth-aside__foot">© @DateTime.Now.Year @site.SiteName</small>
+        </aside>
+
+        <!-- Forma -->
+        <main class="auth-main">
+            <div class="auth-top">
+                <a asp-controller="Home" asp-action="Index" class="auth-brand auth-brand--mobile">
+                    <span class="auth-brand__icon"><partial name="_BrandIcon" model="site" /></span>
+                    @site.SiteName
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="auth-back">
+                    <i class="fa-solid fa-arrow-left"></i> Ana səhifə
+                </a>
+            </div>
+
+            <div class="auth-card">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+    <script src="~/js/no-autocomplete.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

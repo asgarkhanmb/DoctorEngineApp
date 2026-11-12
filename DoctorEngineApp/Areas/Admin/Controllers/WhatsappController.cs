@@ -51,14 +51,6 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> Delete(int id)
-        {
-            var data = await _service.GetAsync();
-            if (data == null || data.Id != id)
-                return NotFound();
-
-            return View(data);
-        }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

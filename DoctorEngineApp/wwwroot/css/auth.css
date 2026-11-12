@@ -1,204 +1,529 @@
-﻿* {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+﻿/* =====================================================
+   DoctorEngine.Az — Giriş / Qeydiyyat səhifələri
+   ===================================================== */
+
+:root {
+    --a-primary: #D81324;
+    --a-primary-dark: #b00f1d;
+    --a-primary-soft: rgba(216, 19, 36, .1);
+    --a-navy: #0B2154;
+    --a-navy-2: #16306f;
+    --a-text: #5b6477;
+    --a-heading: #0B2154;
+    --a-border: #e3e7ef;
+    --a-soft: #f5f7fb;
+    --a-ok: #16a34a;
+    --a-ease: cubic-bezier(.22, .61, .36, 1);
 }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
 
 body {
-    background-color: #080710;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #fff;
+    color: var(--a-text);
+    font-family: "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
 }
 
-.background {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 430px;
-    height: 520px;
-    overflow: hidden;
+a { color: var(--a-primary); text-decoration: none; transition: color .2s; }
+a:hover { color: var(--a-primary-dark); }
+
+h1, h2, h3 { margin: 0; color: var(--a-heading); font-family: "Barlow", sans-serif; letter-spacing: -.3px; }
+
+:focus-visible { outline: 3px solid rgba(216, 19, 36, .4); outline-offset: 2px; border-radius: 6px; }
+
+/* ---------- KARKAS ---------- */
+
+.auth-shell {
+    display: grid;
+    grid-template-columns: minmax(380px, 46%) 1fr;
+    min-height: 100vh;
 }
 
-    .background .shape {
-        position: absolute;
-        border-radius: 50%;
-        height: 200px;
-        width: 200px;
-    }
+/* ---------- SOL PANEL ---------- */
 
-.shape:first-child {
-    background: linear-gradient(#1845ad, #23a2f6);
-    top: -80px;
-    left: -80px;
-}
-
-.shape:last-child {
-    background: linear-gradient(to right, #ff512f, #f09819);
-    bottom: -80px;
-    right: -30px;
-}
-
-form {
+.auth-aside {
     position: relative;
-    width: 90%;
-    max-width: 400px;
-    background-color: rgba(255, 255, 255, 0.13);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-    padding: 50px 35px;
-    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 44px 56px;
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(circle at 85% 15%, rgba(216, 19, 36, .45), transparent 42%),
+        radial-gradient(circle at 10% 95%, rgba(216, 19, 36, .25), transparent 40%),
+        linear-gradient(150deg, rgba(11, 33, 84, .96), rgba(8, 18, 48, .97)),
+        url("../assets/img/bmwserv.jpg") center / cover no-repeat;
 }
 
-    form * {
-        font-family: 'Poppins', sans-serif;
-        color: #ffffff;
-        letter-spacing: 0.5px;
-        outline: none;
-        border: none;
-    }
+.auth-aside::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, .07) 1px, transparent 0) 0 0 / 22px 22px;
+    pointer-events: none;
+}
 
-    form h3 {
-        font-size: 32px;
-        font-weight: 500;
-        line-height: 42px;
-        text-align: center;
-        margin-bottom: 30px;
-    }
+.auth-aside > * { position: relative; z-index: 1; }
 
-label {
+.auth-aside__content { max-width: 460px; animation: a-rise .8s var(--a-ease) both; }
+
+.auth-aside__eyebrow {
+    display: inline-block;
+    margin-bottom: 18px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(216, 19, 36, .85);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.auth-aside h2 { color: #fff; font-size: clamp(34px, 3.4vw, 48px); line-height: 1.1; margin-bottom: 16px; }
+.auth-aside p { margin: 0 0 32px; color: rgba(255, 255, 255, .75); font-size: 16px; }
+
+.auth-perks { display: grid; gap: 18px; margin: 0; padding: 0; list-style: none; }
+
+.auth-perks li { display: flex; gap: 14px; align-items: center; }
+
+.auth-perks i {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid rgba(255, 255, 255, .14);
+    font-size: 18px;
+}
+
+.auth-perks strong { display: block; color: #fff; font-weight: 500; }
+.auth-perks span { color: rgba(255, 255, 255, .68); font-size: 14px; }
+
+.auth-aside__foot { color: rgba(255, 255, 255, .5); }
+
+/* ---------- BREND ---------- */
+
+.auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--a-primary);
+    font-family: "Barlow", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+}
+
+.auth-brand--light { color: #fff; }
+.auth-brand--light:hover { color: #fff; }
+
+.auth-brand__icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--a-primary);
+    color: #fff;
+    font-size: 18px;
+    box-shadow: 0 6px 16px rgba(216, 19, 36, .4);
+}
+
+/* ---------- SAĞ TƏRƏF ---------- */
+
+.auth-main {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 40px 40px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(216, 19, 36, .05), transparent 35%),
+        var(--a-soft);
+}
+
+.auth-top { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+.auth-brand--mobile { display: none; }
+
+.auth-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--a-border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--a-navy);
+    font-size: 14px;
+    transition: border-color .2s, transform .2s var(--a-ease);
+}
+
+.auth-back:hover { color: var(--a-primary); border-color: var(--a-primary); transform: translateX(-2px); }
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    margin: auto;
+    padding: 36px 0 12px;
+    animation: a-rise .6s var(--a-ease) both;
+}
+
+@keyframes a-rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ---------- BAŞLIQ ---------- */
+
+.auth-head { margin-bottom: 28px; }
+
+.auth-head__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+    border-radius: 16px;
+    background: var(--a-primary-soft);
+    color: var(--a-primary);
+    font-size: 22px;
+}
+
+.auth-head h1 { font-size: 32px; margin-bottom: 6px; }
+.auth-head p { margin: 0; color: var(--a-text); }
+
+/* ---------- SAHƏLƏR ---------- */
+
+.auth-form { display: grid; gap: 18px; }
+.auth-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.auth-field label {
     display: block;
-    margin-top: 30px;
-    font-size: 16px;
+    margin-bottom: 7px;
+    color: var(--a-navy);
+    font-size: 14px;
     font-weight: 500;
 }
 
-input {
-    width: 100%;
-    height: 50px;
-    padding: 0 10px;
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: 300;
-    background-color: rgba(255, 255, 255, 0.07);
-    border-radius: 3px;
-    color: #ffffff;
-}
+.auth-input { position: relative; }
 
-    input::placeholder {
-        color: #e5e5e5;
-    }
-
-button {
-    width: 100%;
-    padding: 15px 0;
-    margin-top: 50px;
-    background-color: #ffffff;
-    color: #080710;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-    outline: none;
-}
-
-.social {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-}
-
-    .social div {
-        background-color: rgba(255, 255, 255, 0.27);
-        color: #eaf0fb;
-        padding: 5px 10px;
-        border-radius: 3px;
-        margin: 0 10px;
-        text-align: center;
-        cursor: pointer;
-    }
-
-        .social div:hover {
-            background-color: rgba(255, 255, 255, 0.47);
-        }
-
-.footer {
+.auth-input > i {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9aa2b1;
+    font-size: 15px;
+    pointer-events: none;
+    transition: color .2s;
 }
 
-    .footer a {
-        color: #ffffff;
-        text-decoration: none;
-    }
+.auth-input input {
+    width: 100%;
+    height: 52px;
+    padding: 0 16px 0 46px;
+    border: 1px solid var(--a-border);
+    border-radius: 12px;
+    background: #fff;
+    color: #1d2433;
+    font: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
 
-/* Show Password Style */
-.show-password {
-    margin-top: 15px;
+.auth-input input::placeholder { color: #a3aab8; }
+
+.auth-input input:hover { border-color: #cfd5e0; }
+
+.auth-input input:focus {
+    border-color: var(--a-primary);
+    box-shadow: 0 0 0 4px var(--a-primary-soft);
+}
+
+.auth-input:focus-within > i { color: var(--a-primary); }
+
+.auth-input--password input { padding-right: 50px; }
+
+.auth-eye {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #8a93a6;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+
+.auth-eye:hover { background: var(--a-soft); color: var(--a-navy); }
+
+/* Validation */
+.auth-input input.input-validation-error { border-color: var(--a-primary); background: #fffafa; }
+
+.field-validation-error {
     display: flex;
     align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    color: var(--a-primary);
+    font-size: 13px;
+    animation: a-rise .25s var(--a-ease) both;
 }
 
-    .show-password input {
-        width: auto;
-        height: auto;
-        margin-right: 8px;
-        cursor: pointer;
-    }
+.field-validation-error::before { content: "\f06a"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 12px; }
+.field-validation-valid { display: none; }
 
-/* Responsive adjustments */
-.media (max-width: 400px) {
-    .background
+.auth-hint { display: block; margin-top: 6px; color: #8a93a6; font-size: 12.5px; }
+.auth-caps { display: none; margin-top: 6px; color: #b45309; font-size: 12.5px; }
+.auth-caps.is-on { display: flex; align-items: center; gap: 6px; }
 
-{
-    width: 300px;
-    height: 420px;
+/* Şifrə qaydaları */
+.auth-rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+    margin: 10px 0 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid var(--a-border);
+    list-style: none;
+    font-size: 12.5px;
 }
 
-form {
-    padding: 30px;
+.auth-rules li { display: flex; align-items: center; gap: 7px; color: #8a93a6; transition: color .2s; }
+.auth-rules li::before { content: "\f111"; font-family: "Font Awesome 6 Free"; font-weight: 400; font-size: 10px; }
+.auth-rules li.is-ok { color: var(--a-ok); }
+.auth-rules li.is-ok::before { content: "\f058"; font-weight: 900; font-size: 12px; }
+
+.auth-meter { display: flex; gap: 5px; margin-top: 10px; }
+.auth-meter span { flex: 1; height: 4px; border-radius: 4px; background: var(--a-border); transition: background .25s; }
+.auth-meter[data-level="1"] span:nth-child(-n+1) { background: #ef4444; }
+.auth-meter[data-level="2"] span:nth-child(-n+2) { background: #f59e0b; }
+.auth-meter[data-level="3"] span:nth-child(-n+3) { background: #eab308; }
+.auth-meter[data-level="4"] span:nth-child(-n+4) { background: #22c55e; }
+.auth-meter[data-level="5"] span { background: var(--a-ok); }
+
+.auth-match { display: none; align-items: center; gap: 6px; margin-top: 6px; font-size: 12.5px; }
+.auth-match.is-ok { display: flex; color: var(--a-ok); }
+.auth-match.is-bad { display: flex; color: var(--a-primary); }
+
+/* Sətir: məni xatırla + unutdum */
+.auth-options { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; }
+
+.auth-check { display: inline-flex; align-items: center; gap: 9px; color: var(--a-navy); cursor: pointer; user-select: none; }
+.auth-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--a-primary); cursor: pointer; }
+
+/* ---------- DÜYMƏ ---------- */
+
+.auth-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 54px;
+    margin-top: 4px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--a-primary), var(--a-primary-dark));
+    color: #fff;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: .3px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(216, 19, 36, .3);
+    transition: transform .2s var(--a-ease), box-shadow .2s, opacity .2s;
 }
 
-    form h3 {
-        font-size: 28px;
-        line-height: 36px;
-    }
+.auth-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(216, 19, 36, .38); color: #fff; }
+.auth-btn:active { transform: translateY(0); }
+.auth-btn:disabled { opacity: .75; cursor: wait; transform: none; }
+.auth-btn i { transition: transform .2s var(--a-ease); }
+.auth-btn:hover i.fa-arrow-right { transform: translateX(4px); }
 
-label {
+.auth-btn--ghost {
+    background: #fff;
+    color: var(--a-navy);
+    border: 1px solid var(--a-border);
+    box-shadow: none;
+}
+
+.auth-btn--ghost:hover { color: var(--a-primary); border-color: var(--a-primary); box-shadow: none; }
+
+.auth-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, .4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: a-spin .7s linear infinite;
+}
+
+@keyframes a-spin { to { transform: rotate(360deg); } }
+
+/* ---------- ALT ---------- */
+
+.auth-switch {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid var(--a-border);
+    text-align: center;
+    font-size: 14.5px;
+}
+
+.auth-switch a { font-weight: 500; }
+
+/* ---------- XƏBƏRDARLIQLAR ---------- */
+
+.auth-alert {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-radius: 12px;
     font-size: 14px;
+    animation: a-rise .3s var(--a-ease) both;
 }
 
-input, button {
-    height: 40px;
-    font-size: 12px;
+.auth-alert i { margin-top: 3px; }
+.auth-alert--ok { background: #ecfdf3; color: #166534; border: 1px solid #bbf7d0; }
+
+.validation-summary-errors {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    font-size: 14px;
+    animation: a-shake .4s var(--a-ease) both;
 }
 
-.social div {
-    padding: 4px 8px;
-    font-size: 12px;
+.validation-summary-errors::before { content: "\f071"; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-top: 2px; }
+.validation-summary-errors ul { margin: 0; padding-left: 16px; }
+.validation-summary-errors ul:has(> li:only-child) { padding-left: 0; list-style: none; }
+.validation-summary-valid { display: none; }
+
+@keyframes a-shake {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
 }
 
+/* ---------- MOBİL ---------- */
+
+@media (max-width: 960px) {
+    .auth-shell { grid-template-columns: 1fr; }
+    .auth-aside { display: none; }
+    .auth-main { min-height: 100vh; padding: 20px 20px 32px; }
+    .auth-top { justify-content: space-between; }
+    .auth-brand--mobile { display: inline-flex; font-size: 22px; }
+    .auth-brand--mobile .auth-brand__icon { width: 36px; height: 36px; font-size: 15px; }
+    .auth-back { padding: 7px 12px; font-size: 13px; }
+    .auth-card { padding-top: 28px; }
 }
 
-.media (min-width: 401px) and (max-width: 768px) {
-    .background
-
-{
-    width: 90%;
-    height: auto;
+@media (max-width: 480px) {
+    .auth-row { grid-template-columns: 1fr; }
+    .auth-rules { grid-template-columns: 1fr; }
+    .auth-head h1 { font-size: 28px; }
+    .auth-options { flex-wrap: wrap; }
 }
 
-form {
-    padding: 40px;
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
+/* ---------- SCROLLSUZ (desktop) ----------
+   Səhifə ekran hündürlüyünə bərkidilir və forma yığcamlaşdırılır ki, sığsın.
+   Çox alçaq ekranda (və ya çoxlu xəta mesajı olanda) forma görünməz zolaqla
+   öz içində sürüşür — düymə heç vaxt əlçatmaz qalmır. */
+@media (min-width: 961px) {
+    html, body { overflow: hidden; }
+
+    .auth-shell { height: 100vh; height: 100dvh; min-height: 0; }
+    .auth-aside { padding: 36px 52px; }
+
+    .auth-main {
+        padding: 20px 40px;
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+    .auth-main::-webkit-scrollbar { display: none; }
+
+    .auth-card { padding: 8px 0; }
+
+    .auth-head { margin-bottom: 18px; }
+    .auth-head__icon { width: 46px; height: 46px; margin-bottom: 12px; border-radius: 14px; font-size: 19px; }
+    .auth-head h1 { font-size: 28px; margin-bottom: 4px; }
+
+    .auth-form { gap: 13px; }
+    .auth-field label { margin-bottom: 5px; }
+    .auth-input input { height: 46px; }
+    .auth-eye { height: 36px; }
+    .auth-rules { margin-top: 8px; padding: 9px 12px; }
+    .auth-meter { margin-top: 8px; }
+    .auth-btn { height: 50px; }
+    .auth-switch { margin-top: 18px; padding-top: 16px; }
 }
+
+/* Alçaq ekranlarda başlıq ikonu gizlənir — əlavə yer qazanılır */
+@media (min-width: 961px) and (max-height: 820px) {
+    .auth-head__icon { display: none; }
+
+    /* "Ana səhifə" düyməsi axından çıxarılır — yuxarıda ~60px yer açılır */
+    .auth-main { position: relative; }
+    .auth-top { position: absolute; top: 16px; right: 24px; z-index: 2; }
+
+    .auth-card { max-width: 480px; }
+    .auth-head { margin-bottom: 14px; padding-right: 120px; }
+    .auth-head h1 { font-size: 26px; }
+    .auth-head p { font-size: 14px; }
+
+    .auth-form { gap: 10px; }
+    .auth-field label { margin-bottom: 4px; font-size: 13.5px; }
+    .auth-input input { height: 42px; }
+    .auth-eye { height: 34px; }
+
+    /* Şifrə tələbləri 3 sütunda — iki sətirə sığır */
+    .auth-rules { grid-template-columns: repeat(3, auto); gap: 4px 10px; padding: 8px 12px; font-size: 12.5px; }
+    .auth-meter { margin-top: 6px; }
+
+    .auth-btn { height: 46px; }
+    .auth-switch { margin-top: 12px; padding-top: 12px; }
+}
+
+/* Çox alçaq ekranlar: alt başlıq da gizlənir */
+@media (min-width: 961px) and (max-height: 660px) {
+    .auth-head p { display: none; }
+    .auth-aside { padding: 28px 48px; }
+}
+
+/* Yüklənmiş loqo: qırmızı qutu əvəzinə loqonun öz görünüşü */
+.auth-brand__icon:has(.de-brand-logo) { width: auto; background: transparent; box-shadow: none; }
+.auth-brand__icon .de-brand-logo { display: block; height: 42px; width: auto; max-width: 140px; object-fit: contain; border-radius: 10px; }
+
+/* Saytla giriş səhifələri arasında hamar keçid */
+@view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; } }
 

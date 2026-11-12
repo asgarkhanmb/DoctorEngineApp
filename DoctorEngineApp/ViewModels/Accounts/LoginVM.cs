@@ -1,16 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.ViewModels.Accounts
 {
     public class LoginVM
     {
-        [Required]
-        public string EmailOrUsername { get; set; }
+        [Required(ErrorMessage = "Email və ya istifadəçi adını daxil edin")]
+        [Display(Name = "Email və ya istifadəçi adı")]
+        public string EmailOrUsername { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Şifrəni daxil edin")]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        [Display(Name = "Şifrə")]
+        public string Password { get; set; } = string.Empty;
 
+        [Display(Name = "Məni xatırla")]
         public bool RememberMe { get; set; }
     }
 }

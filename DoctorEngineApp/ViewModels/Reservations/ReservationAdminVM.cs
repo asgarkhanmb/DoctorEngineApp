@@ -8,7 +8,6 @@
         public string WhatsApp { get; set; }
 
         public string ServiceName { get; set; }
-        public string ServiceWhatsApp { get; set; }
 
         public DateTime DateTime { get; set; }
         public string Note { get; set; }

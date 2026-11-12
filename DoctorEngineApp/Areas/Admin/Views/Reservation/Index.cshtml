@@ -1,72 +1,94 @@
-﻿<div class="table-responsive">
-    <table class="table table-bordered table-striped align-middle table-fixed">
-        <thead class="table-light">
-            <tr>
-                <th>Ad</th>
-                <th>Telefon</th>
-                <th>WhatsApp</th>
-                <th>Xidmət</th>
-                <th>Tarix</th>
-                <th class="note-col">Qeyd</th>
-                <th>Status</th>
-                <th class="note-col">Səbəb</th>
-                <th>Əməliyyat</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var r in Model)
-            {
-                <tr>
-                    <td>@r.FullName</td>
-                    <td>@r.Phone</td>
+﻿@model List<ReservationAdminVM>
+@{
+    ViewData["Title"] = "Rezervasiyalar";
+    var items = Model.OrderByDescending(r => r.Status == "Pending").ThenByDescending(r => r.DateTime).ToList();
+    int pending = items.Count(r => r.Status == "Pending"), confirmed = items.Count(r => r.Status == "Confirmed"), rejected = items.Count(r => r.Status == "Rejected");
 
-                    <!-- WhatsApp link -->
-                    <td>
-                        @if (!string.IsNullOrWhiteSpace(r.WhatsApp))
-                        {
-                            <a href="https://wa.me/@r.WhatsApp.Replace("+", "").Replace(" ", "")?text=Salam" target="_blank">
-                                @r.WhatsApp
-                            </a>
-                        }
-                        else
-                        {
-                            <span>@r?.WhatsApp</span>
-                        }
-                    </td>
+    string Wa(string? number) => (number ?? "").Replace("+", "").Replace(" ", "").Replace("-", "");
+    string WaText(ReservationAdminVM r) => r.Status switch
+    {
+        "Confirmed" => $"Salam, {r.FullName}! {r.ServiceName} üzrə {r.DateTime:dd.MM.yyyy HH:mm} tarixli rezervasiyanız təsdiqləndi. DoctorEngine.Az",
+        "Rejected" => $"Salam, {r.FullName}! Təəssüf ki, {r.DateTime:dd.MM.yyyy HH:mm} tarixli rezervasiyanız təsdiqlənmədi. Səbəb: {r.RejectionReason}",
+        _ => $"Salam, {r.FullName}! {r.ServiceName} üzrə rezervasiyanızla bağlı yazırıq."
+    };
+}
 
+<partial name="_PageHead" model='new AdminPageHead("Rezervasiyalar", "Müştərilərin onlayn rezervasiyaları — təsdiqləyin, rədd edin və ya WhatsApp ilə yazın.")' />
 
-                    <td>@r.ServiceName</td>
-                    <td>@r.DateTime.ToString("dd.MM.yyyy HH:mm")</td>
+<div class="adm-card">
+    <div class="adm-card__head flex-wrap">
+        <div class="btn-group btn-group-sm" role="group" data-status-filter="#resTable" aria-label="Statusa görə filtr">
+            <button type="button" class="btn btn-light active" data-status="all">Hamısı <span class="text-muted">@items.Count</span></button>
+            <button type="button" class="btn btn-light" data-status="Pending">Gözləyir <span class="text-muted">@pending</span></button>
+            <button type="button" class="btn btn-light" data-status="Confirmed">Təsdiqləndi <span class="text-muted">@confirmed</span></button>
+            <button type="button" class="btn btn-light" data-status="Rejected">Rədd edildi <span class="text-muted">@rejected</span></button>
+        </div>
+        <div class="adm-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" class="form-control form-control-sm" data-table-search="#resTable" placeholder="Ad, telefon, xidmət…" />
+        </div>
+    </div>
 
-                    <!-- Qeyd -->
-                    <td class="note-td">
-                        <textarea class="form-control note-textarea" readonly>@r.Note</textarea>
-                    </td>
-
-                    <!-- Status -->
-                    <td>
-                        <span class="badge @(r.Status == "Pending" ? "bg-warning" : r.Status == "Confirmed" ? "bg-success" : "bg-danger")">
-                            @r.Status
-                        </span>
-                    </td>
-
-                    <!-- Səbəb -->
-                    <td class="note-td">
-                        <textarea class="form-control note-textarea" readonly>@r.RejectionReason</textarea>
-                    </td>
-
-                    <!-- Əməliyyat -->
-                    <td>
-                        @if (r.Status == "Pending")
-                        {
-                            <a asp-action="Confirm" asp-route-id="@r.Id" class="btn btn-success btn-sm mb-1">Təsdiqlə</a>
-                            <a asp-action="Reject" asp-route-id="@r.Id" class="btn btn-warning btn-sm mb-1">İmtina et</a>
-                        }
-
-                        <a asp-action="Delete" asp-route-id="@r.Id" class="btn btn-danger btn-sm" onclick="return confirm('Silmək istədiyinizə əminsiniz?')">Sil</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    @if (!items.Any())
+    {
+        <div class="adm-empty"><i class="fa-regular fa-calendar"></i><strong>Hələ rezervasiya yoxdur</strong>Saytdan gələn rezervasiyalar burada görünəcək.</div>
+    }
+    else
+    {
+        <div class="adm-table-wrap">
+            <table class="adm-table" id="resTable">
+                <thead>
+                    <tr>
+                        <th>Müştəri</th>
+                        <th>Xidmət</th>
+                        <th>Tarix</th>
+                        <th>Qeyd</th>
+                        <th>Status</th>
+                        <th class="adm-actions-col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in items)
+                    {
+                        <tr data-row data-status="@r.Status">
+                            <td>
+                                <div class="adm-cell-title">@r.FullName</div>
+                                <div class="adm-cell-sub"><a href="tel:@r.Phone.Replace(" ", "")" class="text-reset">@r.Phone</a></div>
+                            </td>
+                            <td>@r.ServiceName</td>
+                            <td class="text-nowrap">
+                                <div class="adm-cell-title">@r.DateTime.ToString("dd.MM.yyyy")</div>
+                                <div class="adm-cell-sub">@r.DateTime.ToString("HH:mm")</div>
+                            </td>
+                            <td><div class="adm-clamp" title="@r.Note">@(string.IsNullOrWhiteSpace(r.Note) ? "—" : r.Note)</div></td>
+                            <td>
+                                <partial name="_ReservationStatus" model="r.Status" />
+                                @if (r.Status == "Rejected" && !string.IsNullOrWhiteSpace(r.RejectionReason))
+                                {
+                                    <div class="adm-cell-sub mt-1 adm-clamp" title="@r.RejectionReason">@r.RejectionReason</div>
+                                }
+                            </td>
+                            <td class="adm-actions-col">
+                                <div class="adm-actions">
+                                    @if (!string.IsNullOrWhiteSpace(r.WhatsApp))
+                                    {
+                                        <a class="adm-act is-success" href="https://wa.me/@Wa(r.WhatsApp)?text=@Uri.EscapeDataString(WaText(r))" target="_blank" rel="noopener" title="WhatsApp ilə yaz" aria-label="WhatsApp ilə yaz"><i class="fa-brands fa-whatsapp"></i></a>
+                                    }
+                                    @if (r.Status == "Pending")
+                                    {
+                                        <form asp-action="Confirm" asp-route-id="@r.Id" method="post">
+                                            <button type="submit" class="adm-act is-success" title="Təsdiqlə" aria-label="Təsdiqlə"><i class="fa-solid fa-check"></i></button>
+                                        </form>
+                                        <a asp-action="Reject" asp-route-id="@r.Id" class="adm-act" title="Rədd et" aria-label="Rədd et"><i class="fa-solid fa-ban"></i></a>
+                                    }
+                                    <partial name="_DeleteButton" model='new AdminDeleteButton("Delete", r.Id, $"{r.FullName} — rezervasiya silinsin?")' />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    <tr data-search-empty hidden><td colspan="6"><div class="adm-empty"><i class="fa-solid fa-magnifying-glass"></i>Nəticə tapılmadı</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    }
 </div>

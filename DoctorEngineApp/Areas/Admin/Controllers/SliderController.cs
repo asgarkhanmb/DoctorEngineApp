@@ -23,12 +23,15 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            return View(new SliderVM());
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(SliderVM vm)
         {
+            if (vm.ImageFile1 == null)
+                ModelState.AddModelError(nameof(vm.ImageFile1), "Fon şəkli məcburidir");
+
             if (!ModelState.IsValid) return View(vm);
 
             await _service.CreateAsync(vm);
@@ -55,12 +58,22 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(SliderVM vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid)
+            {
+                // Forma yenidən göstəriləndə mövcud şəkillər itməsin
+                var current = await _service.GetByIdAsync(vm.Id);
+                if (current == null) return NotFound();
+                vm.ExistingImage1 = current.Image1;
+                vm.ExistingImage2 = current.Image2;
+                return View(vm);
+            }
 
             await _service.UpdateAsync(vm);
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.DeleteAsync(id);

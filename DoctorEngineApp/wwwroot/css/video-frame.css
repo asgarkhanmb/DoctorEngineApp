@@ -1,0 +1,103 @@
+/* =====================================================
+   Vahid video çərçivəsi (sayt + admin)
+   - Hər yerdə eyni nisbət: 16:9
+   - Video kəsilmir (contain); şaquli videoların yanları
+     videonun öz bulanıq görüntüsü ilə doldurulur
+   ===================================================== */
+
+.de-video {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 18px;
+    background: radial-gradient(circle at 50% 40%, #1a2a52 0%, #070d22 75%);
+    box-shadow: 0 14px 40px rgba(11, 33, 84, .16);
+    isolation: isolate;
+}
+
+/* Bulanıq fon (video kadrından) */
+.de-video__backdrop {
+    position: absolute;
+    inset: -8%;
+    z-index: 0;
+    width: 116%;
+    height: 116%;
+    filter: blur(28px) saturate(1.2) brightness(.6);
+    opacity: 0;
+    transition: opacity .6s ease;
+    pointer-events: none;
+}
+
+.de-video.has-backdrop .de-video__backdrop { opacity: 1; }
+
+.de-video__player {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: transparent;
+}
+
+/* Kiçik önizləmə (admin siyahıları) — eyni 16:9, oynatma düymələri yoxdur */
+.de-video.is-thumb {
+    width: 96px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    box-shadow: none;
+    border: 1px solid rgba(11, 33, 84, .12);
+}
+
+.de-video.is-thumb .de-video__backdrop { filter: blur(10px) saturate(1.2) brightness(.65); }
+.de-video.is-thumb .de-video__player { pointer-events: none; }
+
+.de-video.is-thumb::after {
+    content: "\f04b";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    color: rgba(255, 255, 255, .9);
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 12px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, .6);
+}
+
+/* Admin redaktə səhifələrindəki oynadıcı */
+.de-video.is-compact { max-width: 520px; border-radius: 12px; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+    .de-video__backdrop { transition: none; }
+}
+
+/* Üfüqi (16:9) video çərçivəni tam doldurur — bulanıq fona ehtiyac yoxdur */
+.de-video.is-wide .de-video__backdrop { display: none; }
+
+/* ---------- Videonun öz ölçüsü ----------
+   JS videonun nisbətini --vf-ratio kimi verir (yüklənənə qədər 16:9).
+   Üfüqi video: tam en. Şaquli video (telefon, 9:16): standart hündürlük,
+   ortada, tam görünür — dar zolaq + bulanıq yanlar əvəzinə. */
+.de-video:not(.is-thumb) { aspect-ratio: var(--vf-ratio, 16 / 9); }
+
+.de-video.is-tall {
+    --vf-tall-h: min(560px, 75vh);
+    width: auto;
+    height: var(--vf-tall-h);
+    max-width: 100%;
+    margin-inline: auto;
+}
+
+.de-video.is-tall .de-video__backdrop { display: none; }
+
+/* Admin redaktə səhifələrində daha kiçik */
+.de-video.is-compact.is-tall { --vf-tall-h: 380px; }
+
+/* Mobil: ekranın çox hissəsini tutmasın */
+@media (max-width: 576px) {
+    .de-video.is-tall { --vf-tall-h: min(480px, 70vh); }
+}
+

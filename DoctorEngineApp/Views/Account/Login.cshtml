@@ -1,61 +1,65 @@
 ﻿@model DoctorEngineApp.ViewModels.Accounts.LoginVM
 
 @{
-    Layout = null;
-    ViewData["Title"] = "Login";
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Daxil ol";
+    var returnUrl = Context.Request.Query["ReturnUrl"].ToString();
 }
 
-<link rel="stylesheet" href="~/css/auth.css" />
+<div class="auth-head">
+    <div class="auth-head__icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+    <h1>Xoş gəlmisiniz</h1>
+    <p>Hesabınıza daxil olun və usta ilə əlaqədə qalın.</p>
+</div>
 
-<body>
-    <div class="background">
-        <div class="shape"></div>
-        <div class="shape"></div>
+<form asp-action="Login" asp-controller="Account" asp-route-returnUrl="@returnUrl" method="post"
+      class="auth-form" novalidate data-loading-text="Daxil olunur…">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="auth-alert auth-alert--ok" role="status">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <div asp-validation-summary="ModelOnly" role="alert"></div>
+
+    <div class="auth-field">
+        <label asp-for="EmailOrUsername">Email və ya istifadəçi adı</label>
+        <div class="auth-input">
+            <i class="fa-regular fa-user"></i>
+            <input asp-for="EmailOrUsername" autocomplete="off" autofocus placeholder="ad@numune.az" />
+        </div>
+        <span asp-validation-for="EmailOrUsername"></span>
     </div>
 
-    <form asp-action="Login" asp-controller="Account" method="post" novalidate>
-        @Html.AntiForgeryToken()
-
-        <h3>Giriş</h3>
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div style="background:#d4edda;padding:10px;border-radius:5px;color:#155724;margin-bottom:10px;">
-                @TempData["SuccessMessage"]
-            </div>
-        }
-
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-        <label for="EmailOrUsername">İstifadəçi</label>
-        <input asp-for="EmailOrUsername" id="EmailOrUsername" placeholder="E-poçt və ya istifadəçi adı" />
-        <span asp-validation-for="EmailOrUsername" class="text-danger"></span>
-
-        <label for="loginPassword">Parol</label>
-        <input asp-for="Password" type="password" id="loginPassword" placeholder="Şifrə" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-
-        <button type="submit">Daxil Ol</button>
-
-        <div style="margin-top:10px;">
-            <a asp-action="ForgotPassword" asp-controller="Account">Şifrəni unutdum?</a>
+    <div class="auth-field">
+        <label asp-for="Password">Şifrə</label>
+        <div class="auth-input auth-input--password">
+            <i class="fa-solid fa-lock"></i>
+            <input asp-for="Password" autocomplete="current-password" placeholder="••••••••" />
+            <button type="button" class="auth-eye" data-toggle-password="Password" aria-label="Şifrəni göstər" aria-pressed="false">
+                <i class="fa-regular fa-eye"></i>
+            </button>
         </div>
+        <span asp-validation-for="Password"></span>
+        <small class="auth-caps" data-caps-for="Password"><i class="fa-solid fa-triangle-exclamation"></i> Caps Lock açıqdır</small>
+    </div>
 
-        <div>
-            <br />
-            Hesabın yoxdur?
-            <a asp-action="Register" asp-controller="Account">Qeydiyyat</a>
-        </div>
+    <div class="auth-options">
+        <label class="auth-check">
+            <input asp-for="RememberMe" type="checkbox" />
+            Məni xatırla
+        </label>
+        <a asp-action="ForgotPassword" asp-controller="Account">Şifrəni unutmusunuz?</a>
+    </div>
 
-        <br />
+    <button type="submit" class="auth-btn">
+        Daxil ol <i class="fa-solid fa-arrow-right"></i>
+    </button>
+</form>
 
-        <div>
-            <a asp-controller="Home" asp-action="Index">Ana Səhifə</a>
-        </div>
-
-    </form>
-</body>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<div class="auth-switch">
+    Hesabınız yoxdur? <a asp-action="Register" asp-controller="Account">Qeydiyyatdan keçin</a>
+</div>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DoctorEngineApp.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.ViewModels.Services
 {
@@ -13,6 +14,7 @@ namespace DoctorEngineApp.ViewModels.Services
         public string Description { get; set; } = null!;
 
         public string? ExistingVideo { get; set; }
+        [AllowedUpload(UploadKind.Video)]
         public IFormFile? VideoFile { get; set; }
 
         [Required]

@@ -18,17 +18,20 @@ namespace DoctorEngineApp.Controllers
         private readonly IAboutService _aboutService;
         private readonly IReservationService _reservationService;
         private readonly AppDbContext _db;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(
             IInformService informService,
             IAboutService aboutService,
             IReservationService reservationService,
-            AppDbContext db)
+            AppDbContext db,
+            ILogger<HomeController> logger)
         {
             _informService = informService;
             _aboutService = aboutService;
             _reservationService = reservationService;
             _db = db;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -38,12 +41,13 @@ namespace DoctorEngineApp.Controllers
 
             var categories = await _db.ServiceCategories
                 .Include(c => c.SubServices)
+                .OrderBy(c => c.Id)
                 .Select(c => new CategoryVM
                 {
                     Id = c.Id,
                     Name = c.Name,
                     Icon = c.Icon,
-                    SubServices = c.SubServices.Select(s => new SubServiceVM
+                    SubServices = c.SubServices.OrderBy(s => s.Id).Select(s => new SubServiceVM
                     {
                         Id = s.Id,
                         Title = s.Title,
@@ -100,78 +104,28 @@ namespace DoctorEngineApp.Controllers
         public async Task<IActionResult> CreateReservation(
          [Bind(Prefix = "Reservation")] ReservationCreateVM model)
         {
-            bool alreadyExists = await _reservationService.ExistsAsync(
-                model.Phone,
-                model.ServiceId,
-                model.DateTime
-            );
-
-            if (alreadyExists)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Bu rezervasiya artıq mövcuddur."
-                });
-            }
-
             if (!ModelState.IsValid)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Bütün sahələri düzgün doldurun!"
-                });
-            }
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
 
-            // Keçmiş tarix
-            if (model.DateTime < DateTime.Now)
-            {
                 return Json(new
                 {
                     success = false,
-                    message = "Keçmiş tarix üçün rezervasiya edilə bilməz."
-                });
-            }
-
-            // İş saatları: 10:00 – 20:00
-            if (model.DateTime.Hour < 10 || model.DateTime.Hour >= 20)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Rezervasiya yalnız 10:00 – 20:00 arası mümkündür."
-                });
-            }
-
-            // Maksimum 10 gün qabaqcadan
-            if (model.DateTime > DateTime.Now.AddDays(10))
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Rezervasiya maksimum 10 gün öncədən edilə bilər."
+                    message = firstError ?? "Bütün sahələri düzgün doldurun!"
                 });
             }
 
             try
             {
-                // 🇦🇿 Azərbaycan vaxtına çevirmə
-                model.DateTime = TimeZoneInfo.ConvertTime(
-                    model.DateTime,
-                    TimeZoneInfo.FindSystemTimeZoneById("Azerbaijan Standard Time")
-                );
-
-                await _reservationService.CreateAsync(model);
-
-                return Json(new
-                {
-                    success = true,
-                    message = "Rezervasiya qəbul edildi. WhatsApp üzərindən əlaqə saxlanılacaq."
-                });
+                var result = await _reservationService.TryCreateAsync(model);
+                return Json(new { success = result.Success, message = result.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Rezervasiya yaradılarkən xəta");
                 return Json(new
                 {
                     success = false,

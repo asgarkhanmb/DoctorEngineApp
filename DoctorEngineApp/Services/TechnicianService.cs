@@ -72,9 +72,9 @@ namespace DoctorEngineApp.Services
                 FullName = vm.FullName,
                 Position = vm.Position,
                 Image = fileName,
-                FacebookUrl = vm.FacebookUrl,
-                InstagramUrl = vm.InstagramUrl,
-                TiktokUrl = vm.TiktokUrl,
+                FacebookUrl = vm.FacebookUrl ?? "",
+                InstagramUrl = vm.InstagramUrl ?? "",
+                TiktokUrl = vm.TiktokUrl ?? "",
                 IsDeleted = false
             };
 
@@ -121,9 +121,9 @@ namespace DoctorEngineApp.Services
 
             tech.FullName = vm.FullName;
             tech.Position = vm.Position;
-            tech.FacebookUrl = vm.FacebookUrl;
-            tech.InstagramUrl = vm.InstagramUrl;
-            tech.TiktokUrl = vm.TiktokUrl;
+            tech.FacebookUrl = vm.FacebookUrl ?? "";
+            tech.InstagramUrl = vm.InstagramUrl ?? "";
+            tech.TiktokUrl = vm.TiktokUrl ?? "";
 
             _context.Update(tech);
             await _context.SaveChangesAsync();

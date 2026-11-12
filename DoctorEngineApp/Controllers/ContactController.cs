@@ -1,4 +1,4 @@
-﻿using DoctorEngineApp.Services.Interfaces;
+using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.ContactMessage;
 using DoctorEngineApp.ViewModels.ContactPhones;
 using Microsoft.AspNetCore.Mvc;
@@ -10,18 +10,15 @@ namespace DoctorEngineApp.Controllers
         private readonly IContactInfoService _contactInfoService;
         private readonly IMapService _mapService;
         private readonly IContactMessageService _contactMessageService;
-        private readonly IChatService _chatService; // ✅ ƏLAVƏ OLUNDU
 
         public ContactController(
             IContactInfoService contactInfoService,
             IMapService mapService,
-            IContactMessageService contactMessageService,
-            IChatService chatService) // ✅ BURDA DA ƏLAVƏ OLUNDU
+            IContactMessageService contactMessageService)
         {
             _contactInfoService = contactInfoService;
             _mapService = mapService;
             _contactMessageService = contactMessageService;
-            _chatService = chatService; // ✅ ASSIGN
         }
 
         // ================= GET =================
@@ -31,7 +28,6 @@ namespace DoctorEngineApp.Controllers
             {
                 Contact = await _contactInfoService.GetFirstAsync(),
                 Map = await _mapService.GetFirstAsync(),
-                ChatMessages = await _chatService.GetAllAsync(), // ✅ CHAT
                 Message = new ContactMessageCreateVM()
             };
 
@@ -47,7 +43,6 @@ namespace DoctorEngineApp.Controllers
             {
                 model.Contact = await _contactInfoService.GetFirstAsync();
                 model.Map = await _mapService.GetFirstAsync();
-                model.ChatMessages = await _chatService.GetAllAsync(); // ⚠️ UNUTMA
 
                 return View("Index", model);
             }
@@ -70,7 +65,6 @@ namespace DoctorEngineApp.Controllers
             // ⚠️ HƏR HALDA YENİDƏN DOLDUR
             model.Contact = await _contactInfoService.GetFirstAsync();
             model.Map = await _mapService.GetFirstAsync();
-            model.ChatMessages = await _chatService.GetAllAsync(); // ✅ VACİB
 
             return View("Index", model);
         }

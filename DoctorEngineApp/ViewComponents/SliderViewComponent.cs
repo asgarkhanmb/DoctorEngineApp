@@ -1,27 +1,21 @@
-﻿using DoctorEngineApp.Models;
+using DoctorEngineApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorEngineApp.ViewComponents
 {
-    using DoctorEngineApp.Data;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
-
     public class SliderViewComponent : ViewComponent
     {
-        private readonly AppDbContext _context;
+        private readonly ISliderService _service;
 
-        public SliderViewComponent(AppDbContext context)
+        public SliderViewComponent(ISliderService service)
         {
-            _context = context;
+            _service = service;
         }
 
+        // Yalnız silinməmiş slaydlar, sabit sıra ilə
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var sliders = await _context.Sliders.ToListAsync();
-
-            return View(sliders);  // ← Model NULL olmamalıdır
+            return View(await _service.GetAllAsync());
         }
     }
-
 }

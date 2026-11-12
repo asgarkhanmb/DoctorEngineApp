@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.ViewModels.Accounts
 {
     public class ResetPasswordVM
     {
-        [Required]
+        [Required(ErrorMessage = "Email tələb olunur")]
         [EmailAddress(ErrorMessage = "Email düzgün formatda deyil")]
         public string Email { get; set; }
 

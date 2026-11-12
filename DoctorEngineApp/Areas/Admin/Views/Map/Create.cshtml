@@ -1,18 +1,53 @@
-﻿@model MapVM
+@model MapVM
+@{ ViewData["Title"] = "Xəritə"; }
 
-<form method="post">
-    <div class="mb-3">
-        <label>Ünvan</label>
-        <input asp-for="Address" class="form-control" />
+<partial name="_PageHead" model='new AdminPageHead("Xəritə", "Əlaqə səhifəsində göstərilən Google xəritəsi.")' />
+
+<div class="row g-4">
+    <div class="col-xl-5">
+        <div class="adm-card">
+            <form method="post" class="adm-form">
+                <div class="adm-card__body">
+                    
+                    <div asp-validation-summary="ModelOnly"></div>
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label">Ünvan</label>
+                        <input asp-for="Address" class="form-control" placeholder="Bakı, Nərimanov r., …" />
+                        <span asp-validation-for="Address"></span>
+                    </div>
+                    <div>
+                        <label asp-for="MapUrl" class="form-label">Google Maps “embed” linki</label>
+                        <textarea asp-for="MapUrl" class="form-control" rows="4" id="mapUrl" placeholder="https://www.google.com/maps/embed?pb=…"></textarea>
+                        <div class="form-text">Google Maps → Paylaş → <b>Xəritəni yerləşdir</b> → HTML-i kopyalayın. Bütün iframe kodunu yapışdıra bilərsiniz — link avtomatik çıxarılacaq.</div>
+                        <span asp-validation-for="MapUrl"></span>
+                    </div>
+                </div>
+                <div class="adm-form-actions">
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Yarat</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label>Google Map Embed URL</label>
-        <textarea asp-for="MapUrl" class="form-control" rows="4"></textarea>
-        <small>
-            Google Maps → Share → Embed → iframe src
-        </small>
+    <div class="col-xl-7">
+        <div class="adm-card overflow-hidden">
+            <div class="adm-card__head"><h2>Önizləmə</h2></div>
+            <iframe id="mapPreview" src="about:blank" class="w-100 d-block" style="height:420px;border:0" loading="lazy" title="Xəritə önizləməsi"></iframe>
+        </div>
     </div>
+</div>
 
-    <button class="btn btn-primary">Create</button>
-</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const area = document.getElementById("mapUrl");
+            const frame = document.getElementById("mapPreview");
+            area.addEventListener("input", function () {
+                // Bütün iframe kodu yapışdırılıbsa, yalnız src linkini götür
+                const m = area.value.match(/src=["']([^"']+)["']/i);
+                if (m) area.value = m[1];
+                if (/^https:\/\/[^\s"'<>]+$/.test(area.value.trim())) frame.src = area.value.trim();
+            });
+        })();
+    </script>
+}

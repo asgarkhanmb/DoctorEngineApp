@@ -6,17 +6,17 @@
     {
         public int Id { get; set; }
 
-        [Required]
-        public string Subtitle { get; set; }
+        [Required(ErrorMessage = "Kiçik başlığı daxil edin")]
+        public string Subtitle { get; set; } = string.Empty;
 
-        [Required]
-        public string Title { get; set; }
+        [Required(ErrorMessage = "Başlığı daxil edin")]
+        public string Title { get; set; } = string.Empty;
 
-        [Required]
-        public string Description { get; set; }
+        [Required(ErrorMessage = "Mətni daxil edin")]
+        public string Description { get; set; } = string.Empty;
 
-        [Required]
-        public string PhoneNumber { get; set; }
+        [Required(ErrorMessage = "Telefon nömrəsini daxil edin")]
+        public string PhoneNumber { get; set; } = string.Empty;
     }
 
 }

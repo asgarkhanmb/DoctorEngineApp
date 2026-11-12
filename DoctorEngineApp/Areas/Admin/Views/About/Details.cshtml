@@ -1,17 +1,17 @@
 ﻿@model About
+@{ ViewData["Title"] = "Haqqımızda"; }
 
-<h2>About Details</h2>
+<partial name="_PageHead" model='new AdminPageHead(string.IsNullOrWhiteSpace(Model.Title) ? "(başlıqsız)" : Model.Title, BackAction: "Index")' />
 
-<div class="mb-3">
-    <h4>@Model.Title</h4>
-    <p>@Model.Description</p>
+<div class="adm-card" style="max-width:820px">
     @if (!string.IsNullOrEmpty(Model.VideoPath))
     {
-        <video width="640" controls>
-            <source src="@Model.VideoPath" />
-        </video>
+        <div class="p-3 pb-0"><partial name="_VideoFrame" model='new VideoFrame(Url.Content(Model.VideoPath))' /></div>
     }
-    <p class="text-muted">Updated: @Model.CreatedDate.ToLocalTime()</p>
+    <div class="adm-card__body">
+        <p class="mb-0" style="white-space:pre-wrap">@Model.Description</p>
+    </div>
+    <div class="adm-form-actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary"><i class="fa-solid fa-pen"></i> Redaktə et</a>
+    </div>
 </div>
-
-<a asp-action="Index" class="btn btn-secondary">Geri</a>

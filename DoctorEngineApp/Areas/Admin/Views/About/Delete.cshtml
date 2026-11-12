@@ -1,15 +1,16 @@
-﻿@model About
+@model About
+@{ ViewData["Title"] = "Silmək"; }
 
-<h2>About sil</h2>
+<partial name="_PageHead" model='new AdminPageHead("Qeydi silmək", BackAction: "Index")' />
 
-<div class="alert alert-warning">
-    <p>Bu About-u silmək istədiyinizə əminsiniz?</p>
-    <h4>@Model.Title</h4>
-    <p>@Model.Description</p>
+<div class="adm-card" style="max-width:560px">
+    <div class="adm-card__body">
+        <p>Bu qeyd və onun videosu silinəcək. Bu əməliyyat geri qaytarıla bilməz.</p>
+        <strong>@Model.Title</strong>
+    </div>
+    <form asp-action="Delete" method="post" class="adm-form-actions">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-danger"><i class="fa-regular fa-trash-can"></i> Sil</button>
+        <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+    </form>
 </div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" name="id" value="@Model.Id" />
-    <button type="submit" class="btn btn-danger">Sil</button>
-    <a asp-action="Index" class="btn btn-secondary">Ləğv</a>
-</form>

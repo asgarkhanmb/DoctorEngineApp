@@ -4,43 +4,64 @@ using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Warranties;
 using Microsoft.EntityFrameworkCore;
 
-public class WarrantyService : IWarrantyService
+namespace DoctorEngineApp.Services.Implementations
 {
-    private readonly AppDbContext _db;
-    public WarrantyService(AppDbContext db) => _db = db;
-
-    public async Task CreateAsync(WarrantyCreateVM vm)
+    public class WarrantyService : IWarrantyService
     {
-        var warranty = new Warranty
+        private readonly AppDbContext _context;
+
+        public WarrantyService(AppDbContext context)
         {
-            CustomerName = vm.CustomerName,
-            Phone = vm.Phone,
-            Brand = vm.Brand,
-            Model = vm.Model,
-            Year = vm.Year,
-            Fuel = vm.Fuel,
-            Master = vm.Master,
-            Terms = vm.Terms,
-            WarrantyLogoId = vm.WarrantyLogoId,
-            Jobs = vm.Jobs
-                .Where(x => x.IsSelected)
-                .Select(x => new WarrantyJob
+            _context = context;
+        }
+
+        public async Task<List<Warranty>> GetAllAsync()
+        {
+            return await _context.Warranties
+                .Include(w => w.Items)
+                .OrderByDescending(w => w.CreatedDate)
+                .ToListAsync();
+        }
+
+        public async Task<Warranty> GetByIdAsync(int id)
+        {
+            return await _context.Warranties
+                .Include(x => x.Items)   // 🔥 mütləq
+                .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<Warranty> CreateAsync(WarrantyCreateVM model)
+        {
+            var warranty = new Warranty
+            {
+                CustomerFullName = model.CustomerFullName,
+                VehicleModel = model.VehicleModel,
+                VehicleYear = model.VehicleYear,
+                Terms = model.Terms,
+                CreatedDate = DateTime.Now,
+                Items = model.Items.Select(x => new WarrantyItem
                 {
-                    JobCatalogId = x.JobId,
-                    WarrantyMonths = x.WarrantyMonths
+                    PartName = x.PartName,
+                    WarrantyMonth = x.WarrantyMonth
                 }).ToList()
-        };
+            };
 
-        _db.Warranties.Add(warranty);
-        await _db.SaveChangesAsync();
+            _context.Warranties.Add(warranty);
+            await _context.SaveChangesAsync();
+            return warranty;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var warranty = await _context.Warranties
+                .Include(x => x.Items)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (warranty == null) return;
+
+            _context.WarrantyItems.RemoveRange(warranty.Items);
+            _context.Warranties.Remove(warranty);
+            await _context.SaveChangesAsync();
+        }
     }
-
-    public async Task<List<Warranty>> GetAllAsync()
-        => await _db.Warranties.Include(x => x.WarrantyLogo).ToListAsync();
-
-    public async Task<Warranty> GetAsync(int id)
-        => await _db.Warranties
-            .Include(x => x.WarrantyLogo)
-            .Include(x => x.Jobs).ThenInclude(x => x.JobCatalog)
-            .FirstAsync(x => x.Id == id);
 }

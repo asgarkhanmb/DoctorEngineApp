@@ -1,5 +1,21 @@
 [
   {
+    "ContainingType": "DoctorEngineApp.Controllers.AiApiController",
+    "Method": "Chat",
+    "RelativePath": "api/ai/chat",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "DoctorEngineApp.Controllers.AiApiController\u002BChatRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
     "Method": "Delete",
     "RelativePath": "api/chat/delete/{id}",
@@ -24,12 +40,58 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "vm",
-        "Type": "DoctorEngineApp.ViewModels.Chats.EditMessageVM",
-        "IsRequired": true
+        "Name": "Id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Message",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "RemoveAttachment",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      },
+      {
+        "Name": "File",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "Messages",
+    "RelativePath": "api/chat/messages",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "beforeId",
+        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "take",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "DoctorEngineApp.ViewModels.Chats.ChatPageDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
@@ -40,9 +102,14 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "vm",
-        "Type": "DoctorEngineApp.ViewModels.Chats.ChatMessageVM",
-        "IsRequired": true
+        "Name": "Message",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "File",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

@@ -1,4 +1,4 @@
-﻿using DoctorEngineApp.Models;
+using DoctorEngineApp.Models;
 using DoctorEngineApp.ViewModels.ContactInfos;
 using DoctorEngineApp.ViewModels.ContactMessage;
 using DoctorEngineApp.ViewModels.Maps;
@@ -13,7 +13,6 @@ namespace DoctorEngineApp.ViewModels.ContactPhones
         [ValidateNever]
         public MapVM Map { get; set; }
         public ContactMessageCreateVM Message { get; set; }
-        public List<ChatMessage> ChatMessages { get; set; }
 
     }
 }

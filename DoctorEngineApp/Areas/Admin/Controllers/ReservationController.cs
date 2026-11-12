@@ -18,6 +18,8 @@ public class ReservationController : Controller
         return View(await _reservationService.GetAllAsync());
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm(int id)
     {
         await _reservationService.ConfirmAsync(id);
@@ -32,12 +34,21 @@ public class ReservationController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Reject(int id, string reason)
+    public async Task<IActionResult> Reject(int id, string? reason)
     {
-        await _reservationService.RejectAsync(id, reason);
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            ModelState.AddModelError("reason", "İmtina səbəbini yazın.");
+            ViewBag.Id = id;
+            return View();
+        }
+
+        await _reservationService.RejectAsync(id, reason.Trim());
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
         await _reservationService.DeleteAsync(id);

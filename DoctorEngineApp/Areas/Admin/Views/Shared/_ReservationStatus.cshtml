@@ -1,0 +1,17 @@
+@* Rezervasiya statusu: rəng + ikon + mətn (yalnız rəngə güvənmir) *@
+@model string
+@switch (Model)
+{
+    case "Pending":
+        <span class="adm-badge is-pending"><i class="fa-regular fa-hourglass-half"></i> Gözləyir</span>
+        break;
+    case "Confirmed":
+        <span class="adm-badge is-confirmed"><i class="fa-solid fa-check"></i> Təsdiqləndi</span>
+        break;
+    case "Rejected":
+        <span class="adm-badge is-rejected"><i class="fa-solid fa-xmark"></i> Rədd edildi</span>
+        break;
+    default:
+        <span class="adm-badge is-neutral">@Model</span>
+        break;
+}

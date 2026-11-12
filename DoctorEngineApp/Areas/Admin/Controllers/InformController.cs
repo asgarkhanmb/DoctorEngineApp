@@ -35,6 +35,10 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Create(InformCreateVM vm)
         {
+            // İkon məcburidir (bazada boş ola bilməz)
+            if (vm.Icon == null)
+                ModelState.AddModelError(nameof(vm.Icon), "İkon seçin");
+
             if (!ModelState.IsValid) return View(vm);
 
             string fileName = null;
@@ -89,6 +93,12 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
             var item = _context.Informs.Find(vm.Id);
             if (item == null) return NotFound();
 
+            if (!ModelState.IsValid)
+            {
+                vm.CurrentIcon = item.Icon;
+                return View(vm);
+            }
+
             if (vm.Icon != null)
             {
                 string uploadPath = Path.Combine(_env.WebRootPath, "uploads/inform");
@@ -122,6 +132,8 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
         }
 
         // DELETE
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var item = _context.Informs.Find(id);

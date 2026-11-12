@@ -25,12 +25,13 @@ namespace DoctorEngineApp.Controllers
             var services = await _serviceService.GetAllAsync();
             var categories = await _db.ServiceCategories
                 .Include(c => c.SubServices)
+                .OrderBy(c => c.Id)
                 .Select(c => new CategoryVM
                 {
                     Id = c.Id,
                     Name = c.Name,
                     Icon = c.Icon,
-                    SubServices = c.SubServices.Select(s => new SubServiceVM
+                    SubServices = c.SubServices.OrderBy(s => s.Id).Select(s => new SubServiceVM
                     {
                         Id = s.Id,
                         Title = s.Title,

@@ -1,23 +1,33 @@
-﻿<a asp-action="Create" class="btn btn-primary mb-3">Yeni Xidmət</a>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Ad</th>
-            <th>WhatsApp</th>
-            <th>Əməliyyat</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var s in Model)
-        {
-            <tr>
-                <td>@s.Name</td>
-                <td>@s.WhatsApp</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-warning">Düzəliş et</a>
-                    <a asp-action="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-danger">Sil</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+﻿@model List<ServiceVM>
+@{ ViewData["Title"] = "Rezervasiya xidmətləri"; }
+
+<partial name="_PageHead" model='new AdminPageHead("Rezervasiya xidmətləri", "Saytdakı rezervasiya formunda “Xidmət seçin” siyahısında göstərilən xidmətlər.", "Yeni xidmət", "Create")' />
+
+<div class="adm-card">
+    @if (!Model.Any())
+    {
+        <div class="adm-empty"><i class="fa-solid fa-screwdriver-wrench"></i><strong>Hələ xidmət yoxdur</strong>Xidmət olmadan müştərilər rezervasiya edə bilməz.</div>
+    }
+    else
+    {
+        <div class="adm-table-wrap">
+            <table class="adm-table">
+                <thead><tr><th>Xidmət</th><th class="adm-actions-col"></th></tr></thead>
+                <tbody>
+                    @foreach (var s in Model)
+                    {
+                        <tr>
+                            <td class="adm-cell-title">@s.Name</td>
+                            <td class="adm-actions-col">
+                                <div class="adm-actions">
+                                    <a asp-action="Edit" asp-route-id="@s.Id" class="adm-act" title="Redaktə et" aria-label="Redaktə et"><i class="fa-solid fa-pen"></i></a>
+                                    <partial name="_DeleteButton" model='new AdminDeleteButton("Delete", s.Id, $"“{s.Name}” xidməti silinsin?")' />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

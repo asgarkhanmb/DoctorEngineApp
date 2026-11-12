@@ -1,41 +1,56 @@
-﻿@model List<ContactMessage>
+@model List<ContactMessage>
+@{
+    ViewData["Title"] = "Əlaqə mesajları";
+    var items = Model.OrderByDescending(m => m.CreatedDate).ToList();
+}
 
-<h2>Əlaqə Mesajları</h2>
+<partial name="_PageHead" model='new AdminPageHead("Əlaqə mesajları", "Saytdakı əlaqə formundan göndərilən mesajlar.")' />
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Ad</th>
-            <th>Email</th>
-            <th>Mövzu</th>
-            <th>Tarix</th>
-            <th>Əməliyyatlar</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.FullName</td>
-                <td>@item.Email</td>
-                <td>@item.Subject</td>
-                <td>@item.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>
-                    <a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-info btn-sm">
-                        Bax
-                    </a>
+<div class="adm-card">
+    <div class="adm-card__head">
+        <span class="text-muted">Cəmi: @items.Count</span>
+        <div class="adm-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" class="form-control form-control-sm" data-table-search="#msgTable" placeholder="Ad, email, mövzu…" />
+        </div>
+    </div>
 
-                    <form asp-action="Delete"
-                          asp-route-id="@item.Id"
-                          method="post"
-                          style="display:inline">
-                        <button class="btn btn-danger btn-sm"
-                                onclick="return confirm('Silmək istəyirsiniz?')">
-                            Sil
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    @if (!items.Any())
+    {
+        <div class="adm-empty"><i class="fa-regular fa-envelope-open"></i><strong>Hələ mesaj yoxdur</strong></div>
+    }
+    else
+    {
+        <div class="adm-table-wrap">
+            <table class="adm-table" id="msgTable">
+                <thead>
+                    <tr><th>Göndərən</th><th>Mövzu</th><th>Tarix</th><th class="adm-actions-col"></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in items)
+                    {
+                        <tr data-row>
+                            <td>
+                                <div class="adm-cell-title">@m.FullName</div>
+                                <div class="adm-cell-sub">@m.Email</div>
+                            </td>
+                            <td>
+                                <a asp-action="Detail" asp-route-id="@m.Id" class="adm-cell-title text-reset">@m.Subject</a>
+                                <div class="adm-clamp">@m.Message</div>
+                            </td>
+                            <td class="text-nowrap adm-cell-sub">@m.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="adm-actions-col">
+                                <div class="adm-actions">
+                                    <a asp-action="Detail" asp-route-id="@m.Id" class="adm-act" title="Bax" aria-label="Bax"><i class="fa-regular fa-eye"></i></a>
+                                    <a href="mailto:@m.Email?subject=@Uri.EscapeDataString("Re: " + m.Subject)" class="adm-act" title="Email ilə cavab ver" aria-label="Cavab ver"><i class="fa-solid fa-reply"></i></a>
+                                    <partial name="_DeleteButton" model='new AdminDeleteButton("Delete", m.Id, "Mesaj silinsin?")' />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    <tr data-search-empty hidden><td colspan="4"><div class="adm-empty"><i class="fa-solid fa-magnifying-glass"></i>Nəticə tapılmadı</div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

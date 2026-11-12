@@ -62,10 +62,10 @@ namespace DoctorEngineApp.Services
                 Address = model.Address,
                 Phone = model.Phone,
                 Email = model.Email,
-                YouTube = model.YouTube,
-                Facebook = model.Facebook,
-                TikTok = model.TikTok,
-                WhatsApp = model.WhatsApp,
+                YouTube = model.YouTube ?? "",
+                Facebook = model.Facebook ?? "",
+                TikTok = model.TikTok ?? "",
+                WhatsApp = model.WhatsApp ?? "",
                 Weekdays = model.Weekdays,
                 Weekend = model.Weekend
             };
@@ -82,10 +82,10 @@ namespace DoctorEngineApp.Services
             entity.Address = model.Address;
             entity.Phone = model.Phone;
             entity.Email = model.Email;
-            entity.YouTube = model.YouTube;
-            entity.Facebook = model.Facebook;
-            entity.TikTok = model.TikTok;
-            entity.WhatsApp = model.WhatsApp;
+            entity.YouTube = model.YouTube ?? "";
+            entity.Facebook = model.Facebook ?? "";
+            entity.TikTok = model.TikTok ?? "";
+            entity.WhatsApp = model.WhatsApp ?? "";
             entity.Weekdays = model.Weekdays;
             entity.Weekend = model.Weekend;
 

@@ -1,9 +1,41 @@
-﻿@model ContactPhoneVM
+@model ContactPhoneVM
+@{ ViewData["Title"] = "Yeni telefon bloku"; }
 
-<form method="post">
-    <input asp-for="Subtitle" placeholder="Subtitle" />
-    <input asp-for="Title" placeholder="Title" />
-    <textarea asp-for="Description"></textarea>
-    <input asp-for="PhoneNumber" placeholder="Phone" />
-    <button type="submit">Save</button>
-</form>
+<partial name="_PageHead" model='new AdminPageHead("Yeni telefon bloku", BackAction: "Index")' />
+
+<div class="adm-card" style="max-width:720px">
+    <form asp-action="Create" method="post" class="adm-form">
+        <div class="adm-card__body">
+            
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label asp-for="Subtitle" class="form-label">Kiçik başlıq</label>
+                    <input asp-for="Subtitle" class="form-control" placeholder="Məs: Bizimlə əlaqə" />
+                    <span asp-validation-for="Subtitle"></span>
+                </div>
+                <div class="col-md-7">
+                    <label asp-for="Title" class="form-label">Başlıq</label>
+                    <input asp-for="Title" class="form-control" placeholder="Məs: Rezervasiya ilə bağlı sualınız var?" />
+                    <span asp-validation-for="Title"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label">Mətn</label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="PhoneNumber" class="form-label">Telefon nömrəsi</label>
+                    <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="+994 77 305 13 19" />
+                    <span asp-validation-for="PhoneNumber"></span>
+                </div>
+            </div>
+        </div>
+        <div class="adm-form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Əlavə et</button>
+            <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

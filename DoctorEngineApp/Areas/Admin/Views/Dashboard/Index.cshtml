@@ -1,9 +1,152 @@
-﻿@{
-    ViewData["Title"] = "Index";
+﻿@model DashboardVM
+@{
+    ViewData["Title"] = "İdarə paneli";
+    var hour = DoctorEngineApp.Helpers.AzTime.Now.Hour;
+    var greeting = hour < 12 ? "Sabahınız xeyir" : hour < 18 ? "Günortanız xeyir" : "Axşamınız xeyir";
+    string[] months = { "yan", "fev", "mar", "apr", "may", "iyn", "iyl", "avq", "sen", "okt", "noy", "dek" };
 }
 
-<div class="pcoded-inner-content">
-    <!-- Main-body start -->
-<div class="main-body">
-<div class="page-wrapper">
-<h1>İdarəetmə Panelinə Xoş Gəlmisiniz</h1>
+<div class="adm-page-head">
+    <div>
+        <h1>@greeting, @User.Identity?.Name 👋</h1>
+        <p>Saytın vəziyyəti bir baxışda.</p>
+    </div>
+    <div class="adm-page-head__actions">
+        <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary"><i class="fa-regular fa-calendar-check"></i> Rezervasiyalar</a>
+    </div>
+</div>
+
+<!-- Statistika -->
+<div class="adm-stats">
+    <a asp-controller="Reservation" asp-action="Index" class="adm-card adm-stat">
+        <span class="adm-stat__icon is-amber"><i class="fa-regular fa-hourglass-half"></i></span>
+        <span>
+            <span class="adm-stat__label">Gözləyən rezervasiya</span>
+            <span class="adm-stat__value d-block">@Model.PendingReservations</span>
+            <span class="adm-stat__hint">təsdiq gözləyir</span>
+        </span>
+    </a>
+    <a asp-controller="Reservation" asp-action="Index" class="adm-card adm-stat">
+        <span class="adm-stat__icon"><i class="fa-regular fa-calendar-day"></i></span>
+        <span>
+            <span class="adm-stat__label">Bu günkü rezervasiya</span>
+            <span class="adm-stat__value d-block">@Model.TodayReservations</span>
+            <span class="adm-stat__hint">cəmi: @Model.TotalReservations</span>
+        </span>
+    </a>
+    <a asp-controller="ContactMessage" asp-action="Index" class="adm-card adm-stat">
+        <span class="adm-stat__icon is-navy"><i class="fa-regular fa-envelope"></i></span>
+        <span>
+            <span class="adm-stat__label">Əlaqə mesajı (7 gün)</span>
+            <span class="adm-stat__value d-block">@Model.MessagesLast7Days</span>
+            <span class="adm-stat__hint">cəmi: @Model.TotalMessages</span>
+        </span>
+    </a>
+    <a asp-area="" asp-controller="Chat" asp-action="Index" target="_blank" rel="noopener" class="adm-card adm-stat">
+        <span class="adm-stat__icon is-green"><i class="fa-regular fa-comments"></i></span>
+        <span>
+            <span class="adm-stat__label">Çat mesajı (bu gün)</span>
+            <span class="adm-stat__value d-block">@Model.ChatMessagesToday</span>
+            <span class="adm-stat__hint">istifadəçi: @Model.Users · zəmanət: @Model.Warranties</span>
+        </span>
+    </a>
+</div>
+
+<div class="row g-4">
+
+    <!-- Yaxın rezervasiyalar -->
+    <div class="col-xl-7">
+        <div class="adm-card h-100">
+            <div class="adm-card__head">
+                <h2>Yaxın rezervasiyalar</h2>
+                <a asp-controller="Reservation" asp-action="Index" class="small">Hamısı <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+            @if (!Model.UpcomingReservations.Any())
+            {
+                <div class="adm-empty"><i class="fa-regular fa-calendar"></i><strong>Yaxın rezervasiya yoxdur</strong>Yeni rezervasiyalar burada görünəcək.</div>
+            }
+            else
+            {
+                <ul class="adm-list">
+                    @foreach (var r in Model.UpcomingReservations)
+                    {
+                        <li>
+                            <span class="adm-date"><b>@r.DateTime.Day</b><small>@months[r.DateTime.Month - 1]</small></span>
+                            <div class="adm-list__main">
+                                <div class="adm-list__title">@r.FullName</div>
+                                <div class="adm-list__sub">@r.ServiceName · @r.DateTime.ToString("HH:mm") · @r.Phone</div>
+                            </div>
+                            <partial name="_ReservationStatus" model="r.Status" />
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <!-- Son mesajlar -->
+    <div class="col-xl-5">
+        <div class="adm-card">
+            <div class="adm-card__head">
+                <h2>Son əlaqə mesajları</h2>
+                <a asp-controller="ContactMessage" asp-action="Index" class="small">Hamısı <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+            @if (!Model.LatestMessages.Any())
+            {
+                <div class="adm-empty"><i class="fa-regular fa-envelope-open"></i><strong>Mesaj yoxdur</strong></div>
+            }
+            else
+            {
+                <ul class="adm-list">
+                    @foreach (var m in Model.LatestMessages)
+                    {
+                        <li>
+                            <span class="adm-list__icon"><i class="fa-regular fa-envelope"></i></span>
+                            <a class="adm-list__main" asp-controller="ContactMessage" asp-action="Detail" asp-route-id="@m.Id" style="color:inherit">
+                                <div class="adm-list__title">@m.Subject</div>
+                                <div class="adm-list__sub">@m.FullName · @m.Email</div>
+                            </a>
+                            <span class="adm-list__meta">@m.CreatedDate.ToString("dd.MM HH:mm")</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="adm-card">
+            <div class="adm-card__head">
+                <h2>Canlı çat</h2>
+                <a asp-area="" asp-controller="Chat" asp-action="Index" target="_blank" rel="noopener" class="small">Çatı aç <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a>
+            </div>
+            @if (!Model.LatestChat.Any())
+            {
+                <div class="adm-empty"><i class="fa-regular fa-comments"></i><strong>Hələ mesaj yoxdur</strong></div>
+            }
+            else
+            {
+                <ul class="adm-list">
+                    @foreach (var c in Model.LatestChat)
+                    {
+                        <li>
+                            <span class="adm-list__icon">
+                                @if (c.SenderIsAdmin) { <i class="fa-solid fa-wrench"></i> } else { @c.UserName.Substring(0, 1).ToUpper() }
+                            </span>
+                            <div class="adm-list__main">
+                                <div class="adm-list__title">
+                                    @c.UserName
+                                    @if (c.SenderIsAdmin) { <span class="adm-badge is-admin ms-1">Usta</span> }
+                                </div>
+                                <div class="adm-list__sub">
+                                    @if (c.AttachmentType == "image") { <i class="fa-regular fa-image me-1"></i> }
+                                    @if (c.AttachmentType == "video") { <i class="fa-solid fa-film me-1"></i> }
+                                    @(c.Message ?? (c.AttachmentType == "image" ? "Şəkil" : "Video"))
+                                </div>
+                            </div>
+                            <span class="adm-list__meta">@c.CreatedDate.ToString("dd.MM HH:mm")</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
