@@ -287,5 +287,5 @@ C:\Users\Əsgərxan\AppData\Local\Temp\claude\e5cc5ed15f7fa93a\31650bbc-78e3-4a4
 C:\Users\Əsgərxan\AppData\Local\Temp\claude\e5cc5ed15f7fa93a\31650bbc-78e3-4a48-9319-b0db667c6622\scratchpad\appbuild\DoctorEngineApp.runtimeconfig.dev.json
 C:\Users\Əsgərxan\AppData\Local\Temp\claude\e5cc5ed15f7fa93a\31650bbc-78e3-4a48-9319-b0db667c6622\scratchpad\appbuild\DoctorEngineApp.dll
 C:\Users\Əsgərxan\AppData\Local\Temp\claude\e5cc5ed15f7fa93a\31650bbc-78e3-4a48-9319-b0db667c6622\scratchpad\appbuild\DoctorEngineApp.pdb
-C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\staticwebassets.upToDateCheck.txt
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Debug\net6.0\staticwebassets.upToDateCheck.txt

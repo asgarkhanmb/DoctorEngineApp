@@ -349,7 +349,9 @@ wwwroot\css\admin.css
 wwwroot\css\assistant.css
 wwwroot\css\auth.css
 wwwroot\css\chat.css
+wwwroot\css\motion.css
 wwwroot\css\site.css
+wwwroot\css\theme.css
 wwwroot\css\video-frame.css
 wwwroot\favicon.ico
 wwwroot\js\admin.js
@@ -448,5 +450,3 @@ wwwroot\uploads\sliders\f658b50e-dd23-42fc-b5e9-b8653e25f707.jpg
 wwwroot\uploads\subvideos\1e5e8dbd-57b9-42cc-8468-6fad6348d362.mp4
 wwwroot\uploads\subvideos\3089de15-e224-4887-92ec-79579d1ea361.mp4
 wwwroot\uploads\technicians\c7f081d1-0a5d-4000-b0ce-afbd8e3072a7.png
-wwwroot\css\motion.css
-wwwroot\css\theme.css
