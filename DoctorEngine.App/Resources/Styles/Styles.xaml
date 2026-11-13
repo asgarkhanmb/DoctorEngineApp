@@ -68,15 +68,96 @@
         </Setter>
     </Style>
 
+    <!-- Yeni dizayn: yumşaq kölgəli, daha dəyirmi kart -->
+    <Style x:Key="SoftCard" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 22" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Shadow Brush="#0B2154" Offset="0,8" Radius="22" Opacity="0.12" />
+        </Setter>
+    </Style>
+
+    <!-- Bölmə başlığı: böyük başlıq + sağda "Hamısı" -->
+    <Style x:Key="SectionTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="21" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- Kiçik dəyirmi "pill" (etiket, status) -->
+    <Style x:Key="Pill" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 999" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="HorizontalOptions" Value="Start" />
+    </Style>
+
+    <!-- Şüşə effektli dəyirmi ikon düyməsi (tünd başlıqda) -->
+    <Style x:Key="GlassIconButton" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Glass}" />
+        <Setter Property="Stroke" Value="{StaticResource GlassBorder}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+        <Setter Property="WidthRequest" Value="44" />
+        <Setter Property="HeightRequest" Value="44" />
+        <Setter Property="Padding" Value="11" />
+    </Style>
+
+    <!-- Sürətli əməliyyat plitəsinin ikon qutusu -->
+    <Style x:Key="TileIcon" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+        <Setter Property="WidthRequest" Value="56" />
+        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="Padding" Value="15" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+    </Style>
+
+    <Style x:Key="TileLabel" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowSemiBold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- Skelet yüklənmə qutusu -->
+    <Style x:Key="SkeletonBox" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Skeleton}, Dark={StaticResource SkeletonDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+    </Style>
+
+    <!-- Səhifə başlığı (gradient, aşağı küncləri dəyirmi) -->
+    <Style x:Key="PageHeader" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource HeaderGradient}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 0,0,28,28" />
+        <Setter Property="Padding" Value="20,18,20,26" />
+    </Style>
+
+    <Style x:Key="HeaderTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="TextColor" Value="White" />
+    </Style>
+
+    <Style x:Key="HeaderSubtitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource OnHeaderMuted}" />
+    </Style>
+
     <!-- ================= DÜYMƏLƏR ================= -->
 
     <Style TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
         <Setter Property="TextColor" Value="White" />
         <Setter Property="FontFamily" Value="BarlowBold" />
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="MinimumHeightRequest" Value="48" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="MinimumHeightRequest" Value="52" />
         <Setter Property="Padding" Value="18,0" />
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
@@ -98,7 +179,7 @@
     </Style>
 
     <Style x:Key="LightButton" TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
+        <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
         <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" />
         <Setter Property="BorderWidth" Value="1" />
@@ -108,18 +189,17 @@
     </Style>
 
     <Style x:Key="NavyButton" TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{StaticResource Navy}" />
+        <Setter Property="Background" Value="{StaticResource NavyTile}" />
+        <Setter Property="CornerRadius" Value="16" />
         <Setter Property="TextColor" Value="White" />
         <Setter Property="FontFamily" Value="BarlowBold" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="MinimumHeightRequest" Value="48" />
+        <Setter Property="MinimumHeightRequest" Value="52" />
     </Style>
 
     <Style x:Key="LinkButton" TargetType="Button">
         <Setter Property="FontFamily" Value="BarlowBold" />
-        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextColor" Value="{StaticResource Primary}" />
-        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="Padding" Value="4,0" />
         <Setter Property="MinimumHeightRequest" Value="36" />
     </Style>

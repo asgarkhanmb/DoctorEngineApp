@@ -10,6 +10,7 @@ public partial class ServicesPage : ContentPage
     {
         InitializeComponent();
         this.CenterOnWideScreens();
+        this.UseHeaderStatusBar();
         BindingContext = _vm = vm;
     }
 

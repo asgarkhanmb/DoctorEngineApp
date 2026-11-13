@@ -25,7 +25,69 @@ public partial class HomeViewModel : BaseViewModel
     public ObservableCollection<CategoryItem> Categories { get; } = new();
     public ObservableCollection<TechnicianItem> Technicians { get; } = new();
 
-    public HomeViewModel(ContentService content) => _content = content;
+    private readonly AuthService _auth;
+
+    // ---- Başlıq: salamlama + iş vəziyyəti ("canlı" status) ----
+    [ObservableProperty] private string greeting = "Xoş gəlmisiniz";
+    [ObservableProperty] private string greetingName = "DoctorEngine-ə xoş gəldiniz";
+    [ObservableProperty] private bool isOpenNow;
+    [ObservableProperty] private string openStatus = "";
+    [ObservableProperty] private string todayHours = "";
+
+    public bool HasSlides => Slides.Count > 0;
+    public bool ShowSkeleton => IsBusy && Slides.Count == 0;
+
+    public HomeViewModel(ContentService content, AuthService auth)
+    {
+        _content = content;
+        _auth = auth;
+        _auth.Changed += (_, _) => MainThread.BeginInvokeOnMainThread(UpdateGreeting);
+        Slides.CollectionChanged += (_, _) => { OnPropertyChanged(nameof(HasSlides)); OnPropertyChanged(nameof(ShowSkeleton)); };
+        PropertyChanged += (_, e) => { if (e.PropertyName == nameof(IsBusy)) OnPropertyChanged(nameof(ShowSkeleton)); };
+        UpdateGreeting();
+    }
+
+    /// <summary>Səhifə hər göstəriləndə: salamlama və "indi açıqdır" vəziyyəti yenilənir.</summary>
+    public void RefreshLive()
+    {
+        UpdateGreeting();
+        UpdateOpenStatus();
+    }
+
+    private void UpdateGreeting()
+    {
+        var h = DateTime.Now.Hour;
+        Greeting = h switch
+        {
+            >= 5 and < 12 => "Sabahınız xeyir",
+            >= 12 and < 18 => "Günortanız xeyir",
+            >= 18 and < 23 => "Axşamınız xeyir",
+            _ => "Gecəniz xeyrə qalsın"
+        };
+        var first = _auth.User?.FullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        GreetingName = string.IsNullOrWhiteSpace(first) ? "Xoş gəlmisiniz!" : $"{first}, xoş gəldiniz";
+    }
+
+    /// <summary>Saytdakı iş saatlarından ("10:00 - 20:00") hazırda açıq olub-olmadığını hesablayır.</summary>
+    private void UpdateOpenStatus()
+    {
+        var now = DateTime.Now;
+        var weekend = now.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
+        var range = weekend ? Contact?.Weekend : Contact?.Weekdays;
+        TodayHours = string.IsNullOrWhiteSpace(range) ? "" : range.Replace(" ", "");
+        var m = System.Text.RegularExpressions.Regex.Match(range ?? "", @"(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})");
+        if (!m.Success) { IsOpenNow = false; OpenStatus = ""; return; }
+        var open = new TimeSpan(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), 0);
+        var close = new TimeSpan(int.Parse(m.Groups[3].Value), int.Parse(m.Groups[4].Value), 0);
+        var t = now.TimeOfDay;
+        IsOpenNow = t >= open && t < close;
+        OpenStatus = IsOpenNow
+            ? $"İndi açıqdır · {close:hh\\:mm}-dək"
+            : t < open ? $"Bağlıdır · {open:hh\\:mm}-da açılır" : "Bağlıdır · sabah açılır";
+    }
+
+    [RelayCommand] private Task OpenChat() => Shell.Current.GoToAsync("//chat");
+    [RelayCommand] private Task OpenAi() => Shell.Current.GoToAsync("ai");
 
     [RelayCommand]
     public async Task LoadAsync(bool force = false)
@@ -42,6 +104,7 @@ public partial class HomeViewModel : BaseViewModel
             WhatsApp = home.WhatsApp;
             Map = home.Map;
             PrimaryPhone = home.Phones.FirstOrDefault()?.PhoneNumber ?? home.Contact?.Phone;
+            UpdateOpenStatus();
 
             Replace(Slides, home.Slides.Select(s => new SlideItem(s.Title, s.Subtitle, AppConfig.Absolute(s.BackgroundUrl), AppConfig.Absolute(s.SideImageUrl))));
             Replace(Informs, home.Informs.Select(i => new InformItem(i.Title, i.Description, AppConfig.Absolute(i.IconUrl))));

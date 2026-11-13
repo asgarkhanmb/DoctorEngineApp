@@ -2,139 +2,240 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
              x:Class="DoctorEngine.App.Views.ProfilePage"
              x:DataType="vm:ProfileViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="Container"
              Title="Profil">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="16">
+    <ContentPage.Resources>
+        <!-- Menyu sətri: ikon qutusu + mətn + ox -->
+        <Style x:Key="MenuIcon" TargetType="Border">
+            <Setter Property="WidthRequest" Value="42" />
+            <Setter Property="HeightRequest" Value="42" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 13" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Padding" Value="11" />
+        </Style>
+        <Style x:Key="MenuText" TargetType="Label">
+            <Setter Property="FontFamily" Value="BarlowSemiBold" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+        </Style>
+        <!-- Seqment (Daxil ol / Qeydiyyat) -->
+        <Style x:Key="Segment" TargetType="Border">
+            <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="HeightRequest" Value="44" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+    </ContentPage.Resources>
 
-            <!-- ===== DAXİL OLUB ===== -->
-            <VerticalStackLayout IsVisible="{Binding IsLoggedIn}" Spacing="16">
-                <Border Style="{StaticResource Card}" Padding="20">
+    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <ScrollView>
+            <VerticalStackLayout Spacing="16" Padding="0,0,0,24">
+
+                <!-- ================= DAXİL OLUB: başlıq ================= -->
+                <Border Style="{StaticResource PageHeader}" Padding="20,26,20,30" IsVisible="{Binding IsLoggedIn}">
                     <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                        <Border WidthRequest="88" HeightRequest="88" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{StaticResource Navy}" HorizontalOptions="Center">
-                            <Grid>
-                                <Label Text="{Binding Initial}" TextColor="White" FontSize="34" FontFamily="BarlowBold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding AvatarUrl, Converter={StaticResource HasValue}}" />
-                            </Grid>
+                        <Grid WidthRequest="104" HeightRequest="104" HorizontalOptions="Center">
+                            <Ellipse Stroke="{StaticResource GlassBorder}" StrokeThickness="3" />
+                            <Border Margin="6" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}">
+                                <Grid>
+                                    <Label Text="{Binding Initial}" TextColor="White" FontSize="38" FontFamily="BarlowBold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding AvatarUrl, Converter={StaticResource HasValue}}" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <Label Text="{Binding User.FullName}" TextColor="White" FontFamily="BarlowBold" FontSize="24" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding User.Email}" Style="{StaticResource HeaderSubtitle}" HorizontalTextAlignment="Center" />
+                        <Border Style="{StaticResource Pill}" BackgroundColor="{StaticResource Glass}" HorizontalOptions="Center" Padding="12,5">
+                            <Label TextColor="White" FontSize="12" FontFamily="BarlowSemiBold">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="@" />
+                                        <Span Text="{Binding User.UserName}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
                         </Border>
-                        <Label Text="{Binding User.FullName}" Style="{StaticResource H2}" HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding User.Email}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
-                        <Label Style="{StaticResource Muted}" HorizontalTextAlignment="Center">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="@" />
-                                    <Span Text="{Binding User.UserName}" />
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Border IsVisible="{Binding User.IsAdmin}" BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="10,3" HorizontalOptions="Center">
+                        <Border IsVisible="{Binding User.IsAdmin}" Style="{StaticResource Pill}" BackgroundColor="{StaticResource Primary}" HorizontalOptions="Center" Padding="12,4">
                             <Label Text="ADMİNİSTRATOR · USTA" TextColor="White" FontSize="11" FontFamily="BarlowBold" />
                         </Border>
                     </VerticalStackLayout>
                 </Border>
 
-                <Border Style="{StaticResource Card}" Padding="8">
-                    <VerticalStackLayout>
-                        <Button Text="💬  Canlı çat" Style="{StaticResource LightButton}" BorderWidth="0" Clicked="OnChatClicked" />
-                        <Button Text="📅  Rezervasiyalarım" Style="{StaticResource LightButton}" BorderWidth="0" Clicked="OnBookingClicked" />
-                        <Button Text="✨  AI köməkçi" Style="{StaticResource LightButton}" BorderWidth="0" Clicked="OnAiClicked" />
-                    </VerticalStackLayout>
-                </Border>
-
-                <Button Text="Hesabdan çıx" Style="{StaticResource LightButton}" TextColor="{StaticResource Primary}" Command="{Binding LogoutCommand}" />
-            </VerticalStackLayout>
-
-            <!-- ===== QONAQ ===== -->
-            <VerticalStackLayout IsVisible="{Binding IsGuest}" Spacing="16">
-                <VerticalStackLayout Spacing="2">
-                    <Label Text="HESAB" Style="{StaticResource Eyebrow}" />
-                    <Label Text="Xoş gəlmisiniz" Style="{StaticResource H1}" />
-                    <Label Text="Usta ilə yazışmaq üçün daxil olun və ya qeydiyyatdan keçin. Saytdakı hesabınız burada da işləyir." Style="{StaticResource Muted}" />
-                </VerticalStackLayout>
-
-                <Border Style="{StaticResource SuccessBox}" IsVisible="{Binding HasInfo}">
-                    <Label Text="{Binding InfoMessage}" TextColor="#14532D" FontSize="13" />
-                </Border>
-                <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
-                    <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
-                </Border>
-
-                <!-- Giriş -->
-                <Border Style="{StaticResource Card}" IsVisible="{Binding IsLoginMode}">
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Daxil ol" Style="{StaticResource H2}" />
-                        <VerticalStackLayout>
-                            <Label Text="Email və ya istifadəçi adı" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding LoginName}" Keyboard="Email" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" /></Border>
-                        </VerticalStackLayout>
-                        <VerticalStackLayout>
-                            <Label Text="Şifrə" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding Password}" IsPassword="True" ReturnCommand="{Binding LoginCommand}" /></Border>
-                        </VerticalStackLayout>
-                        <Button Text="Daxil ol" Command="{Binding LoginCommand}" IsEnabled="{Binding IsNotBusy}" />
-                        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="22" />
-                        <Grid ColumnDefinitions="*,*">
-                            <Button Text="Şifrəni unutmusunuz?" Style="{StaticResource LinkButton}" FontSize="13" HorizontalOptions="Start" Command="{Binding ShowForgotCommand}" />
-                            <Button Grid.Column="1" Text="Qeydiyyat →" Style="{StaticResource LinkButton}" FontSize="13" HorizontalOptions="End" Command="{Binding ShowRegisterCommand}" />
+                <!-- ================= DAXİL OLUB: menyu ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,0" Padding="8" IsVisible="{Binding IsLoggedIn}">
+                    <VerticalStackLayout Spacing="2">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="10" v:Motion.Press="True">
+                            <Border Style="{StaticResource MenuIcon}" Background="{StaticResource NavyTile}"><Image Source="ic_chat_w.png" /></Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                <Label Text="Canlı çat" Style="{StaticResource MenuText}" />
+                                <Label Text="Usta ilə yazışmalarınız" Style="{StaticResource Muted}" FontSize="12" />
+                            </VerticalStackLayout>
+                            <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnChatClicked" /></Grid.GestureRecognizers>
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Margin="66,0,10,0" />
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="10" v:Motion.Press="True">
+                            <Border Style="{StaticResource MenuIcon}" Background="{StaticResource PrimaryGradient}"><Image Source="ic_calendar_w.png" /></Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                <Label Text="Rezervasiyalarım" Style="{StaticResource MenuText}" />
+                                <Label Text="Növbələr və onların statusu" Style="{StaticResource Muted}" FontSize="12" />
+                            </VerticalStackLayout>
+                            <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnBookingClicked" /></Grid.GestureRecognizers>
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Margin="66,0,10,0" />
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="10" v:Motion.Press="True">
+                            <Border Style="{StaticResource MenuIcon}" Background="{StaticResource VioletTile}"><Image Source="ic_spark_w.png" /></Border>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                <Label Text="AI köməkçi" Style="{StaticResource MenuText}" />
+                                <Label Text="Mühərrik problemi barədə sürətli məsləhət" Style="{StaticResource Muted}" FontSize="12" />
+                            </VerticalStackLayout>
+                            <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                            <Grid.GestureRecognizers><TapGestureRecognizer Tapped="OnAiClicked" /></Grid.GestureRecognizers>
                         </Grid>
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Qeydiyyat -->
-                <Border Style="{StaticResource Card}" IsVisible="{Binding IsRegisterMode}">
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Qeydiyyat" Style="{StaticResource H2}" />
-                        <VerticalStackLayout>
-                            <Label Text="Ad Soyad" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding FullName}" /></Border>
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,0" Padding="18,0" HeightRequest="56" IsVisible="{Binding IsLoggedIn}" v:Motion.Press="True">
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                        <Image Source="ic_logout_r.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center" />
+                        <Label Text="Hesabdan çıx" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="16" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding LogoutCommand}" /></Border.GestureRecognizers>
+                </Border>
+
+                <!-- ================= QONAQ: başlıq ================= -->
+                <Border Style="{StaticResource PageHeader}" IsVisible="{Binding IsGuest}" Padding="20,18,20,64">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="HESAB" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
+                            <Label Text="Xoş gəlmisiniz" Style="{StaticResource HeaderTitle}" />
+                            <Label Text="Saytdakı hesabınız tətbiqdə də işləyir." Style="{StaticResource HeaderSubtitle}" />
                         </VerticalStackLayout>
-                        <VerticalStackLayout>
-                            <Label Text="İstifadəçi adı" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding UserName}" Placeholder="latın hərfləri, rəqəm, . _ -" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" /></Border>
+                        <Border Grid.Column="1" Style="{StaticResource GlassIconButton}" WidthRequest="56" HeightRequest="56" Padding="15" VerticalOptions="Center">
+                            <Image Source="ic_user_w.png" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- ================= QONAQ: forma kartı (başlığın üzərinə çıxır) ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,-62,16,0" Padding="18" IsVisible="{Binding IsGuest}">
+                    <VerticalStackLayout Spacing="14">
+
+                        <!-- Seqment -->
+                        <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="4" BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}"
+                                IsVisible="{Binding IsForgotMode, Converter={StaticResource InvertedBool}}">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
+                                <Border Style="{StaticResource Segment}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsLoginMode}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="Daxil ol" FontFamily="BarlowBold" FontSize="15" HorizontalOptions="Center" VerticalOptions="Center"
+                                           TextColor="{Binding IsLoginMode, Converter={StaticResource SelectedText}}" />
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowLoginCommand}" /></Border.GestureRecognizers>
+                                </Border>
+                                <Border Grid.Column="1" Style="{StaticResource Segment}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsRegisterMode}" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="Qeydiyyat" FontFamily="BarlowBold" FontSize="15" HorizontalOptions="Center" VerticalOptions="Center"
+                                           TextColor="{Binding IsRegisterMode, Converter={StaticResource SelectedText}}" />
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowRegisterCommand}" /></Border.GestureRecognizers>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource SuccessBox}" IsVisible="{Binding HasInfo}">
+                            <Label Text="{Binding InfoMessage}" TextColor="#14532D" FontSize="13" />
+                        </Border>
+                        <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                            <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                        </Border>
+
+                        <!-- Giriş -->
+                        <VerticalStackLayout Spacing="12" IsVisible="{Binding IsLoginMode}">
+                            <VerticalStackLayout>
+                                <Label Text="Email və ya istifadəçi adı" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                                    <Entry Text="{Binding LoginName}" Keyboard="Email" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" Placeholder="ad@numune.az" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="Şifrə" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                                    <Entry Text="{Binding Password}" IsPassword="True" ReturnCommand="{Binding LoginCommand}" Placeholder="••••••••" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <Label Text="Şifrəni unutmusunuz?" TextColor="{StaticResource Primary}" FontFamily="BarlowSemiBold" FontSize="14" HorizontalOptions="End">
+                                <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowForgotCommand}" /></Label.GestureRecognizers>
+                            </Label>
+                            <Button Text="Daxil ol" Command="{Binding LoginCommand}" IsEnabled="{Binding IsNotBusy}" />
+                            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="22" />
                         </VerticalStackLayout>
-                        <VerticalStackLayout>
-                            <Label Text="Email" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding Email}" Keyboard="Email" IsSpellCheckEnabled="False" /></Border>
+
+                        <!-- Qeydiyyat -->
+                        <VerticalStackLayout Spacing="12" IsVisible="{Binding IsRegisterMode}">
+                            <VerticalStackLayout>
+                                <Label Text="Ad Soyad" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding FullName}" /></Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="İstifadəçi adı" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                                    <Entry Text="{Binding UserName}" Placeholder="latın hərfləri, rəqəm, . _ -" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="Email" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding Email}" Keyboard="Email" IsSpellCheckEnabled="False" /></Border>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="Şifrə" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding Password}" IsPassword="True" /></Border>
+                                <Label Text="Ən azı 6 simvol: böyük və kiçik hərf, rəqəm və xüsusi simvol (!@#…)" Style="{StaticResource Muted}" FontSize="12" Margin="2,4,0,0" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout>
+                                <Label Text="Şifrə təkrarı" Style="{StaticResource FieldLabel}" />
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding Password2}" IsPassword="True" /></Border>
+                            </VerticalStackLayout>
+                            <Button Text="Qeydiyyatdan keç" Command="{Binding RegisterCommand}" IsEnabled="{Binding IsNotBusy}" />
+                            <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="22" />
                         </VerticalStackLayout>
-                        <VerticalStackLayout>
-                            <Label Text="Şifrə" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding Password}" IsPassword="True" /></Border>
-                            <Label Text="Ən azı 6 simvol: böyük və kiçik hərf, rəqəm və xüsusi simvol (!@#…)" Style="{StaticResource Muted}" FontSize="12" Margin="2,4,0,0" />
+
+                        <!-- Şifrə bərpası -->
+                        <VerticalStackLayout Spacing="12" IsVisible="{Binding IsForgotMode}">
+                            <Label Text="Şifrənin bərpası" Style="{StaticResource SectionTitle}" FontSize="19" />
+                            <Label Text="Emailinizi yazın — şifrə yeniləmə linki göndəriləcək." Style="{StaticResource Muted}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding Email}" Keyboard="Email" Placeholder="ad@numune.az" /></Border>
+                            <Button Text="Link göndər" Command="{Binding ForgotCommand}" IsEnabled="{Binding IsNotBusy}" />
+                            <Label Text="← Girişə qayıt" TextColor="{StaticResource Primary}" FontFamily="BarlowSemiBold" FontSize="14" HorizontalOptions="Center">
+                                <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding ShowLoginCommand}" /></Label.GestureRecognizers>
+                            </Label>
                         </VerticalStackLayout>
-                        <VerticalStackLayout>
-                            <Label Text="Şifrə təkrarı" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}"><Entry Text="{Binding Password2}" IsPassword="True" /></Border>
-                        </VerticalStackLayout>
-                        <Button Text="Qeydiyyatdan keç" Command="{Binding RegisterCommand}" IsEnabled="{Binding IsNotBusy}" />
-                        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="22" />
-                        <Button Text="← Artıq hesabım var" Style="{StaticResource LinkButton}" FontSize="13" Command="{Binding ShowLoginCommand}" />
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Şifrə bərpası -->
-                <Border Style="{StaticResource Card}" IsVisible="{Binding IsForgotMode}">
-                    <VerticalStackLayout Spacing="12">
-                        <Label Text="Şifrənin bərpası" Style="{StaticResource H2}" />
-                        <Label Text="Emailinizi yazın — şifrə yeniləmə linki göndəriləcək." Style="{StaticResource Muted}" />
-                        <Border Style="{StaticResource Field}"><Entry Text="{Binding Email}" Keyboard="Email" Placeholder="ad@numune.az" /></Border>
-                        <Button Text="Link göndər" Command="{Binding ForgotCommand}" IsEnabled="{Binding IsNotBusy}" />
-                        <Button Text="← Geri" Style="{StaticResource LinkButton}" FontSize="13" Command="{Binding ShowLoginCommand}" />
+                <!-- ================= Proqramçı ayarları (yalnız Debug) ================= -->
+                <Border Style="{StaticResource SoftCard}" Margin="16,0" IsVisible="{Binding ShowDevSettings}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Server ünvanı (test)" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding ServerUrl}" Keyboard="Url" IsSpellCheckEnabled="False" /></Border>
+                        <Button Text="Yadda saxla" Style="{StaticResource NavyButton}" Command="{Binding SaveServerCommand}" />
                     </VerticalStackLayout>
                 </Border>
+
+                <Label Text="{Binding AppVersion}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" FontSize="12" />
             </VerticalStackLayout>
-
-            <!-- ===== Proqramçı ayarları (yalnız Debug) ===== -->
-            <Border Style="{StaticResource Card}" IsVisible="{Binding ShowDevSettings}">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Server ünvanı (test)" Style="{StaticResource FieldLabel}" />
-                    <Border Style="{StaticResource Field}"><Entry Text="{Binding ServerUrl}" Keyboard="Url" IsSpellCheckEnabled="False" /></Border>
-                    <Button Text="Yadda saxla" Style="{StaticResource NavyButton}" Command="{Binding SaveServerCommand}" />
-                </VerticalStackLayout>
-            </Border>
-
-            <Label Text="{Binding AppVersion}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" FontSize="12" />
-        </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+    </Grid>
 </ContentPage>

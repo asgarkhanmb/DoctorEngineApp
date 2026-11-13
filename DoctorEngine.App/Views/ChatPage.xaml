@@ -2,105 +2,184 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
              x:Class="DoctorEngine.App.Views.ChatPage"
              x:DataType="vm:ChatViewModel"
-             Title="Canlı usta dəstəyi">
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="Çat">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{AppThemeBinding Light=#EEF2F8, Dark={StaticResource BackgroundDark}}">
 
-        <!-- Status zolağı -->
-        <Grid Background="{StaticResource HeroGradient}" Padding="16,10" ColumnDefinitions="Auto,*" ColumnSpacing="8" IsVisible="{Binding IsLoggedIn}">
-            <Ellipse WidthRequest="9" HeightRequest="9" VerticalOptions="Center" Fill="#2ECC71" IsVisible="{Binding IsOnline}" />
-            <Ellipse WidthRequest="9" HeightRequest="9" VerticalOptions="Center" Fill="#F5B301" IsVisible="{Binding IsOnline, Converter={StaticResource InvertedBool}}" />
-            <Label Grid.Column="1" Text="{Binding Status}" TextColor="#DDFFFFFF" FontSize="13" VerticalOptions="Center" />
-        </Grid>
+        <!-- ================= BAŞLIQ ================= -->
+        <Border Style="{StaticResource PageHeader}" Padding="16,12,16,16" StrokeShape="RoundRectangle 0,0,24,24">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Grid WidthRequest="48" HeightRequest="48">
+                    <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" Padding="12">
+                        <Image Source="ic_wrench_w.png" />
+                    </Border>
+                    <Ellipse x:Name="OnlineDot" Fill="{StaticResource Live}" Stroke="#0A1C47" StrokeThickness="2" WidthRequest="14" HeightRequest="14"
+                             HorizontalOptions="End" VerticalOptions="End" Margin="0,0,-2,-2" IsVisible="{Binding IsOnline}" />
+                </Grid>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                    <Label Text="Canlı usta dəstəyi" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
+                    <Label TextColor="{StaticResource OnHeaderMuted}" FontSize="13">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsGuest}" Value="True">
+                                <Setter Property="Text" Value="Ustalarımız adətən bir neçə dəqiqəyə cavab verir" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsLoggedIn}" Value="True">
+                                <Setter Property="Text" Value="{Binding Status}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
 
-        <!-- ===== Qonaq ===== -->
-        <VerticalStackLayout Grid.Row="1" Grid.RowSpan="2" IsVisible="{Binding IsGuest}" Padding="24" Spacing="14" VerticalOptions="Center">
-            <Border BackgroundColor="{StaticResource PrimarySoft}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="84" HeightRequest="84" HorizontalOptions="Center">
-                <Label Text="💬" FontSize="38" HorizontalOptions="Center" VerticalOptions="Center" />
-            </Border>
-            <Label Text="Usta ilə birbaşa yazışın" Style="{StaticResource H2}" HorizontalTextAlignment="Center" />
-            <Label Text="Probleminizi yazın, şəkil, video və ya səs mesajı göndərin — ustalarımız tezliklə cavab verəcək. Yazışmaları görmək üçün hesabınıza daxil olun."
-                   Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
-            <Button Text="Daxil ol / Qeydiyyat" Command="{Binding GoToLoginCommand}" />
-        </VerticalStackLayout>
+        <!-- ================= QONAQ ================= -->
+        <ScrollView Grid.Row="1" Grid.RowSpan="2" IsVisible="{Binding IsGuest}">
+            <VerticalStackLayout Padding="24,30,24,24" Spacing="16" VerticalOptions="Center">
+                <Grid HorizontalOptions="Center" WidthRequest="140" HeightRequest="140">
+                    <Ellipse Fill="{AppThemeBinding Light=#FDE3E6, Dark=#33D81324}" />
+                    <Ellipse Fill="{AppThemeBinding Light=#FBCFD5, Dark=#4DD81324}" Margin="22" />
+                    <Border StrokeShape="RoundRectangle 26" StrokeThickness="0" Background="{StaticResource PrimaryGradient}"
+                            WidthRequest="74" HeightRequest="74" Padding="20" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="ic_chat_w.png" />
+                    </Border>
+                </Grid>
+                <Label Text="Usta ilə birbaşa yazışın" Style="{StaticResource SectionTitle}" FontSize="24" HorizontalTextAlignment="Center" />
+                <Label Text="Probleminizi yazın, şəkil, video və ya səs mesajı göndərin — ustalarımız tezliklə cavab verəcək."
+                       Style="{StaticResource Muted}" FontSize="15" HorizontalTextAlignment="Center" />
 
-        <!-- ===== Mesajlar ===== -->
+                <VerticalStackLayout Spacing="10" Margin="0,6,0,6">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="9">
+                            <Image Source="ic_attach_r.png" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Şəkil və video göndərin" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="9">
+                            <Image Source="ic_mic_r.png" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Səs mesajı ilə problemi izah edin" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="9">
+                            <Image Source="ic_shield_r.png" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Yazışmalar yalnız sizə və ustaya görünür" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                    </Grid>
+                </VerticalStackLayout>
+
+                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" HeightRequest="54" v:Motion.Press="True">
+                    <Label Text="Daxil ol / Qeydiyyat" TextColor="White" FontFamily="BarlowBold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ================= MESAJLAR ================= -->
         <CollectionView x:Name="MessagesView" Grid.Row="1" ItemsSource="{Binding Messages}" IsVisible="{Binding IsLoggedIn}"
                         SelectionMode="None" ItemsUpdatingScrollMode="KeepLastItemInView">
             <CollectionView.Header>
-                <VerticalStackLayout Padding="0,8">
-                    <Button Text="Köhnə mesajları göstər" Style="{StaticResource LightButton}" HorizontalOptions="Center" FontSize="13"
-                            MinimumHeightRequest="36" HeightRequest="36" Command="{Binding LoadMoreCommand}" IsVisible="{Binding CanLoadMore}" />
-                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="28" />
+                <VerticalStackLayout Padding="0,10,0,4" Spacing="6">
+                    <Border Style="{StaticResource Pill}" HorizontalOptions="Center" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}"
+                            IsVisible="{Binding CanLoadMore}" v:Motion.Press="True">
+                        <Label Text="Köhnə mesajları göstər" FontFamily="BarlowSemiBold" FontSize="13" TextColor="{StaticResource Primary}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding LoadMoreCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="26" />
+                    <VerticalStackLayout Padding="32,40" Spacing="8" IsVisible="{Binding IsEmpty}">
+                        <Border StrokeShape="RoundRectangle 22" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}"
+                                WidthRequest="66" HeightRequest="66" Padding="18" HorizontalOptions="Center">
+                            <Image Source="ic_chat_r.png" />
+                        </Border>
+                        <Label Text="Söhbətə başlayın" Style="{StaticResource SectionTitle}" FontSize="18" HorizontalTextAlignment="Center" />
+                        <Label Text="Sualınızı yazın — ustalarımız cavab verəcək." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </CollectionView.Header>
-            <CollectionView.EmptyView>
-                <VerticalStackLayout Padding="32" Spacing="6" VerticalOptions="Center" IsVisible="{Binding IsEmpty}">
-                    <Label Text="💬" FontSize="40" HorizontalOptions="Center" Opacity="0.5" />
-                    <Label Text="Hələ mesaj yoxdur." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
-                    <Label Text="Sualınızı yazın — ustalarımız cavab verəcək." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:ChatItem">
                     <VerticalStackLayout Padding="12,3" Spacing="4">
                         <!-- Tarix ayırıcısı -->
-                        <Border IsVisible="{Binding ShowDate}" HorizontalOptions="Center" StrokeShape="RoundRectangle 10" StrokeThickness="0"
-                                BackgroundColor="#E3E7EF" Padding="10,3" Margin="0,8,0,4">
-                            <Label Text="{Binding DateLabel}" FontSize="11" TextColor="#5B6476" />
+                        <Border IsVisible="{Binding ShowDate}" HorizontalOptions="Center" Style="{StaticResource Pill}" Padding="12,4" Margin="0,10,0,4"
+                                BackgroundColor="{AppThemeBinding Light=#DCE3EE, Dark=#202A44}">
+                            <Label Text="{Binding DateLabel}" FontSize="12" FontFamily="BarlowSemiBold" TextColor="{AppThemeBinding Light=#5B6476, Dark=#AEB7C8}" />
                         </Border>
 
                         <!-- Göndərən adı -->
                         <HorizontalStackLayout IsVisible="{Binding ShowName}" Spacing="6" Margin="6,4,0,0">
                             <Label Text="{Binding UserName}" FontSize="12" Style="{StaticResource Muted}" FontFamily="BarlowBold" />
-                            <Border IsVisible="{Binding IsAdmin}" BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="6,0">
+                            <Border IsVisible="{Binding IsAdmin}" Style="{StaticResource Pill}" BackgroundColor="{StaticResource Primary}" Padding="7,1">
                                 <Label Text="USTA" TextColor="White" FontSize="10" FontFamily="BarlowBold" />
                             </Border>
                         </HorizontalStackLayout>
 
                         <!-- Qabarcıq -->
                         <Border HorizontalOptions="{Binding IsMine, Converter={StaticResource MineAlign}}" MaximumWidthRequest="310"
-                                StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="12,8,12,6"
+                                StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="13,9,13,7"
                                 BackgroundColor="{Binding ., Converter={StaticResource BubbleColor}}">
+                            <Border.Shadow>
+                                <Shadow Brush="#0B2154" Offset="0,2" Radius="6" Opacity="0.08" />
+                            </Border.Shadow>
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer NumberOfTapsRequired="1"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OptionsCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding .}" />
                             </Border.GestureRecognizers>
                             <VerticalStackLayout Spacing="4">
                                 <!-- Şəkil -->
-                                <Border IsVisible="{Binding ImageUrl, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 12" StrokeThickness="0" Padding="0" Margin="-6,-2,-6,2">
+                                <Border IsVisible="{Binding ImageUrl, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 14" StrokeThickness="0" Padding="0" Margin="-7,-3,-7,2">
                                     <Image Source="{Binding ImageUrl}" Aspect="AspectFill" WidthRequest="260" HeightRequest="200" />
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenMediaCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding ImageUrl}" />
                                     </Border.GestureRecognizers>
                                 </Border>
                                 <!-- Video -->
-                                <Border IsVisible="{Binding VideoUrl, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 12" StrokeThickness="0"
-                                        BackgroundColor="#0B0F19" WidthRequest="240" HeightRequest="140" Margin="-6,-2,-6,2">
-                                    <VerticalStackLayout VerticalOptions="Center" Spacing="6">
-                                        <Border BackgroundColor="{StaticResource Primary}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="48" HeightRequest="48" HorizontalOptions="Center">
-                                            <Label Text="▶" TextColor="White" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                <Border IsVisible="{Binding VideoUrl, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 14" StrokeThickness="0"
+                                        Background="{StaticResource HeaderGradient}" WidthRequest="240" HeightRequest="140" Margin="-7,-3,-7,2">
+                                    <VerticalStackLayout VerticalOptions="Center" Spacing="8">
+                                        <Border Background="{StaticResource PrimaryGradient}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="52" HeightRequest="52" Padding="15" HorizontalOptions="Center">
+                                            <Image Source="ic_play_w.png" />
                                         </Border>
-                                        <Label Text="Videoya bax" TextColor="White" FontSize="12" HorizontalOptions="Center" />
+                                        <Label Text="Videoya bax" TextColor="White" FontFamily="BarlowSemiBold" FontSize="13" HorizontalOptions="Center" />
                                     </VerticalStackLayout>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenMediaCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding VideoUrl}" />
                                     </Border.GestureRecognizers>
                                 </Border>
                                 <!-- Səs -->
-                                <Grid IsVisible="{Binding AudioUrl, Converter={StaticResource HasValue}}" ColumnDefinitions="Auto,*" ColumnSpacing="10" WidthRequest="210">
-                                    <Border BackgroundColor="{StaticResource Navy}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="40" HeightRequest="40">
+                                <Grid IsVisible="{Binding AudioUrl, Converter={StaticResource HasValue}}" ColumnDefinitions="Auto,*" ColumnSpacing="10" WidthRequest="220">
+                                    <Border BackgroundColor="{StaticResource Navy}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="42" HeightRequest="42" Padding="12">
                                         <Grid>
-                                            <Label Text="▶" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsPlaying, Converter={StaticResource InvertedBool}}" />
+                                            <Image Source="ic_play_w.png" IsVisible="{Binding IsPlaying, Converter={StaticResource InvertedBool}}" />
                                             <Label Text="❚❚" TextColor="White" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsPlaying}" />
                                         </Grid>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=PlayAudioCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding .}" />
                                         </Border.GestureRecognizers>
                                     </Border>
-                                    <Label Grid.Column="1" Text="🎤 Səs mesajı" VerticalOptions="Center" FontSize="13" TextColor="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                    <!-- Səs dalğası (dekorativ) -->
+                                    <HorizontalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center" Opacity="0.75">
+                                        <BoxView WidthRequest="3" HeightRequest="10" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="18" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="26" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="14" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="22" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="8" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="16" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="24" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="20" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="10" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                        <BoxView WidthRequest="3" HeightRequest="16" CornerRadius="2" Color="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                    </HorizontalStackLayout>
                                 </Grid>
                                 <!-- Mətn -->
                                 <Label Text="{Binding Text}" IsVisible="{Binding Text, Converter={StaticResource HasValue}}" FontSize="15"
@@ -116,39 +195,80 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
             <CollectionView.Footer>
-                <BoxView HeightRequest="8" Color="Transparent" />
+                <BoxView HeightRequest="10" Color="Transparent" />
             </CollectionView.Footer>
         </CollectionView>
 
-        <!-- ===== Yazma sahəsi ===== -->
-        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsLoggedIn}" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="10,8" Spacing="6">
-            <!-- Redaktə rejimi -->
-            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding Editing, Converter={StaticResource HasValue}}" Padding="6,0">
-                <Label Text="✏️ Mesaj redaktə olunur" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" FontFamily="BarlowBold" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="Ləğv et" Style="{StaticResource LinkButton}" Command="{Binding CancelEditCommand}" FontSize="12" />
-            </Grid>
-
-            <!-- Səs yazılır -->
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10" IsVisible="{Binding IsRecording}" HeightRequest="48">
-                <Button Text="🗑" Style="{StaticResource LightButton}" WidthRequest="46" HeightRequest="46" Padding="0" Command="{Binding CancelRecordCommand}" />
-                <Ellipse Grid.Column="1" Fill="{StaticResource Primary}" WidthRequest="10" HeightRequest="10" VerticalOptions="Center" />
-                <Label Grid.Column="2" Text="{Binding RecordTime}" FontSize="16" FontFamily="BarlowBold" VerticalOptions="Center" />
-                <Button Grid.Column="3" Text="➤" WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" FontSize="18" Command="{Binding ToggleRecordCommand}" />
-            </Grid>
-
-            <!-- Adi yazma -->
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" IsVisible="{Binding IsRecording, Converter={StaticResource InvertedBool}}">
-                <Button Text="📎" Style="{StaticResource LightButton}" WidthRequest="46" HeightRequest="46" Padding="0" CornerRadius="23" Command="{Binding AttachCommand}" />
-                <Border Grid.Column="1" Style="{StaticResource Field}" StrokeShape="RoundRectangle 22" Padding="14,0">
-                    <Editor Text="{Binding Text}" Placeholder="Mesaj yazın…" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
-                </Border>
-                <Grid Grid.Column="2">
-                    <Button Text="➤" WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" FontSize="18" Command="{Binding SendCommand}" IsVisible="{Binding CanSend}" />
-                    <Button Text="🎤" WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" FontSize="18" Command="{Binding ToggleRecordCommand}"
-                            IsVisible="{Binding CanSend, Converter={StaticResource InvertedBool}}" />
+        <!-- ================= YAZMA SAHƏSİ ================= -->
+        <Border Grid.Row="2" IsVisible="{Binding IsLoggedIn}" StrokeThickness="0" StrokeShape="RoundRectangle 22,22,0,0" Padding="10,10,10,12"
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}">
+            <Border.Shadow>
+                <Shadow Brush="#0B2154" Offset="0,-4" Radius="16" Opacity="0.08" />
+            </Border.Shadow>
+            <VerticalStackLayout Spacing="6">
+                <!-- Redaktə rejimi -->
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding Editing, Converter={StaticResource HasValue}}" Padding="8,0">
+                    <Label Text="Mesaj redaktə olunur" FontSize="13" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="Ləğv et" FontSize="13" FontFamily="BarlowBold" TextColor="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelEditCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
                 </Grid>
-            </Grid>
-            <ActivityIndicator IsRunning="{Binding IsSending}" IsVisible="{Binding IsSending}" HeightRequest="18" />
-        </VerticalStackLayout>
+
+                <!-- Səs yazılır -->
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12" IsVisible="{Binding IsRecording}" HeightRequest="50" Padding="4,0">
+                    <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" v:Motion.Press="True">
+                        <Label Text="✕" FontSize="18" FontFamily="BarlowBold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelRecordCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Ellipse x:Name="RecDot" Grid.Column="1" Fill="{StaticResource Primary}" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
+                        <Label Text="Səs yazılır…" Style="{StaticResource Muted}" FontSize="12" />
+                        <Label Text="{Binding RecordTime}" FontSize="18" FontFamily="BarlowBold" />
+                    </VerticalStackLayout>
+                    <Border Grid.Column="3" WidthRequest="50" HeightRequest="50" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" Padding="14" v:Motion.Press="True">
+                        <Image Source="ic_send_w.png" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleRecordCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+
+                <!-- Adi yazma -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" IsVisible="{Binding IsRecording, Converter={StaticResource InvertedBool}}">
+                    <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}"
+                            Padding="12" VerticalOptions="End" v:Motion.Press="True">
+                        <Image Source="ic_attach_g.png" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding AttachCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 23" StrokeThickness="0" Padding="16,2"
+                            BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}">
+                        <Editor Text="{Binding Text}" Placeholder="Mesaj yazın…" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
+                    </Border>
+                    <Grid Grid.Column="2" VerticalOptions="End">
+                        <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" Padding="13"
+                                IsVisible="{Binding CanSend}" v:Motion.Press="True">
+                            <Image Source="ic_send_w.png" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SendCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource NavyTile}" Padding="12"
+                                IsVisible="{Binding CanSend, Converter={StaticResource InvertedBool}}" v:Motion.Press="True">
+                            <Image Source="ic_mic_w.png" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleRecordCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+                </Grid>
+                <ActivityIndicator IsRunning="{Binding IsSending}" IsVisible="{Binding IsSending}" HeightRequest="18" />
+            </VerticalStackLayout>
+        </Border>
     </Grid>
 </ContentPage>

@@ -2,73 +2,129 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
              x:Class="DoctorEngine.App.Views.ServicesPage"
              x:DataType="vm:ServicesViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="Container"
              Title="Xidmətlər">
 
-    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
-        <CollectionView ItemsSource="{Binding Categories}" Margin="0">
-            <CollectionView.Header>
-                <VerticalStackLayout Padding="16,16,16,4" Spacing="2">
-                    <Label Text="XİDMƏTLƏRİMİZ" Style="{StaticResource Eyebrow}" />
-                    <Label Text="Videolara baxın, uyğun xidməti bir kliklə rezervasiya edin." Style="{StaticResource Muted}" />
-                    <Border Style="{StaticResource ErrorBox}" Margin="0,10,0,0" IsVisible="{Binding HasError}">
-                        <Label Text="{Binding ErrorMessage}" FontSize="13" TextColor="#7F1D1D" />
-                    </Border>
-                </VerticalStackLayout>
-            </CollectionView.Header>
-            <CollectionView.EmptyView>
-                <VerticalStackLayout Padding="32" Spacing="8" HorizontalOptions="Center">
-                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
-                    <Label Text="Xidmətlər tezliklə əlavə olunacaq." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" IsVisible="{Binding IsNotBusy}" />
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:CategoryItem">
-                    <Border Style="{StaticResource Card}" Margin="16,8" Padding="0">
-                        <VerticalStackLayout>
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Padding="14">
-                                <Border WidthRequest="48" HeightRequest="48" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{StaticResource PrimarySoft}" Padding="8">
-                                    <Image Source="{Binding IconUrl}" Aspect="AspectFit" />
-                                </Border>
-                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                                    <Label Text="{Binding Name}" FontFamily="BarlowBold" FontSize="17" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
-                                    <Label Text="{Binding Description}" Style="{StaticResource Muted}" MaxLines="3" LineBreakMode="TailTruncation" />
+    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+            <CollectionView ItemsSource="{Binding Categories}" SelectionMode="None">
+                <CollectionView.Header>
+                    <VerticalStackLayout Spacing="0">
+                        <Border Style="{StaticResource PageHeader}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="XİDMƏTLƏRİMİZ" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
+                                    <Label Text="Xidmətlər" Style="{StaticResource HeaderTitle}" />
+                                    <Label Text="Videolara baxın və uyğun xidməti bir toxunuşla rezervasiya edin." Style="{StaticResource HeaderSubtitle}" />
                                 </VerticalStackLayout>
+                                <Border Grid.Column="1" Style="{StaticResource GlassIconButton}" WidthRequest="56" HeightRequest="56" Padding="14" VerticalOptions="Center">
+                                    <Image Source="ic_wrench_w.png" />
+                                </Border>
                             </Grid>
+                        </Border>
+                        <Border Style="{StaticResource ErrorBox}" Margin="16,14,16,0" IsVisible="{Binding HasError}">
+                            <Label Text="{Binding ErrorMessage}" FontSize="13" TextColor="#7F1D1D" />
+                        </Border>
+                        <BoxView HeightRequest="8" Color="Transparent" />
+                    </VerticalStackLayout>
+                </CollectionView.Header>
 
-                            <!-- Videolar -->
-                            <VerticalStackLayout Padding="14,0,14,4" Spacing="8" BindableLayout.ItemsSource="{Binding Videos}">
-                                <BindableLayout.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:VideoItem">
-                                        <Border StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{StaticResource Navy}" HeightRequest="64" Padding="14,0">
-                                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                                                <Border BackgroundColor="{StaticResource Primary}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="38" HeightRequest="38" VerticalOptions="Center">
-                                                    <Label Text="▶" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                                                </Border>
-                                                <Label Grid.Column="1" Text="{Binding Title, TargetNullValue='Videoya bax'}" TextColor="White" FontFamily="BarlowBold" VerticalOptions="Center" LineBreakMode="TailTruncation" />
-                                            </Grid>
-                                            <Border.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=PlayVideoCommand, x:DataType=vm:ServicesViewModel}"
-                                                                      CommandParameter="{Binding VideoUrl}" />
-                                            </Border.GestureRecognizers>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="32" Spacing="8" HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+                        <Label Text="Xidmətlər tezliklə əlavə olunacaq." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" IsVisible="{Binding IsNotBusy}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CategoryItem">
+                        <!-- Kənar boşluq xarici Grid-in Padding-i ilə: Windows CollectionView şablonun kök Margin-ini nəzərə almır -->
+                        <Grid Padding="16,10">
+                        <Border Style="{StaticResource SoftCard}" Padding="0">
+                            <VerticalStackLayout Spacing="0">
+                                <!-- Rəngli üst hissə -->
+                                <Grid Background="{StaticResource NavyTile}" HeightRequest="112" Padding="18,0" IsClippedToBounds="True">
+                                    <Ellipse Fill="#14FFFFFF" WidthRequest="200" HeightRequest="200" HorizontalOptions="End" VerticalOptions="Start" Margin="0,-90,-70,0" />
+                                    <Ellipse Fill="#0FFFFFFF" WidthRequest="90" HeightRequest="90" HorizontalOptions="End" VerticalOptions="End" Margin="0,0,70,-40" />
+                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" VerticalOptions="Center">
+                                        <Border WidthRequest="64" HeightRequest="64" StrokeShape="RoundRectangle 20" StrokeThickness="0" BackgroundColor="White" Padding="13">
+                                            <Image Source="{Binding IconUrl}" Aspect="AspectFit" />
                                         </Border>
-                                    </DataTemplate>
-                                </BindableLayout.ItemTemplate>
+                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                                            <Label Text="{Binding Name}" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
+                                            <Border Style="{StaticResource Pill}" BackgroundColor="{StaticResource Glass}" Padding="9,3">
+                                                <Label TextColor="White" FontSize="11" FontFamily="BarlowSemiBold">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding HasVideo}" Value="True">
+                                                            <Setter Property="Text" Value="▶  Video izah var" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding HasVideo}" Value="False">
+                                                            <Setter Property="Text" Value="Video tezliklə" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                            </Border>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Grid>
+
+                                <VerticalStackLayout Padding="16,14,16,16" Spacing="12">
+                                    <Label Text="{Binding Description, TargetNullValue='Peşəkar diaqnostika və etibarlı təmir — ustalarımız mühərrikinizə ən doğru həlli tapacaq.'}"
+                                           Style="{StaticResource Muted}" />
+
+                                    <!-- Videolar -->
+                                    <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Videos}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:VideoItem">
+                                                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="10"
+                                                        BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" v:Motion.Press="True">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                                        <Border WidthRequest="42" HeightRequest="42" StrokeShape="RoundRectangle 14" StrokeThickness="0"
+                                                                Background="{StaticResource PrimaryGradient}" Padding="12">
+                                                            <Image Source="ic_play_w.png" />
+                                                        </Border>
+                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                                            <Label Text="{Binding Title, TargetNullValue='Videoya bax'}" FontFamily="BarlowBold" FontSize="14" LineBreakMode="TailTruncation"
+                                                                   TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                                            <Label Text="Videoya baxmaq üçün toxunun" Style="{StaticResource Muted}" FontSize="12" />
+                                                        </VerticalStackLayout>
+                                                        <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                                    </Grid>
+                                                    <Border.GestureRecognizers>
+                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=PlayVideoCommand, x:DataType=vm:ServicesViewModel}"
+                                                                              CommandParameter="{Binding VideoUrl}" />
+                                                    </Border.GestureRecognizers>
+                                                </Border>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+
+                                    <!-- Rezervasiya -->
+                                    <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" HeightRequest="52" v:Motion.Press="True">
+                                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                                            <Image Source="ic_calendar_w.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+                                            <Label Text="Rezervasiya et" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=BookCommand, x:DataType=vm:ServicesViewModel}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </VerticalStackLayout>
                             </VerticalStackLayout>
+                        </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
 
-                            <Label Text="🕒 Video tezliklə" Style="{StaticResource Muted}" Margin="14,0,14,4" IsVisible="{Binding HasVideo, Converter={StaticResource InvertedBool}}" />
-
-                            <Button Text="Rezervasiya et →" Margin="14,8,14,14"
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=BookCommand, x:DataType=vm:ServicesViewModel}"
-                                    CommandParameter="{Binding .}" />
-                        </VerticalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-            <CollectionView.Footer>
-                <BoxView HeightRequest="16" Color="Transparent" />
-            </CollectionView.Footer>
-        </CollectionView>
-    </RefreshView>
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="20" Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
 </ContentPage>

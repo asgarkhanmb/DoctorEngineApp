@@ -10,7 +10,10 @@ public partial class ChatPage : ContentPage
     {
         InitializeComponent();
         this.CenterOnWideScreens();
+        this.UseHeaderStatusBar();
         BindingContext = _vm = vm;
+        Motion.Pulse(OnlineDot, 0.5, 1400);
+        Motion.Pulse(RecDot, 0.25, 800);
         _vm.ScrollToRequested += item =>
             MainThread.BeginInvokeOnMainThread(() =>
             {

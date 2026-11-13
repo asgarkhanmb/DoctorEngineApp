@@ -42,10 +42,27 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
         : SelectedSlot == null ? $"{SelectedService.Name} · saat seçin"
         : $"{SelectedService.Name} · {SelectedDay?.Long} · {SelectedSlot.Time}";
 
+    // ---- Mərhələ göstəricisi (başlıqda 1-2-3-4) ----
+    public bool Step1Done => SelectedService != null;
+    public bool Step2Done => SelectedService != null && SelectedDay != null;
+    public bool Step3Done => SelectedSlot != null;
+    public bool Step4Done => !string.IsNullOrWhiteSpace(FullName) && !string.IsNullOrWhiteSpace(Phone);
+    public bool CanSubmit => Step1Done && Step3Done && Step4Done && !IsBusy;
+
+    private static readonly string[] StepSources =
+        { nameof(SelectedService), nameof(SelectedDay), nameof(SelectedSlot), nameof(FullName), nameof(Phone), nameof(IsBusy) };
+
     public BookingViewModel(BookingService booking)
     {
         _booking = booking;
         MyReservations.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasMyReservations));
+        PropertyChanged += (_, e) =>
+        {
+            if (Array.IndexOf(StepSources, e.PropertyName) < 0) return;
+            OnPropertyChanged(nameof(Step1Done)); OnPropertyChanged(nameof(Step2Done));
+            OnPropertyChanged(nameof(Step3Done)); OnPropertyChanged(nameof(Step4Done));
+            OnPropertyChanged(nameof(CanSubmit));
+        };
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -228,22 +245,24 @@ public partial class SlotItem : ObservableObject
     [NotifyPropertyChangedFor(nameof(Background), nameof(Foreground))]
     private bool isSelected;
 
-    /// <summary>Seçilmiş — tünd göy; boş — ağ; tutulub — açıq qırmızı; keçib — boz (saytdakı kimi).</summary>
-    public Color Background => IsSelected
-        ? Color.FromArgb(Application.Current?.RequestedTheme == AppTheme.Dark ? "#D81324" : "#0B2154")
-        : State switch
+    private static bool Dark => Application.Current?.RequestedTheme == AppTheme.Dark;
+
+    /// <summary>Seçilmiş — qırmızı; boş — açıq kart; tutulub — açıq qırmızı (üstündən xətt); keçib — boz.</summary>
+    public Color Background => IsSelected ? Color.FromArgb("#D81324") : State switch
     {
-        "free" => Color.FromArgb("#FFFFFF"),
-        "busy" => Color.FromArgb("#FDECEE"),
-        _ => Color.FromArgb("#EEF0F4")
+        "free" => Color.FromArgb(Dark ? "#202A44" : "#F1F4FA"),
+        "busy" => Color.FromArgb(Dark ? "#3A1E26" : "#FDECEE"),
+        _ => Color.FromArgb(Dark ? "#171E31" : "#F4F5F8")
     };
 
     public Color Foreground => IsSelected ? Colors.White : State switch
     {
-        "free" => Color.FromArgb("#0B2154"),
-        "busy" => Color.FromArgb("#D81324"),
-        _ => Color.FromArgb("#A3AAB8")
+        "free" => Color.FromArgb(Dark ? "#EEF1F7" : "#0B2154"),
+        "busy" => Color.FromArgb(Dark ? "#FF8A95" : "#D81324"),
+        _ => Color.FromArgb(Dark ? "#4B5670" : "#B4BAC6")
     };
+
+    public TextDecorations Decorations => State == "free" ? TextDecorations.None : TextDecorations.Strikethrough;
 
     public SlotItem(string time, string state)
     {
