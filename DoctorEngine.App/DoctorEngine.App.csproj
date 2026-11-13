@@ -19,6 +19,8 @@
 		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<ApplicationTitle>DoctorEngine</ApplicationTitle>
+		<!-- Windows-da məlumat qovluğunun adı (%LOCALAPPDATA%\DoctorEngine\...) buradan götürülür -->
+		<Company>DoctorEngine</Company>
 		<ApplicationId>az.doctorengine.app</ApplicationId>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
