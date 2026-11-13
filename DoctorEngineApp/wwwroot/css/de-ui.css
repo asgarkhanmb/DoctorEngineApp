@@ -1,0 +1,191 @@
+/* =====================================================
+   DoctorEngine — bildirişlər (toast) və təsdiq pəncərəsi (wwwroot/js/de-ui.js)
+   ===================================================== */
+
+/* ---------- Toast ---------- */
+
+.de-toasts {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 10100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(380px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.de-toast {
+    --t-color: #0B2154;
+    --t-soft: rgba(11, 33, 84, .08);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 12px 16px 14px;
+    overflow: hidden;
+    border: 1px solid #e5e8ef;
+    border-radius: 14px;
+    background: #fff;
+    color: #1d2433;
+    box-shadow: 0 18px 44px rgba(11, 33, 84, .16);
+    font: 14px/1.45 "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateX(24px) scale(.98);
+    transition: opacity .24s ease, transform .26s cubic-bezier(.22, .61, .36, 1);
+}
+
+.de-toast.is-visible { opacity: 1; transform: none; }
+.de-toast.is-leaving { opacity: 0; transform: translateX(24px); }
+
+.de-toast.is-success { --t-color: #16a34a; --t-soft: #e9f8ef; }
+.de-toast.is-error { --t-color: #D81324; --t-soft: #fdecee; }
+.de-toast.is-warning { --t-color: #d97706; --t-soft: #fff6e5; }
+.de-toast.is-info { --t-color: #2563eb; --t-soft: #eaf1ff; }
+
+.de-toast__icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: var(--t-soft);
+    color: var(--t-color);
+    font-size: 16px;
+}
+
+.de-toast__body { flex: 1; min-width: 0; padding-top: 6px; overflow-wrap: anywhere; }
+.de-toast__body b { display: block; margin-bottom: 2px; color: #0B2154; font-weight: 500; }
+
+.de-toast__close {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #8a93a5;
+    cursor: pointer;
+}
+
+.de-toast__close:hover { background: #f2f4f8; color: #1d2433; }
+
+/* Qalan vaxt zolağı */
+.de-toast__bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--t-color);
+    opacity: .7;
+    transform-origin: left;
+    animation: de-toast-bar linear forwards;
+}
+
+.de-toast.is-paused .de-toast__bar { animation-play-state: paused; }
+
+@keyframes de-toast-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ---------- Təsdiq pəncərəsi ---------- */
+
+.de-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10200;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(11, 20, 45, .5);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+
+.de-dialog-backdrop.is-visible { opacity: 1; }
+body.de-dialog-open { overflow: hidden; }
+
+.de-dialog {
+    width: min(400px, 100%);
+    padding: 26px 24px 22px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 30px 70px rgba(11, 20, 45, .35);
+    color: #1d2433;
+    font-family: "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+    text-align: center;
+    transform: translateY(14px) scale(.97);
+    transition: transform .24s cubic-bezier(.22, .61, .36, 1);
+}
+
+.de-dialog-backdrop.is-visible .de-dialog { transform: none; }
+
+.de-dialog__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: rgba(11, 33, 84, .08);
+    color: #0B2154;
+    font-size: 22px;
+}
+
+.de-dialog.is-danger .de-dialog__icon { background: #fdecee; color: #D81324; }
+
+.de-dialog__title { margin: 0 0 6px; color: #0B2154; font-family: "Barlow", sans-serif; font-size: 21px; font-weight: 700; }
+.de-dialog__text { margin: 0; color: #6b7486; font-size: 14.5px; line-height: 1.5; }
+
+.de-dialog__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+
+.de-dialog__btn {
+    min-height: 44px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: 500 14.5px/1 "Ubuntu", system-ui, sans-serif;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, transform .1s;
+}
+
+.de-dialog__btn:active { transform: scale(.97); }
+.de-dialog__btn:focus-visible { outline: 3px solid rgba(216, 19, 36, .35); outline-offset: 2px; }
+.de-dialog__btn.is-light { border-color: #e5e8ef; background: #fff; color: #0B2154; }
+.de-dialog__btn.is-light:hover { border-color: #0B2154; }
+.de-dialog__btn.is-primary { background: #0B2154; color: #fff; }
+.de-dialog__btn.is-primary:hover { background: #16306f; }
+.de-dialog__btn.is-danger { background: #D81324; color: #fff; }
+.de-dialog__btn.is-danger:hover { background: #b00f1d; }
+
+/* ---------- Bootstrap .alert — müasir görünüş (Əlaqə forması və s.) ---------- */
+
+.alert {
+    position: relative;
+    border: 1px solid transparent;
+    border-left-width: 4px;
+    border-radius: 12px;
+    font-size: 14.5px;
+}
+
+.alert-success { border-color: #bfe8cf; border-left-color: #16a34a; background: #effaf3; color: #14532d; }
+.alert-danger { border-color: #f6c9ce; border-left-color: #D81324; background: #fdf1f2; color: #7f1d1d; }
+.alert-warning { border-color: #f9dfb0; border-left-color: #d97706; background: #fff8eb; color: #78350f; }
+.alert-info { border-color: #c9dafc; border-left-color: #2563eb; background: #f0f5ff; color: #1e3a8a; }
+
+@media (max-width: 576px) {
+    .de-toasts { top: auto; bottom: 16px; right: 16px; left: 16px; width: auto; }
+    .de-toast { transform: translateY(18px); }
+    .de-toast.is-leaving { transform: translateY(18px); }
+    .de-dialog__actions { grid-template-columns: 1fr; }
+    .de-dialog__actions .is-light { order: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .de-toast, .de-dialog, .de-dialog-backdrop { transition: none; }
+    .de-toast__bar { animation: none; }
+}

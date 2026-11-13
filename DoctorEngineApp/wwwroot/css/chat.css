@@ -1173,3 +1173,72 @@
 }
 
 .dc-chat__push-x:hover { background: rgba(0, 0, 0, .06); color: var(--dc-text); }
+
+/* ---------- Açılış ekranı (html.de-intro, motion.css) ----------
+   Çat düyməsi z-index-i yüksək olduğu üçün açılış pərdəsinin ÜSTÜNDƏ görünürdü.
+   Pərdə qalxana qədər (~2s) düymə və bildirişlər gizli qalır, sonra yumşaq görünür. */
+/* "backwards": yalnız gözləmə müddətində gizlədir, sonra hover və digər effektlərə mane olmur */
+html.de-intro .dc-launcher,
+html.de-intro .dc-toast,
+html.de-intro .de-toasts {
+    animation: dc-after-intro .45s 2s cubic-bezier(.22, .61, .36, 1) backwards;
+}
+
+/* Oxunmamış mesaj varsa: əvvəl görünmə, sonra "zəng" animasiyası */
+html.de-intro .dc-launcher.has-unread:not(.is-open) {
+    animation: dc-after-intro .45s 2s cubic-bezier(.22, .61, .36, 1) backwards,
+               dc-launcher-ring 2.4s 2.45s ease-in-out infinite;
+}
+
+@keyframes dc-after-intro {
+    from { opacity: 0; visibility: hidden; transform: translateY(14px) scale(.9); }
+    to { opacity: 1; visibility: visible; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.de-intro .dc-launcher, html.de-intro .dc-toast, html.de-intro .de-toasts { animation: none; }
+}
+
+/* ---------- Paneldə redaktə (yığcam) ----------
+   .dc-edit eni min(440px, 72vw) idi — 350px-lik paneldən böyük olub kənara çıxırdı. */
+.dc-drawer .dc-msg.is-editing .dc-msg__content { flex: 1; max-width: 100%; }
+.dc-drawer .dc-msg.is-editing.is-mine .dc-msg__content { align-items: stretch; }
+
+.dc-drawer .dc-edit {
+    width: 100%;
+    gap: 6px;
+    padding: 8px;
+    border-width: 1.5px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(11, 33, 84, .12);
+}
+
+.dc-drawer .dc-edit textarea {
+    min-height: 40px;
+    max-height: 120px;
+    padding: 7px 9px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    resize: none;
+}
+
+.dc-drawer .dc-edit__file { gap: 8px; padding: 4px; border-radius: 8px; font-size: 12px; }
+.dc-drawer .dc-edit__file .thumb { width: 34px; height: 34px; border-radius: 6px; font-size: 13px; }
+
+.dc-drawer .dc-edit__row { gap: 5px; }
+.dc-drawer .dc-btn { gap: 5px; padding: 5px 9px; border-radius: 8px; font-size: 12px; }
+.dc-drawer .dc-btn i { font-size: 11px; }
+.dc-drawer .dc-edit__error { font-size: 11.5px; }
+
+/* Fayl düymələri bir sətirdə, "Ləğv et / Yadda saxla" alt sətirdə sağda */
+.dc-drawer .dc-edit > .dc-edit__row:last-of-type { row-gap: 6px; }
+.dc-drawer .dc-edit > .dc-edit__row > .dc-edit__row { flex: 1 1 100%; }
+.dc-drawer .dc-edit > .dc-edit__row > .spacer { display: none; }
+.dc-drawer .dc-edit > .dc-edit__row > .dc-btn { flex: 1 1 0; justify-content: center; }
+
+/* Yazı zolağı: mikrofon açılarkən ("hazırlanır") — boz nöqtə, göndər/fasilə hələ işləmir */
+.dc-rec.is-starting .dc-rec__dot { background: #9aa3b5; animation: dc-blink .6s ease-in-out infinite; }
+.dc-rec.is-starting .dc-rec__time { color: var(--dc-muted); }
+.dc-rec.is-starting .dc-rec__pause,
+.dc-rec.is-starting .dc-rec__send { opacity: .45; pointer-events: none; }

@@ -12,11 +12,11 @@ namespace DoctorEngineApp.Helpers
         public override IdentityError PasswordMismatch() => E(nameof(PasswordMismatch), "Şifrə yanlışdır.");
         public override IdentityError InvalidToken() => E(nameof(InvalidToken), "Link etibarsızdır və ya vaxtı bitib. Yenisini tələb edin.");
         public override IdentityError LoginAlreadyAssociated() => E(nameof(LoginAlreadyAssociated), "Bu giriş artıq başqa hesaba bağlıdır.");
-        public override IdentityError InvalidUserName(string userName) => E(nameof(InvalidUserName), $"İstifadəçi adı \"{userName}\" yanlışdır. Yalnız hərf və rəqəm istifadə edin.");
-        public override IdentityError InvalidEmail(string email) => E(nameof(InvalidEmail), $"Email \"{email}\" düzgün deyil.");
+        public override IdentityError InvalidUserName(string? userName) => E(nameof(InvalidUserName), $"İstifadəçi adı \"{userName}\" yanlışdır. Yalnız hərf və rəqəm istifadə edin.");
+        public override IdentityError InvalidEmail(string? email) => E(nameof(InvalidEmail), $"Email \"{email}\" düzgün deyil.");
         public override IdentityError DuplicateUserName(string userName) => E(nameof(DuplicateUserName), $"\"{userName}\" istifadəçi adı artıq tutulub.");
         public override IdentityError DuplicateEmail(string email) => E(nameof(DuplicateEmail), $"\"{email}\" ünvanı ilə artıq qeydiyyat var.");
-        public override IdentityError InvalidRoleName(string role) => E(nameof(InvalidRoleName), $"Rol adı \"{role}\" yanlışdır.");
+        public override IdentityError InvalidRoleName(string? role) => E(nameof(InvalidRoleName), $"Rol adı \"{role}\" yanlışdır.");
         public override IdentityError DuplicateRoleName(string role) => E(nameof(DuplicateRoleName), $"\"{role}\" rolu artıq mövcuddur.");
         public override IdentityError UserAlreadyHasPassword() => E(nameof(UserAlreadyHasPassword), "İstifadəçinin artıq şifrəsi var.");
         public override IdentityError UserLockoutNotEnabled() => E(nameof(UserLockoutNotEnabled), "Bu istifadəçi üçün bloklama aktiv deyil.");

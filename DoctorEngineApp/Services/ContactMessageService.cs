@@ -64,7 +64,7 @@ public class ContactMessageService : IContactMessageService
         var message = await _context.ContactMessages.FindAsync(id);
 
         if (message == null)
-            throw new Exception("Mesaj tapilmadi");
+            throw new Exception("Mesaj tapılmadı — artıq silinmiş ola bilər.");
 
         _context.ContactMessages.Remove(message);
         await _context.SaveChangesAsync();

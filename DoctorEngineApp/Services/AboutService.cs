@@ -82,7 +82,7 @@ namespace DoctorEngineApp.Services
         {
             var about = await _context.Abouts.FindAsync(vm.Id);
             if (about == null)
-                throw new Exception("About tapılmadı.");
+                throw new Exception("Haqqımızda məlumatı tapılmadı.");
 
             about.Title = vm.Title;
             about.Description = vm.Description;
@@ -127,7 +127,7 @@ namespace DoctorEngineApp.Services
         {
             var about = await _context.Abouts.FindAsync(id);
             if (about == null)
-                throw new Exception("About tapılmadı.");
+                throw new Exception("Haqqımızda məlumatı tapılmadı.");
 
             if (!string.IsNullOrEmpty(about.VideoPath))
             {

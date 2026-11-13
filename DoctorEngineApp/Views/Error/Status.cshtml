@@ -1,0 +1,99 @@
+@* Xəta səhifəsi (404, 403, 500 ...). Layout istifadə olunmur: header/footer verilənlər bazasından oxunur,
+   baza işləməyəndə də bu səhifə açılmalıdır. *@
+@model DoctorEngineApp.Helpers.ErrorPageVM
+@{
+    Layout = null;
+    var isNotFound = Model.Code == 404;
+}
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0B2154" />
+    <title>@Model.Code — @Model.Title | @Model.SiteName</title>
+    <link href="~/assets/img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true" />
+</head>
+<body class="err-page">
+
+    <header class="err-top">
+        <a href="/" class="err-brand">
+            <span class="err-brand__icon"><i class="fa-solid fa-gears" aria-hidden="true"></i></span>
+            <span>@Model.SiteName</span>
+        </a>
+    </header>
+
+    <main class="err-main">
+        <section class="err-card" aria-labelledby="errTitle">
+            <div class="err-code" aria-hidden="true">
+                <span>@Model.Code.ToString()[0]</span><span class="err-code__mid"><i class="@Model.Icon"></i></span><span>@Model.Code.ToString()[^1]</span>
+            </div>
+
+            <h1 id="errTitle">@Model.Title</h1>
+            <p class="err-text">@Model.Message</p>
+
+            <div class="err-actions">
+                @if (Model.LoginUrl != null)
+                {
+                    <a href="@Model.LoginUrl" class="err-btn err-btn--primary"><i class="fa-solid fa-right-to-bracket"></i> Daxil ol</a>
+                }
+                @if (Model.CanRetry)
+                {
+                    <button type="button" class="err-btn err-btn--primary" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Yenidən cəhd et</button>
+                }
+                <a href="/" class="err-btn @(Model.CanRetry || Model.LoginUrl != null ? "err-btn--light" : "err-btn--primary")"><i class="fa-solid fa-house"></i> Ana səhifə</a>
+                <button type="button" class="err-btn err-btn--light" data-back hidden><i class="fa-solid fa-arrow-left"></i> Geri qayıt</button>
+            </div>
+
+            @if (isNotFound)
+            {
+                <nav class="err-links" aria-label="Faydalı keçidlər">
+                    <span>Bəlkə bunlar lazımdır:</span>
+                    <a href="/Service"><i class="fa-solid fa-screwdriver-wrench"></i> Xidmətlər</a>
+                    <a href="/Reservation"><i class="fa-regular fa-calendar-check"></i> Rezervasiya</a>
+                    <a href="/Contact"><i class="fa-regular fa-comments"></i> Əlaqə</a>
+                </nav>
+            }
+
+            @if (Model.Code >= 500 && !string.IsNullOrEmpty(Model.RequestId))
+            {
+                <p class="err-ref">
+                    Problem davam edərsə, bizə bu kodu bildirin:
+                    <button type="button" class="err-ref__code" data-copy="@Model.RequestId" title="Kopyala">
+                        <code>@Model.RequestId</code> <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                    </button>
+                </p>
+            }
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            // Geri düyməsi yalnız əvvəlki səhifə bu saytdan idisə
+            var back = document.querySelector("[data-back]");
+            try {
+                if (back && history.length > 1 && document.referrer && new URL(document.referrer).origin === location.origin) {
+                    back.hidden = false;
+                    back.addEventListener("click", function () { history.back(); });
+                }
+            } catch (e) { }
+
+            var copy = document.querySelector("[data-copy]");
+            if (copy && navigator.clipboard) {
+                copy.addEventListener("click", function () {
+                    navigator.clipboard.writeText(copy.getAttribute("data-copy")).then(function () {
+                        copy.classList.add("is-copied");
+                        setTimeout(function () { copy.classList.remove("is-copied"); }, 1600);
+                    });
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

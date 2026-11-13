@@ -84,7 +84,8 @@ namespace DoctorEngineApp.Controllers
                           $"<p>Emailinizi təsdiqləyin:</p>" +
                           $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Təsdiqlə</a>";
 
-            await _emailService.SendAsync(user.Email, "Email Confirmation", html);
+            if (!await TrySendEmailAsync(user.Email, "Email təsdiqi", html))
+                TempData["ToastError"] = "Hesab yaradıldı, amma təsdiq məktubu göndərilmədi. Bir azdan «Şifrəni unutmusunuz» ilə yenidən cəhd edin və ya bizimlə əlaqə saxlayın.";
 
             return RedirectToAction(nameof(VerifyEmail));
         }
@@ -200,7 +201,11 @@ namespace DoctorEngineApp.Controllers
                               $"<p>Yeni şifrə təyin etmək üçün aşağıdakı linkə klik edin:</p>" +
                               $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Şifrəni dəyiş</a>";
 
-                await _emailService.SendAsync(user.Email, "Reset Password", html);
+                if (!await TrySendEmailAsync(user.Email, "Şifrənin yenilənməsi", html))
+                {
+                    ModelState.AddModelError(string.Empty, "Məktub göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin.");
+                    return View(model);
+                }
             }
 
             // Mesaj göstərmək üçün TempData
@@ -379,7 +384,11 @@ namespace DoctorEngineApp.Controllers
                           $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Yeni emaili təsdiqlə</a>" +
                           $"<p>Bu sorğunu siz göndərməmisinizsə, bu məktubu nəzərə almayın.</p>";
 
-            await _emailService.SendAsync(newEmail, "Email dəyişikliyinin təsdiqi", html);
+            if (!await TrySendEmailAsync(newEmail, "Email dəyişikliyinin təsdiqi", html))
+            {
+                TempData["ProfileError"] = "Təsdiq məktubu göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin.";
+                return RedirectToAction(nameof(Profile), null, null, "email");
+            }
 
             TempData["ProfileSuccess"] = $"Təsdiq linki {newEmail} ünvanına göndərildi. Email linkə klik etdikdən sonra dəyişəcək.";
             return RedirectToAction(nameof(Profile), null, null, "email");
@@ -568,6 +577,25 @@ namespace DoctorEngineApp.Controllers
             if (email != null) vm.Email = new ChangeEmailVM { NewEmail = email.NewEmail };   // şifrə geri yazılmır
             if (password != null) vm.Password = password;
             return View(nameof(Profile), vm);
+        }
+
+        /// <summary>
+        /// Email göndərir; SMTP xətası olarsa istifadəçiyə xəta səhifəsi göstərmir — loga yazır və false qaytarır.
+        /// </summary>
+        private async Task<bool> TrySendEmailAsync(string? to, string subject, string html)
+        {
+            if (string.IsNullOrWhiteSpace(to)) return false;
+            try
+            {
+                await _emailService.SendAsync(to, subject, html);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                HttpContext.RequestServices.GetRequiredService<ILogger<AccountController>>()
+                    .LogError(ex, "Email göndərilmədi: {Subject} → {To}", subject, to);
+                return false;
+            }
         }
     }
 }

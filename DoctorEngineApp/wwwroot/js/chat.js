@@ -153,7 +153,10 @@
     }
 
     function showError(message) {
-        if (!errorEl) { alert(message); return; }
+        if (!errorEl) {
+            if (window.deUI) window.deUI.toast(message, "error");
+            return;
+        }
         errorEl.textContent = message;
         errorEl.hidden = false;
         clearTimeout(showError._t);
@@ -285,13 +288,64 @@
                     peaks.push(sum / block);
                 }
                 const max = Math.max(...peaks) || 1;
-                return { peaks: peaks.map((p) => 0.15 + 0.85 * (p / max)), duration: audio.duration };
+
+                // Səviyyə normallaşdırması üçün: danışığın orta səviyyəsi və pik (oxutmada sakit yazılar qaldırılır)
+                const win = Math.max(1, Math.round(audio.sampleRate * 0.02));
+                let sum = 0, cnt = 0, pk = 0;
+                for (let i = 0; i < data.length; i++) { const v = Math.abs(data[i]); if (v > pk) pk = v; }
+                for (let i = 0; i + win <= data.length; i += win) {
+                    let s = 0;
+                    for (let j = 0; j < win; j++) s += data[i + j] * data[i + j];
+                    const lv = 10 * Math.log10(s / win + 1e-12);
+                    if (lv > -45) { sum += lv; cnt++; }
+                }
+                const speechDb = cnt ? sum / cnt : -30;
+                const peakDb = 20 * Math.log10(pk + 1e-12);
+                // Hədəf: danışıq −20 dB; ən çox +12 dB; pik (EQ +4 dB nəzərə alınmaqla) 1.5 dB ehtiyatla 0 dB-ni keçməsin
+                const gainDb = Math.max(0, Math.min(12, -20 - speechDb, -peakDb - 4 - 1.5));
+
+                return { peaks: peaks.map((p) => 0.15 + 0.85 * (p / max)), duration: audio.duration, gainDb };
             } catch (e) {
                 return null;
             }
         })();
         peaksCache.set(url, job);
         return job;
+    }
+
+    // ---------- Oxutma zamanı səsin aydınlaşdırılması ----------
+    // Yazı xam mikrofondan aparılır (gecikməsiz); səs oxudulanda emal olunur.
+    // Real yazıların analizi: aşağı uğultu (<150 Hz) danışıq qədər güclü, aydınlıq (3–6 kHz) 15–24 dB zəif idi → "boğuq" səs.
+    //   1) 150 Hz-dən aşağı kəsilir (uğultu)
+    //   2) 3 kHz ətrafı +4 dB (samitlər — s, ş, t, k — aydın eşidilir)
+    //   3) 10 kHz-dən yuxarı yumşaq kəsilir (xışıltı; danışığı küt etmir)
+    //   4) sakit yazılar qaldırılır (ən çox +12 dB, pik qorunur → kəsilmə/təhrif yoxdur)
+    // Sınaq (3 real yazı): uğultu səsdən 8–12 dB aşağı, kəsilmə 0. Kompressor qəsdən YOXDUR —
+    // Chrome-un kompressoru avtomatik gücləndirmə əlavə edib xışıltını artırırdı.
+    let playCtx = null;
+
+    function connectPlaybackFilter(audio) {
+        if (audio._filtered) return;
+        audio._filtered = true;   // createMediaElementSource hər element üçün yalnız bir dəfə çağırıla bilər
+        try {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            playCtx = playCtx || new Ctx();
+            const src = playCtx.createMediaElementSource(audio);
+            // Diqqət: Web Audio-da highpass/lowpass üçün Q desibeldir, peaking üçün isə adi ədəddir
+            const hp = playCtx.createBiquadFilter();
+            hp.type = "highpass"; hp.frequency.value = 150; hp.Q.value = -3.01;   // 0.707
+            const presence = playCtx.createBiquadFilter();
+            presence.type = "peaking"; presence.frequency.value = 3000; presence.Q.value = 0.8; presence.gain.value = 4;
+            const lp = playCtx.createBiquadFilter();
+            lp.type = "lowpass"; lp.frequency.value = 10000; lp.Q.value = -3.01;
+            const gain = playCtx.createGain();
+            gain.gain.value = Math.pow(10, (audio._gainDb || 0) / 20);
+            audio._gainNode = gain;
+            src.connect(hp).connect(presence).connect(lp).connect(gain).connect(playCtx.destination);
+        } catch (e) {
+            console.warn("Oxutma emalı qoşulmadı:", e);   // səs emalsız çalınır
+        }
     }
 
     function stopVoiceIn(node) {
@@ -348,15 +402,21 @@
             track.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
         }
 
-        // MediaRecorder webm faylında müddət "Infinity" olur — brauzeri onu hesablamağa məcbur et
+        // MediaRecorder webm faylında müddət "Infinity" olur — brauzeri onu hesablamağa məcbur et.
+        // Bu müddətdə "oynat" basılsa, səs sondan başlayıb atlanırdı — hazır olana qədər gözlənilir.
+        let ready = Promise.resolve();
         audio.addEventListener("loadedmetadata", () => {
             if (audio.duration === Infinity) {
-                const fix = () => {
-                    audio.removeEventListener("durationchange", fix);
-                    audio.currentTime = 0;
-                    render();
-                };
-                audio.addEventListener("durationchange", fix);
+                ready = new Promise((resolve) => {
+                    const fix = () => {
+                        audio.removeEventListener("durationchange", fix);
+                        audio.currentTime = 0;
+                        render();
+                        resolve();
+                    };
+                    audio.addEventListener("durationchange", fix);
+                    setTimeout(fix, 3000);   // ehtiyat: hadisə gəlməsə də oynatma bloklanmasın
+                });
                 audio.currentTime = 1e101;
             } else {
                 render();
@@ -366,6 +426,9 @@
         loadPeaks(dto.attachmentUrl).then((res) => {
             if (!res) return;
             duration = res.duration;
+            // Səviyyə normallaşdırması: oxutma artıq başlayıbsa da yenilənir
+            audio._gainDb = res.gainDb || 0;
+            if (audio._gainNode) audio._gainNode.gain.value = Math.pow(10, audio._gainDb / 20);
             res.peaks.forEach((h, i) => (bars[i].style.height = Math.round(h * 100) + "%"));
             render();
         });
@@ -392,9 +455,12 @@
             timeEl.textContent = "Fayl açılmadı";
         });
 
-        playBtn.addEventListener("click", () => {
-            if (audio.paused) audio.play().catch(() => {});
-            else audio.pause();
+        playBtn.addEventListener("click", async () => {
+            if (!audio.paused) { audio.pause(); return; }
+            connectPlaybackFilter(audio);
+            if (playCtx && playCtx.state === "suspended") await playCtx.resume().catch(() => {});
+            await ready;
+            audio.play().catch(() => {});
         });
 
         function seek(clientX) {
@@ -995,7 +1061,7 @@
     }
 
     function recElapsedMs() {
-        if (!rec) return 0;
+        if (!rec || rec.starting) return 0;
         return rec.elapsed + (rec.paused ? 0 : Date.now() - rec.resumedAt);
     }
 
@@ -1045,67 +1111,94 @@
         if (rec || sending) return;
         clearError();
 
+        // Yazı zolağı KLİKLƏ DƏRHAL açılır ("hazırlanır"); mikrofon açılan kimi yazı başlayır.
+        // Əvvəl zolaq yalnız mikrofon + səs konteksti + 0.25 s hazırlıqdan sonra görünürdü (gecikmə).
+        const me = {
+            starting: true, stream: null, recorder: null, mime: "",
+            chunks: [], elapsed: 0, resumedAt: 0, paused: false,
+            levels: [], lastLevelAt: 0, canvas: recBar.querySelector(".dc-rec__wave"),
+            analyser: null, audioCtx: null, raf: 0, timer: 0
+        };
+        rec = me;
+        if (currentVoice) currentVoice.pause();
+        rowEl.hidden = true;
+        recBar.hidden = false;
+        recBar.classList.remove("is-paused");
+        recBar.classList.add("is-starting");
+        recBar.querySelector(".dc-rec__pause i").className = "fa-solid fa-pause";
+        recBar.querySelector(".dc-rec__time").textContent = "0:00";
+
         let stream;
         try {
+            // Brauzerin mikrofon emalı — real yazıların analizinə əsasən seçilib:
+            //  - noiseSuppression: BAĞLI — mikrofon səviyyəsi aşağı olanda danışığı "küy" sayıb
+            //    tam susdururdu (−100 dB, ~0.5 s boşluqlar = qırılmalar)
+            //  - echoCancellation: BAĞLI — o da səsi kəsə bilir; yazarkən dinamikdən səs çalınmır
+            //  - autoGainControl: AÇIQ — onsuz səviyyə çox aşağı idi (pik −30 dB)
+            // Xışıltı aşağıdakı filtrlə azaldılır (yüksək tezliklər).
             stream = await navigator.mediaDevices.getUserMedia({
-                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: true,
+                    channelCount: 1
+                }
             });
         } catch (e) {
+            if (rec === me) { rec = null; recBar.hidden = true; recBar.classList.remove("is-starting"); rowEl.hidden = false; updateSendState(); }
             showError(e && e.name === "NotAllowedError"
                 ? "Mikrofona icazə verilmədi. Brauzerin ünvan sətrindəki kilid işarəsindən icazə verin."
                 : "Mikrofon tapılmadı və ya istifadə olunur.");
             return;
         }
 
+        // Mikrofon açılarkən istifadəçi "ləğv et" basıbsa — mikrofonu bağla, heç nə yazma
+        if (rec !== me) {
+            stream.getTracks().forEach((t) => t.stop());
+            return;
+        }
+
+        // Mikrofon BİRBAŞA yazılır: əlavə səs zənciri yoxdur → gecikmə yoxdur, sözün əvvəli itmir.
+        // Xışıltı filtri oxutma zamanı tətbiq olunur (bax: playbackFilter).
         const mime = pickRecorderMime();
         let recorder;
         try {
-            recorder = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 32000 } : undefined);
+            // 48 kbps Opus: səs aydın, 1 dəqiqə ≈ 360 KB
+            recorder = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 48000 } : undefined);
         } catch (e) {
             stream.getTracks().forEach((t) => t.stop());
+            rec = null; recBar.hidden = true; recBar.classList.remove("is-starting"); rowEl.hidden = false; updateSendState();
             showError("Brauzeriniz səs yazmanı dəstəkləmir.");
             return;
         }
 
-        rec = {
-            stream, recorder, mime,
-            chunks: [],
-            elapsed: 0,
-            resumedAt: Date.now(),
-            paused: false,
-            levels: [],
-            lastLevelAt: 0,
-            canvas: recBar.querySelector(".dc-rec__wave"),
-            analyser: null,
-            audioCtx: null,
-            raf: 0,
-            timer: 0
-        };
-
-        recorder.ondataavailable = (e) => { if (e.data && e.data.size) rec && rec.chunks.push(e.data); };
+        me.stream = stream;
+        me.recorder = recorder;
+        me.mime = mime;
+        recorder.ondataavailable = (e) => { if (e.data && e.data.size) me.chunks.push(e.data); };
         recorder.start(250);
+        me.resumedAt = Date.now();
+        me.starting = false;
+        recBar.classList.remove("is-starting");
+        me.timer = setInterval(tickRecTimer, 200);
+        drawRecWave();
 
+        // Dalğa göstəricisi — yazı başladıqdan SONRA, arxa planda (yazını gecikdirmir)
         try {
             const Ctx = window.AudioContext || window.webkitAudioContext;
-            rec.audioCtx = new Ctx();
-            rec.analyser = rec.audioCtx.createAnalyser();
-            rec.analyser.fftSize = 512;
-            rec.audioCtx.createMediaStreamSource(stream).connect(rec.analyser);
+            const micRate = stream.getAudioTracks()[0]?.getSettings?.().sampleRate;
+            let ctx;
+            try { ctx = micRate ? new Ctx({ sampleRate: micRate }) : new Ctx(); } catch (e2) { ctx = new Ctx(); }
+            const analyser = ctx.createAnalyser();
+            analyser.fftSize = 512;
+            ctx.createMediaStreamSource(stream).connect(analyser);
+            if (rec === me) { me.audioCtx = ctx; me.analyser = analyser; }
+            else ctx.close().catch(() => {});
         } catch (e) { /* dalğa olmadan da yazılır */ }
-
-        if (currentVoice) currentVoice.pause();
-
-        rowEl.hidden = true;
-        recBar.hidden = false;
-        recBar.classList.remove("is-paused");
-        recBar.querySelector(".dc-rec__pause i").className = "fa-solid fa-pause";
-        recBar.querySelector(".dc-rec__time").textContent = "0:00";
-        rec.timer = setInterval(tickRecTimer, 200);
-        drawRecWave();
     }
 
     function togglePauseRecording() {
-        if (!rec || rec.recorder.state === "inactive") return;
+        if (!rec || rec.starting || !rec.recorder || rec.recorder.state === "inactive") return;
         const btnIcon = recBar.querySelector(".dc-rec__pause i");
         if (rec.paused) {
             rec.recorder.resume();
@@ -1124,6 +1217,7 @@
     function stopRecorder() {
         const r = rec;
         return new Promise((resolve) => {
+            if (!r.recorder) return resolve(new Blob([]));   // hələ hazırlanırdı
             const finish = () => resolve(new Blob(r.chunks, { type: (r.recorder.mimeType || r.mime || "audio/webm").split(";")[0] }));
             if (r.recorder.state === "inactive") return finish();
             r.recorder.onstop = finish;
@@ -1135,9 +1229,10 @@
         if (!rec) return;
         clearInterval(rec.timer);
         cancelAnimationFrame(rec.raf);
-        rec.stream.getTracks().forEach((t) => t.stop());
+        if (rec.stream) rec.stream.getTracks().forEach((t) => t.stop());
         if (rec.audioCtx) rec.audioCtx.close().catch(() => {});
         rec = null;
+        recBar.classList.remove("is-starting");
         recBar.hidden = true;
         rowEl.hidden = false;
         updateSendState();
@@ -1150,7 +1245,7 @@
     }
 
     async function sendRecording() {
-        if (!rec || rec.sending) return;
+        if (!rec || rec.sending || rec.starting) return;   // mikrofon hələ açılmayıb
         rec.sending = true;
         const ms = recElapsedMs();
         const blob = await stopRecorder();
@@ -1198,7 +1293,11 @@
             if (e.key === "Escape" && rec) cancelRecording();
         });
         // Səhifədən çıxanda mikrofonu bağla
-        window.addEventListener("pagehide", () => { if (rec) { rec.recorder.stop(); cleanupRecording(); } });
+        window.addEventListener("pagehide", () => {
+            if (!rec) return;
+            if (rec.recorder && rec.recorder.state !== "inactive") rec.recorder.stop();
+            cleanupRecording();
+        });
     }
 
     function autosize(textarea) {
@@ -1576,10 +1675,17 @@
         const dto = messages.get(id);
         if (!dto) return;
         const ownMessage = dto.userName === cfg.currentUser;
-        const question = ownMessage
-            ? "Bu mesaj silinsin?"
-            : "Bu mesaj (" + dto.userName + ") admin olaraq silinsin?";
-        if (!confirm(question)) return;
+        const ok = window.deUI
+            ? await window.deUI.confirm({
+                title: "Mesaj silinsin?",
+                text: ownMessage
+                    ? "Mesaj hamı üçün silinəcək. Bu əməliyyat geri qaytarıla bilməz."
+                    : dto.userName + " istifadəçisinin mesajı admin olaraq silinəcək.",
+                okText: "Sil",
+                danger: true
+            })
+            : window.confirm("Bu mesaj silinsin?");
+        if (!ok) return;
 
         const node = list.querySelector('.dc-msg[data-id="' + id + '"]');
         if (node) node.style.opacity = ".5";

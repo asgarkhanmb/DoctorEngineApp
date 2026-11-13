@@ -140,23 +140,25 @@
         </div>
     </nav>
     <!-- Navbar End -->
-
-    <!-- WhatsApp Floating Button -->
-    @{
-        var whatsapp = await WhatsAppService.GetAsync();
-    }
-
-    @if (whatsapp != null)
-    {
-        <a href="https://wa.me/@whatsapp.PhoneNumber?text=@Uri.EscapeDataString(whatsapp.Message ?? "")"
-           class="whatsapp-btn"
-           target="_blank"
-           rel="noopener"
-           aria-label="WhatsApp ilə yazın">
-            <i class="bi bi-whatsapp"></i>
-        </a>
-    }
 </header>
+
+<!-- WhatsApp Floating Button
+     <header>-dən KƏNARDA olmalıdır: açılışda header-in transform animasiyası position:fixed düyməni
+     ekrandan kənara çıxarırdı (ilk girişdə bir neçə saniyə görünmürdü). -->
+@{
+    var whatsapp = await WhatsAppService.GetAsync();
+}
+
+@if (whatsapp != null)
+{
+    <a href="https://wa.me/@whatsapp.PhoneNumber?text=@Uri.EscapeDataString(whatsapp.Message ?? "")"
+       class="whatsapp-btn"
+       target="_blank"
+       rel="noopener"
+       aria-label="WhatsApp ilə yazın">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+}
 
 @functions {
     private bool IsCurrent(params string[] controllers)

@@ -1240,7 +1240,8 @@ html, body { overflow-x: clip !important; }
     .de-totop { --de-totop-size: 44px; font-size: 15px; left: 4px; bottom: calc(16px + var(--de-float-lift, 0px)); }
 }
 
-.whatsapp-btn { right: 24px !important; left: auto !important; bottom: calc(24px + 55px + 14px + var(--de-float-lift, 0px)) !important; transition: transform .25s var(--de-ease), opacity .25s, box-shadow .25s, bottom .4s var(--de-ease); }
+/* z-index: header-dən kənara çıxarıldı (Header/Default.cshtml) — bölmələrin üstündə, açılış ekranının (3000) və çat panelinin altında */
+.whatsapp-btn { z-index: 1040 !important; right: 24px !important; left: auto !important; bottom: calc(24px + 55px + 14px + var(--de-float-lift, 0px)) !important; transition: transform .25s var(--de-ease), opacity .25s, box-shadow .25s, bottom .4s var(--de-ease); }
 .whatsapp-btn:hover { transform: scale(1.08); box-shadow: 0 10px 26px rgba(37, 211, 102, .45); }
 
 @media (min-width: 993px) {

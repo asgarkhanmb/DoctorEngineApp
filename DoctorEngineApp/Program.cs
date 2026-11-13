@@ -127,6 +127,7 @@ builder.Services.AddControllersWithViews(opt =>
     {
     opt.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
     opt.Filters.Add<DoctorEngineApp.Helpers.AdminFlashFilter>();   // admin əməliyyatlarından sonra bildiriş
+    opt.Filters.Add<DoctorEngineApp.Helpers.AdminExceptionFilter>(); // admin xətaları → qırmızı bildiriş, xəta səhifəsi yox
 });
 
 var app = builder.Build();
@@ -137,12 +138,27 @@ RotativaConfiguration.Setup(
     "Rotativa"
 );
 
-// Middleware
+// ---------- XƏTALAR ----------
+// Tutulmamış exception → /Error (ErrorController: loga yazır, istifadəçiyə səliqəli səhifə, API-yə JSON).
+// Development-də proqramçı üçün ətraflı səhifə qalır; nəticəni görmək üçün: /Error/500, /Error/404 ...
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
+
+// Boş cavablı 4xx/5xx (404 tapılmadı, 403 qadağan ...):
+//  - səhifələr → /Error/{kod} (eyni ünvanda, yönləndirmə olmadan)
+//  - API / hub-lar → qısa JSON { error, code }
+app.UseWhen(ctx => !ErrorPages.IsNonPageRequest(ctx.Request.Path),
+    branch => branch.UseStatusCodePagesWithReExecute("/Error/{0}"));
+app.UseWhen(ctx => ctx.Request.Path.StartsWithSegments("/api"),
+    branch => branch.UseStatusCodePages(async ctx =>
+    {
+        var res = ctx.HttpContext.Response;
+        res.ContentType = "application/json; charset=utf-8";
+        await res.WriteAsJsonAsync(new { error = ErrorPages.For(res.StatusCode).Message, code = res.StatusCode });
+    }));
 
 app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions
