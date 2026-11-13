@@ -13,7 +13,24 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .AddAudio();   // Plugin.Maui.Audio — səs mesajı yazma / oxutma
+            .AddAudio()   // Plugin.Maui.Audio — səs mesajı yazma / oxutma
+            .ConfigureFonts(fonts =>
+            {
+                // Saytın şrifti — Barlow (bütün Azərbaycan hərfləri: ə, ğ, ı, İ, ş, ç, ö, ü)
+                fonts.AddFont("Barlow-Regular.ttf", "Barlow");
+                fonts.AddFont("Barlow-Medium.ttf", "BarlowMedium");
+                fonts.AddFont("Barlow-SemiBold.ttf", "BarlowSemiBold");
+                fonts.AddFont("Barlow-Bold.ttf", "BarlowBold");
+            })
+            .ConfigureMauiHandlers(handlers =>
+            {
+#if ANDROID
+                // Alt menyuda bütün tabların yazısı görünsün
+                handlers.AddHandler(typeof(Shell), typeof(Platforms.Android.DeShellRenderer));
+#endif
+            });
+
+        RemoveNativeFieldChrome();
 
 #if DEBUG
         builder.Logging.AddDebug();
@@ -55,5 +72,34 @@ public static class MauiProgram
         Task.Run(auth.InitializeAsync).GetAwaiter().GetResult();
 
         return app;
+    }
+
+    /// <summary>
+    /// Sahələr (Entry, Editor, Picker) öz haşiyəli qabımızın (Style "Field") içindədir — platformanın
+    /// öz alt xətti / çərçivəsi ikiqat görünür. Android-də alt xətt, Windows-da çərçivə və fon götürülür.
+    /// </summary>
+    private static void RemoveNativeFieldChrome()
+    {
+#if ANDROID
+        static void NoUnderline(global::Android.Views.View v)
+        {
+            v.BackgroundTintList = global::Android.Content.Res.ColorStateList.ValueOf(global::Android.Graphics.Color.Transparent);
+            v.SetPadding(0, v.PaddingTop, 0, v.PaddingBottom);
+        }
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("DeNoUnderline", (h, _) => NoUnderline(h.PlatformView));
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("DeNoUnderline", (h, _) => NoUnderline(h.PlatformView));
+        Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("DeNoUnderline", (h, _) => NoUnderline(h.PlatformView));
+#elif WINDOWS
+        static void NoBorder(Microsoft.UI.Xaml.Controls.Control c)
+        {
+            c.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+            c.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            c.Resources["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
+            c.Resources["TextControlBackgroundFocused"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            c.Resources["TextControlBackgroundPointerOver"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+        }
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("DeNoBorder", (h, _) => NoBorder(h.PlatformView));
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("DeNoBorder", (h, _) => NoBorder(h.PlatformView));
+#endif
     }
 }

@@ -54,9 +54,9 @@
 
                         <!-- Göndərən adı -->
                         <HorizontalStackLayout IsVisible="{Binding ShowName}" Spacing="6" Margin="6,4,0,0">
-                            <Label Text="{Binding UserName}" FontSize="12" Style="{StaticResource Muted}" FontAttributes="Bold" />
+                            <Label Text="{Binding UserName}" FontSize="12" Style="{StaticResource Muted}" FontFamily="BarlowBold" />
                             <Border IsVisible="{Binding IsAdmin}" BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="6,0">
-                                <Label Text="USTA" TextColor="White" FontSize="10" FontAttributes="Bold" />
+                                <Label Text="USTA" TextColor="White" FontSize="10" FontFamily="BarlowBold" />
                             </Border>
                         </HorizontalStackLayout>
 
@@ -124,7 +124,7 @@
         <VerticalStackLayout Grid.Row="2" IsVisible="{Binding IsLoggedIn}" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="10,8" Spacing="6">
             <!-- Redaktə rejimi -->
             <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding Editing, Converter={StaticResource HasValue}}" Padding="6,0">
-                <Label Text="✏️ Mesaj redaktə olunur" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" FontAttributes="Bold" VerticalOptions="Center" />
+                <Label Text="✏️ Mesaj redaktə olunur" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" FontFamily="BarlowBold" VerticalOptions="Center" />
                 <Button Grid.Column="1" Text="Ləğv et" Style="{StaticResource LinkButton}" Command="{Binding CancelEditCommand}" FontSize="12" />
             </Grid>
 
@@ -132,7 +132,7 @@
             <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10" IsVisible="{Binding IsRecording}" HeightRequest="48">
                 <Button Text="🗑" Style="{StaticResource LightButton}" WidthRequest="46" HeightRequest="46" Padding="0" Command="{Binding CancelRecordCommand}" />
                 <Ellipse Grid.Column="1" Fill="{StaticResource Primary}" WidthRequest="10" HeightRequest="10" VerticalOptions="Center" />
-                <Label Grid.Column="2" Text="{Binding RecordTime}" FontSize="16" FontAttributes="Bold" VerticalOptions="Center" />
+                <Label Grid.Column="2" Text="{Binding RecordTime}" FontSize="16" FontFamily="BarlowBold" VerticalOptions="Center" />
                 <Button Grid.Column="3" Text="➤" WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" FontSize="18" Command="{Binding ToggleRecordCommand}" />
             </Grid>
 

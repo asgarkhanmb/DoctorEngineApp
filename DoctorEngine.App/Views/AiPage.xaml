@@ -22,7 +22,7 @@
                         <Border IsVisible="{Binding IsUser, Converter={StaticResource InvertedBool}}" HorizontalOptions="Start" MaximumWidthRequest="340"
                                 Style="{StaticResource Card}" Padding="12,10">
                             <VerticalStackLayout Spacing="4">
-                                <Label Text="✨ AI köməkçi" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                <Label Text="✨ AI köməkçi" FontSize="11" FontFamily="BarlowBold" TextColor="{StaticResource Primary}" />
                                 <Label Text="{Binding Content}" FontSize="15" />
                                 <ActivityIndicator IsRunning="True" HeightRequest="18" HorizontalOptions="Start"
                                                    IsVisible="{Binding Content, Converter={StaticResource HasValue}, ConverterParameter=inv}" />

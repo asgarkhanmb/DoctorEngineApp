@@ -21,33 +21,37 @@
         <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
     </Style>
 
+    <!-- Şrift: Barlow (saytın başlıq şrifti). Saytın mətn şrifti Ubuntu-da "ə" hərfi yoxdur — ona görə mətn də Barlow-dur.
+         Qalın yazı üçün FontAttributes="Bold" yox, FontFamily="BarlowBold" (həqiqi qalın fayl; süni qalınlaşdırma pis görünür). -->
     <Style TargetType="Label">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
-        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="15" />
     </Style>
 
     <Style x:Key="H1" TargetType="Label">
         <Setter Property="FontSize" Value="26" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
     </Style>
 
     <Style x:Key="H2" TargetType="Label">
         <Setter Property="FontSize" Value="20" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
     </Style>
 
     <Style x:Key="Eyebrow" TargetType="Label">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="TextColor" Value="{StaticResource Primary}" />
         <Setter Property="CharacterSpacing" Value="1.5" />
         <!-- TextTransform istifadə olunmur: Windows "ı/i" hərflərini Azərbaycan qaydası ilə böyütmür — mətnlər hazır böyük yazılıb -->
     </Style>
 
     <Style x:Key="Muted" TargetType="Label">
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
     </Style>
 
@@ -69,7 +73,7 @@
     <Style TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
         <Setter Property="TextColor" Value="White" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="MinimumHeightRequest" Value="48" />
@@ -98,7 +102,7 @@
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
         <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" />
         <Setter Property="BorderWidth" Value="1" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="MinimumHeightRequest" Value="48" />
     </Style>
@@ -106,15 +110,16 @@
     <Style x:Key="NavyButton" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{StaticResource Navy}" />
         <Setter Property="TextColor" Value="White" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="MinimumHeightRequest" Value="48" />
     </Style>
 
     <Style x:Key="LinkButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="TextColor" Value="{StaticResource Primary}" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="Padding" Value="4,0" />
         <Setter Property="MinimumHeightRequest" Value="36" />
     </Style>
@@ -122,6 +127,7 @@
     <!-- ================= SAHƏLƏR ================= -->
 
     <Style TargetType="Entry">
+        <Setter Property="FontFamily" Value="Barlow" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
         <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
         <Setter Property="FontSize" Value="15" />
@@ -130,6 +136,7 @@
     </Style>
 
     <Style TargetType="Editor">
+        <Setter Property="FontFamily" Value="Barlow" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
         <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
         <Setter Property="FontSize" Value="15" />
@@ -146,7 +153,7 @@
 
     <Style x:Key="FieldLabel" TargetType="Label">
         <Setter Property="FontSize" Value="13" />
-        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
         <Setter Property="Margin" Value="2,0,0,4" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
     </Style>
@@ -165,6 +172,19 @@
         <Setter Property="Stroke" Value="#BFE8CF" />
         <Setter Property="StrokeShape" Value="RoundRectangle 12" />
         <Setter Property="Padding" Value="12,10" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
+        <Setter Property="TitleColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="MinimumHeightRequest" Value="46" />
+    </Style>
+
+    <Style TargetType="CheckBox">
+        <Setter Property="Color" Value="{StaticResource Primary}" />
     </Style>
 
     <Style TargetType="ActivityIndicator">

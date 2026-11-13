@@ -254,7 +254,10 @@ app.UseWhen(ctx => ctx.Request.Path.StartsWithSegments("/api"),
         await res.WriteAsJsonAsync(new { error = ErrorPages.For(res.StatusCode).Message, code = res.StatusCode });
     }));
 
-app.UseHttpsRedirection();
+// Development-də HTTP → HTTPS yönləndirmə yoxdur: mobil tətbiq (Android emulyatoru 10.0.2.2, telefon LAN IP)
+// lokal serverə HTTP ilə qoşulur və "localhost:7192"-yə yönləndirmə ona çatmır. Production-da həmişə HTTPS.
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#512BD4</color>
-    <color name="colorPrimaryDark">#2B0B98</color>
-    <color name="colorAccent">#2B0B98</color>
+    <!-- Saytın rəngləri: status bar (colorPrimaryDark) göy, vurğular (dialoq düymələri, kursor) qırmızı -->
+    <color name="colorPrimary">#0B2154</color>
+    <color name="colorPrimaryDark">#0B2154</color>
+    <color name="colorAccent">#D81324</color>
 </resources>

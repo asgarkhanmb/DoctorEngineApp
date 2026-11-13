@@ -23,7 +23,7 @@
                         <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 11" StrokeThickness="0" BackgroundColor="White" Padding="0">
                             <Image Source="{Binding LogoUrl, TargetNullValue='logo.png'}" Aspect="AspectFill" />
                         </Border>
-                        <Label Grid.Column="1" Text="{Binding SiteName}" TextColor="White" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Label Grid.Column="1" Text="{Binding SiteName}" TextColor="White" FontSize="20" FontFamily="BarlowBold" VerticalOptions="Center" />
                         <Button Grid.Column="2" Text="✨ AI köməkçi" Clicked="OnAiClicked"
                                 BackgroundColor="#33FFFFFF" CornerRadius="12" HeightRequest="40" MinimumHeightRequest="40" Padding="12,0" FontSize="13" />
                     </Grid>
@@ -36,8 +36,8 @@
                                         <Image Source="{Binding BackgroundUrl}" Aspect="AspectFill" />
                                         <BoxView Color="#990B2154" />
                                         <VerticalStackLayout VerticalOptions="End" Padding="18" Spacing="4">
-                                            <Label Text="AVTO XİDMƏTLƏR" TextColor="White" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5" />
-                                            <Label Text="{Binding Title}" TextColor="White" FontSize="20" FontAttributes="Bold" MaxLines="3" LineBreakMode="TailTruncation" />
+                                            <Label Text="AVTO XİDMƏTLƏR" TextColor="White" FontSize="11" FontFamily="BarlowBold" CharacterSpacing="1.5" />
+                                            <Label Text="{Binding Title}" TextColor="White" FontSize="20" FontFamily="BarlowBold" MaxLines="3" LineBreakMode="TailTruncation" />
                                             <Label Text="{Binding Subtitle}" TextColor="#DDFFFFFF" FontSize="13" MaxLines="2" LineBreakMode="TailTruncation" />
                                         </VerticalStackLayout>
                                     </Grid>
@@ -76,7 +76,7 @@
                                         <Image Source="{Binding IconUrl}" Aspect="AspectFit" />
                                     </Border>
                                     <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                        <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding Title}" FontFamily="BarlowBold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
                                         <Label Text="{Binding Description}" Style="{StaticResource Muted}" MaxLines="2" LineBreakMode="TailTruncation" />
                                     </VerticalStackLayout>
                                 </Grid>
@@ -114,7 +114,7 @@
                                         </Border>
                                     </Grid>
                                     <VerticalStackLayout Grid.Row="1" Padding="14,12" Spacing="6">
-                                        <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding Name}" FontFamily="BarlowBold" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
                                         <Label Text="{Binding Description}" Style="{StaticResource Muted}" MaxLines="2" LineBreakMode="TailTruncation" />
                                         <Button Text="Rezervasiya et →" FontSize="13" MinimumHeightRequest="38" HeightRequest="38" Margin="0,4,0,0"
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=BookCommand, x:DataType=vm:HomeViewModel}"
@@ -139,9 +139,9 @@
                                     <Image Source="{Binding ImageUrl}" Aspect="AspectFill" HeightRequest="160" />
                                     <VerticalStackLayout Grid.Column="1" Padding="14" Spacing="6" VerticalOptions="Center">
                                         <Border BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="8,2" HorizontalOptions="Start">
-                                            <Label Text="{Binding Position, Converter={StaticResource UpperAz}}" TextColor="White" FontSize="11" FontAttributes="Bold" />
+                                            <Label Text="{Binding Position, Converter={StaticResource UpperAz}}" TextColor="White" FontSize="11" FontFamily="BarlowBold" />
                                         </Border>
-                                        <Label Text="{Binding FullName}" FontAttributes="Bold" FontSize="17" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding FullName}" FontFamily="BarlowBold" FontSize="17" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
                                         <Label Text="{Binding Bio}" Style="{StaticResource Muted}" MaxLines="4" LineBreakMode="TailTruncation" />
                                     </VerticalStackLayout>
                                 </Grid>
@@ -153,15 +153,15 @@
                 <!-- ===== ƏLAQƏ ===== -->
                 <Border Margin="16,24,16,0" StrokeShape="RoundRectangle 20" StrokeThickness="0" Background="{StaticResource HeroGradient}" Padding="20">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Mühərrikinizlə bağlı sualınız var?" TextColor="White" FontSize="19" FontAttributes="Bold" />
+                        <Label Text="Mühərrikinizlə bağlı sualınız var?" TextColor="White" FontSize="19" FontFamily="BarlowBold" />
                         <Label Text="{Binding Contact.Address}" TextColor="#CCFFFFFF" FontSize="13" />
                         <Label TextColor="#CCFFFFFF" FontSize="13">
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span Text="B.e–Cümə: " />
-                                    <Span Text="{Binding Contact.Weekdays}" FontAttributes="Bold" />
+                                    <Span Text="{Binding Contact.Weekdays}" FontFamily="BarlowBold" />
                                     <Span Text="   Şənbə–Bazar: " />
-                                    <Span Text="{Binding Contact.Weekend}" FontAttributes="Bold" />
+                                    <Span Text="{Binding Contact.Weekend}" FontFamily="BarlowBold" />
                                 </FormattedString>
                             </Label.FormattedText>
                         </Label>

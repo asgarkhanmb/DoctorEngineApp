@@ -48,14 +48,15 @@
 	     Android-in ara faylları (obj) və çıxışı (bin) ASCII qovluğa yazılır. Digər platformalara təsir etmir. -->
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' and $([System.Text.RegularExpressions.Regex]::IsMatch('$(MSBuildProjectDirectory)', '[^\x00-\x7F]'))">
 		<_DeAsciiRoot>$(ProgramData)\DoctorEngineBuild\</_DeAsciiRoot>
-		<IntermediateOutputPath>$(_DeAsciiRoot)obj\$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
-		<OutputPath>$(_DeAsciiRoot)bin\$(Configuration)\$(TargetFramework)\</OutputPath>
+		<IntermediateOutputPath>$(_DeAsciiRoot)obj\$(Configuration)\</IntermediateOutputPath>
+		<OutputPath>$(_DeAsciiRoot)bin\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#D81324" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#D81324" BaseSize="128,128" />
 		<MauiImage Include="Resources\Images\*" />
+		<MauiFont Include="Resources\Fonts\*" />
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
