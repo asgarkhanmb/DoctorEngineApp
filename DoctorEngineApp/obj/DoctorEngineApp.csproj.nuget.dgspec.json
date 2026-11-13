@@ -30,6 +30,7 @@
         },
         "frameworks": {
           "net6.0": {
+            "framework": "net6.0",
             "targetAlias": "net6.0",
             "projectReferences": {}
           }
@@ -44,10 +45,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "11.0.100"
       },
       "frameworks": {
         "net6.0": {
+          "framework": "net6.0",
           "targetAlias": "net6.0",
           "dependencies": {
             "MailKit": {
@@ -93,6 +95,10 @@
             "Rotativa.AspNetCore": {
               "target": "Package",
               "version": "[1.4.0, )"
+            },
+            "WebPush": {
+              "target": "Package",
+              "version": "[1.0.12, )"
             }
           },
           "imports": [
@@ -114,7 +120,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.317\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\11.0.100-rc.3.26522.148\\RuntimeIdentifierGraph.json"
         }
       }
     }

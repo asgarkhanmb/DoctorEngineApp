@@ -95,6 +95,64 @@
   },
   {
     "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "PushSubscribe",
+    "RelativePath": "api/chat/push/subscribe",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "endpoint",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "p256dh",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "auth",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "PushUnsubscribe",
+    "RelativePath": "api/chat/push/unsubscribe",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "endpoint",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "Read",
+    "RelativePath": "api/chat/read",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "lastId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
     "Method": "Send",
     "RelativePath": "api/chat/send",
     "HttpMethod": "POST",
@@ -112,6 +170,16 @@
         "IsRequired": false
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DoctorEngineApp.Controllers.ChatApiController",
+    "Method": "Unread",
+    "RelativePath": "api/chat/unread",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   }
 ]

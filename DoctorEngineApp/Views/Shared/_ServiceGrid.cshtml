@@ -1,0 +1,120 @@
+@* Xidmət kartları + video pəncərəsi. Ana səhifə və Xidmətlər səhifəsi.
+   Tələb: səhifədə wwwroot/css/services.css və wwwroot/js/services.js, ətrafda .sv konteyneri.
+   İstifadə: <partial name="_ServiceGrid" model="new ServiceGridVM { ... }" /> *@
+@model DoctorEngineApp.ViewModels.Services.ServiceGridVM
+@{
+    var cats = Model.Categories ?? new();
+
+    // Hər kateqoriya bir kart: kateqoriyanın videosu (bir neçə qalıbsa — ən köhnəsi).
+    // Videosu olmayan kateqoriya "tezliklə" kartı kimi göstərilir.
+    var items = cats.Take(DoctorEngineApp.Models.ServiceCategory.MaxCount)
+                    .Select(c => (Cat: c, Sub: c.SubServices?.FirstOrDefault()))
+                    .ToList();
+    var shown = Model.Limit.HasValue ? items.Take(Model.Limit.Value).ToList() : items;
+}
+
+@if (!items.Any())
+{
+    <div class="sv-empty">
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        <p>Xidmətlər tezliklə əlavə olunacaq.</p>
+    </div>
+}
+else
+{
+    @if (Model.ShowFilter)
+    {
+        <div class="sv-filter" role="toolbar" aria-label="Kateqoriyaya görə süz">
+            <button type="button" class="sv-chip is-active" data-filter="all" aria-pressed="true">
+                Hamısı <span class="sv-chip__count">@items.Count</span>
+            </button>
+            @foreach (var (cat, sub) in items)
+            {
+                <button type="button" class="sv-chip" data-filter="cat-@cat.Id" aria-pressed="false">
+                    @if (!string.IsNullOrEmpty(cat.Icon))
+                    {
+                        <img src="@Url.Content($"~/uploads/categories/{cat.Icon}")" alt="" width="20" height="20" />
+                    }
+                    @cat.Name
+                    @if (sub == null)
+                    {
+                        <span class="sv-chip__count">tezliklə</span>
+                    }
+                </button>
+            }
+        </div>
+    }
+
+    <div class="sv-grid">
+        @foreach (var (cat, sub) in shown)
+        {
+            Model.ReservationServiceIds.TryGetValue(cat.Id, out var reserveId);
+            var reserveUrl = reserveId > 0
+                ? Url.Action("Index", "Reservation", new { serviceId = reserveId })
+                : Url.Action("Index", "Reservation");
+            var catIcon = string.IsNullOrEmpty(cat.Icon) ? null : Url.Content($"~/uploads/categories/{cat.Icon}");
+            var videoUrl = string.IsNullOrEmpty(sub?.Video) ? null : Url.Content($"~/uploads/subvideos/{sub!.Video}");
+
+            <article class="sv-card @(sub == null ? "sv-card--soon" : "")" data-cat="cat-@cat.Id">
+                @if (videoUrl != null)
+                {
+                    <button type="button" class="sv-card__media" data-video="@videoUrl" data-title="@sub!.Title" aria-label="Videoya bax: @sub.Title">
+                        <video src="@(videoUrl)#t=0.5" preload="metadata" muted loop playsinline tabindex="-1" aria-hidden="true"></video>
+                        <span class="sv-card__play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
+                        <span class="sv-badge" aria-hidden="true"><i class="fa-solid fa-video"></i> <span data-duration>Video</span></span>
+                    </button>
+                }
+                else
+                {
+                    <div class="sv-card__soon-media">
+                        @if (catIcon != null) { <img src="@catIcon" alt="" /> } else { <i class="fa-solid fa-screwdriver-wrench"></i> }
+                        <span class="sv-badge"><i class="fa-regular fa-clock"></i> Video tezliklə</span>
+                    </div>
+                }
+
+                <div class="sv-card__body">
+                    <span class="sv-card__cat">
+                        @if (catIcon != null) { <img src="@catIcon" alt="" width="18" height="18" /> }
+                        @cat.Name
+                    </span>
+
+                    @if (sub != null)
+                    {
+                        <h3>@sub.Title</h3>
+                        <p>@sub.Description</p>
+                    }
+                    else
+                    {
+                        <h3>@cat.Name</h3>
+                        <p>Bu xidmət üzrə ətraflı məlumat tezliklə əlavə olunacaq. Sualınız varsa, usta ilə yazışın və ya elə indi rezervasiya edin.</p>
+                    }
+
+                    <div class="sv-card__actions">
+                        <a href="@reserveUrl" class="sv-btn sv-btn--primary">Rezervasiya et <i class="fa-solid fa-arrow-right"></i></a>
+                        @if (sub != null)
+                        {
+                            <a asp-controller="Assistant" asp-action="Index" class="sv-btn sv-btn--ghost"><i class="fa-solid fa-wand-magic-sparkles"></i> Sual ver</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--ghost"><i class="fa-regular fa-comments"></i> Ustaya yaz</a>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+
+    <!-- Video pəncərəsi -->
+    <div class="modal fade sv-modal" id="svVideoModal" tabindex="-1" aria-labelledby="svVideoTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="sv-modal__head">
+                    <h2 class="sv-modal__title" id="svVideoTitle"></h2>
+                    <button type="button" class="sv-modal__close" data-bs-dismiss="modal" aria-label="Bağla"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <video class="sv-modal__video" controls playsinline></video>
+            </div>
+        </div>
+    </div>
+}

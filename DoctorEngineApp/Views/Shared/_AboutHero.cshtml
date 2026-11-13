@@ -1,0 +1,72 @@
+@* "Haqqımızda" bloku: solda video, sağda mətn, üstünlüklər, düymələr, telefon və ünvan.
+   Ana səhifə və Haqqımızda səhifəsi. Tələb: services.css + about.css, ətrafda .sv.ab konteyneri. *@
+@model DoctorEngineApp.ViewModels.Abouts.AboutSectionVM
+@inject DoctorEngineApp.Services.Interfaces.IContactInfoService ContactInfo
+@{
+    var contact = await ContactInfo.GetFirstAsync();
+    var phone = contact?.Phone;
+    var telHref = string.IsNullOrWhiteSpace(phone) ? null : "tel:" + new string(phone.Where(c => char.IsDigit(c) || c == '+').ToArray());
+    var informs = Model.Informs ?? new();
+}
+
+<section class="container ab-hero">
+    @if (!string.IsNullOrEmpty(Model.VideoPath))
+    {
+        <div class="ab-hero__media wow fadeInUp" data-wow-delay="0.1s">
+            <partial name="_VideoFrame" model='new VideoFrame(Url.Content(Model.VideoPath))' />
+        </div>
+    }
+
+    <div class="ab-hero__text wow fadeInUp" data-wow-delay="0.2s">
+        <span class="sv-eyebrow">Haqqımızda</span>
+        <h2>@Model.Title</h2>
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="ab-lead">@Model.Description</p>
+        }
+
+        @if (informs.Any())
+        {
+            <ul class="ab-ticks">
+                @foreach (var inf in informs)
+                {
+                    <li><i class="fa-solid fa-check"></i> @inf.Title</li>
+                }
+            </ul>
+        }
+
+        <div class="ab-hero__actions">
+            <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--primary sv-btn--lg">
+                Rezervasiya et <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            @if (Model.IsHome)
+            {
+                <a asp-controller="About" asp-action="Index" class="sv-btn sv-btn--ghost sv-btn--lg">Daha ətraflı</a>
+            }
+            else
+            {
+                <a asp-controller="Service" asp-action="Index" class="sv-btn sv-btn--ghost sv-btn--lg">Xidmətlərimiz</a>
+            }
+        </div>
+
+        @if (contact != null && (telHref != null || !string.IsNullOrWhiteSpace(contact.Address)))
+        {
+            <ul class="ab-contact">
+                @if (telHref != null)
+                {
+                    <li>
+                        <span class="ab-contact__icon"><i class="fa-solid fa-phone"></i></span>
+                        <span><small>Zəng edin</small><a href="@telHref">@phone</a></span>
+                    </li>
+                }
+                @if (!string.IsNullOrWhiteSpace(contact.Address))
+                {
+                    <li>
+                        <span class="ab-contact__icon"><i class="fa-solid fa-location-dot"></i></span>
+                        <span><small>Ünvan</small><a asp-controller="Contact" asp-action="Index">@contact.Address</a></span>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</section>

@@ -42,6 +42,7 @@ public class TechnicianController : Controller
             Id = tech.Id,
             FullName = tech.FullName,
             Position = tech.Position,
+            Bio = tech.Bio,
             ExistingImage = tech.Image,
             FacebookUrl = tech.FacebookUrl,
             InstagramUrl = tech.InstagramUrl,

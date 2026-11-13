@@ -8,27 +8,30 @@
 
 <partial name="_InformCards" model="Model.Informs" />
 <partial name="_BookingForm" for="Reservation" />
-<!-- Telefon -->
+<!-- Telefon: rezervasiya forması ilə eyni endə yığcam blok -->
 @if (!string.IsNullOrEmpty(Model.ContactPhone?.PhoneNumber))
 {
-    <div class="container-xxl py-5">
+    var tel = Model.ContactPhone.PhoneNumber.Replace(" ", "");
+    <section class="rs-call">
         <div class="container">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-7 wow fadeInUp" data-wow-delay="0.1s">
-                    <h6 class="text-primary text-uppercase">@Model.ContactPhone.Subtitle</h6>
-                    <h1 class="mb-4">@Model.ContactPhone.Title</h1>
-                    <p class="mb-0">@Model.ContactPhone.Description</p>
+            <div class="rs-call__box wow fadeInUp" data-wow-delay="0.1s">
+                <div class="rs-call__text">
+                    @if (!string.IsNullOrWhiteSpace(Model.ContactPhone.Subtitle))
+                    {
+                        <span class="rs-call__eyebrow">@Model.ContactPhone.Subtitle</span>
+                    }
+                    <h2>@Model.ContactPhone.Title</h2>
+                    <p>@Model.ContactPhone.Description</p>
                 </div>
-                <div class="col-lg-5 wow fadeInUp" data-wow-delay="0.25s">
-                    <a class="de-call" href="tel:@Model.ContactPhone.PhoneNumber.Replace(" ", "")">
-                        <span class="de-call__icon"><i class="fa fa-phone-alt"></i></span>
-                        <span>
-                            <small>İndi zəng edin</small>
-                            <strong>@Model.ContactPhone.PhoneNumber</strong>
-                        </span>
-                    </a>
-                </div>
+                <a class="rs-call__btn" href="tel:@tel">
+                    <span class="rs-call__icon"><i class="fa fa-phone-alt"></i></span>
+                    <span class="rs-call__num">
+                        <small>İndi zəng edin</small>
+                        <strong>@Model.ContactPhone.PhoneNumber</strong>
+                    </span>
+                    <i class="fa-solid fa-arrow-right rs-call__arrow" aria-hidden="true"></i>
+                </a>
             </div>
         </div>
-    </div>
+    </section>
 }

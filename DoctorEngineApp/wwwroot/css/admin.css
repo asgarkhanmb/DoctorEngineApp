@@ -524,7 +524,9 @@ a.adm-stat:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(11,
 /* ---------- MOBİL ---------- */
 
 @media (max-width: 991.98px) {
-    .adm-sidebar { transform: translateX(-100%); box-shadow: 0 0 40px rgba(0, 0, 0, .3); }
+    /* Kölgə yalnız menyu açıq olanda — bağlı menyunun kölgəsi ekranın sol kənarında zolaq kimi görünürdü */
+    .adm-sidebar { transform: translateX(-100%); box-shadow: none; }
+    body.adm-nav-open .adm-sidebar { box-shadow: 0 0 40px rgba(0, 0, 0, .3); }
     .adm-main { margin-left: 0; }
     .adm-menu-btn { display: grid; }
     body.adm-nav-open .adm-sidebar { transform: none; }
@@ -591,4 +593,168 @@ a.adm-stat:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(11,
         margin: 0 !important;
         border-radius: 10px !important;
     }
+}
+
+/* ---------- CANLI REZERVASİYALAR (admin-live.js) ---------- */
+.adm-nav__badge[hidden] { display: none !important; }
+.adm-nav__badge.is-bump { animation: adm-bump .6s var(--a-ease); }
+@keyframes adm-bump { 30% { transform: scale(1.45); } 60% { transform: scale(.9); } }
+
+.adm-table tr.is-new > td { background: #fffbeb; animation: adm-row-in .6s var(--a-ease) both; }
+.adm-table tr.is-flash > td { animation: adm-row-flash 1.6s ease; }
+@keyframes adm-row-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes adm-row-flash { 25% { background: #fef3c7; } }
+
+.adm-new-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: #D81324; color: #fff; font-size: 11px; font-weight: 600; vertical-align: middle; }
+.adm-toast--live a { color: #D81324; font-weight: 600; }
+.adm-toast--live b { color: #0B2154; }
+.adm-toast.is-success.adm-toast--live i { color: #D81324; }
+
+/* =====================================================
+   SƏHİFƏLƏMƏ (admin.js → .adm-pager)
+   ===================================================== */
+
+.adm-pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    padding: 12px 20px;
+    border-top: 1px solid var(--a-border);
+    background: #fcfcfe;
+    border-radius: 0 0 var(--a-radius) var(--a-radius);
+}
+
+.adm-pager[hidden] { display: none; }
+
+.adm-pager__info {
+    color: var(--a-muted);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.adm-pager__list { display: flex; align-items: center; gap: 4px; }
+
+.adm-pager__btn {
+    display: inline-grid;
+    place-items: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border: 1px solid var(--a-border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--a-text);
+    font-size: 13.5px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
+}
+
+.adm-pager__btn i { font-size: 11px; }
+.adm-pager__btn:hover:not(:disabled):not(.is-current) { border-color: var(--a-navy); color: var(--a-navy); }
+.adm-pager__btn:focus-visible { outline: 0; box-shadow: 0 0 0 3px rgba(216, 19, 36, .25); }
+.adm-pager__btn:disabled { opacity: .4; cursor: default; }
+
+.adm-pager__btn.is-current {
+    border-color: var(--a-primary);
+    background: var(--a-primary);
+    color: #fff;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(216, 19, 36, .25);
+    cursor: default;
+}
+
+.adm-pager__gap { min-width: 20px; color: var(--a-muted); text-align: center; letter-spacing: 1px; }
+.adm-pager__compact { display: none; min-width: 64px; color: var(--a-text); font-size: 13.5px; font-weight: 500; text-align: center; font-variant-numeric: tabular-nums; }
+
+.adm-pager__size { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--a-muted); font-size: 13px; white-space: nowrap; }
+.adm-pager__size select { width: auto; min-width: 70px; border-radius: 9px; }
+
+/* Kart başlığı: dar ekranda sətirlərə bölünsün, axtarış tam en olsun */
+.adm-card__head { flex-wrap: wrap; }
+
+@media (max-width: 767.98px) {
+    .adm-card__head { padding: 14px 16px; }
+    .adm-card__head .adm-search { max-width: none; flex: 1 1 100%; }
+
+    /* Telefonda: məlumat + səhifə sayı bir sətirdə, düymələr və ölçü seçimi alt sətirdə */
+    .adm-pager { padding: 12px 16px; }
+    .adm-pager__list { order: 3; flex: 1 1 100%; justify-content: center; gap: 8px; }
+    .adm-pager__btn.is-num,
+    .adm-pager__gap { display: none; }
+    .adm-pager__compact { display: inline-block; }
+    .adm-pager__btn { min-width: 44px; height: 40px; border-radius: 10px; }
+    .adm-pager__btn i { font-size: 13px; }
+
+    /* =====================================================
+       CƏDVƏL → KART (telefonda üfüqi sürüşmə əvəzinə)
+       Sütun adları admin.js tərəfindən td[data-label]-ə yazılır
+       ===================================================== */
+    .adm-table-wrap { overflow: visible; }
+    .adm-table, .adm-table tbody { display: block; }
+    .adm-table thead { display: none; }
+
+    .adm-table tbody tr {
+        display: block;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--a-border);
+    }
+
+    .adm-table tbody tr[hidden] { display: none; }
+    .adm-table tbody tr:last-child { border-bottom: 0; }
+
+    .adm-table td {
+        display: block;
+        position: relative;
+        min-height: 24px;
+        padding: 4px 0;
+        border: 0 !important;
+        text-align: left;
+    }
+
+    .adm-table td[data-label] { padding-left: 38%; }
+
+    .adm-table td[data-label]::before {
+        content: attr(data-label);
+        position: absolute;
+        top: 6px;
+        left: 0;
+        width: calc(38% - 12px);
+        color: var(--a-muted);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: .5px;
+        line-height: 1.3;
+        text-transform: uppercase;
+        overflow-wrap: anywhere;
+    }
+
+    /* Birinci xana — kartın başlığı */
+    .adm-table td:first-child { padding-bottom: 6px; font-size: 15px; }
+
+    .adm-table .is-num { text-align: left; }
+    .adm-table .text-nowrap { white-space: normal !important; }
+    .adm-clamp { max-width: none; }
+
+    /* Əməliyyatlar: kartın altında, sağda */
+    .adm-table td.adm-actions-col {
+        width: auto;
+        margin-top: 8px;
+        padding: 10px 0 0;
+        border-top: 1px dashed var(--a-border) !important;
+        text-align: right;
+    }
+
+    .adm-table td.adm-actions-col[data-label] { padding-left: 0; }
+    .adm-table td.adm-actions-col[data-label]::before { display: none; }
+    .adm-table .adm-actions { flex-wrap: wrap; justify-content: flex-end; }
+
+    /* Toxunma üçün daha böyük düymələr */
+    .adm-table .adm-act { width: 38px; height: 38px; }
+
+    .adm-table tr[data-search-empty] { padding: 0; }
+    .adm-table tr[data-search-empty] td { padding: 0; text-align: center; }
 }

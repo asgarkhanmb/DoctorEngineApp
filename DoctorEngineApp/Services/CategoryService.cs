@@ -30,6 +30,8 @@ namespace DoctorEngineApp.Services
 
         // ================= OXU =================
 
+        public Task<int> CountAsync() => _ctx.ServiceCategories.CountAsync();
+
         public async Task<List<CategoryVM>> GetAllAsync()
         {
             return await _ctx.ServiceCategories

@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DoctorEngineApp.Hubs
 {
-    public class ChatHub:Hub
+    // Yalnız daxil olmuş istifadəçilər qoşula bilər — qonaqlar canlı mesajları almır
+    [Authorize]
+    public class ChatHub : Hub
     {
     }
 }

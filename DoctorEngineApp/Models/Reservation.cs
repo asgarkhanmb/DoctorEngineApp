@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.Models
 {
+    [Index(nameof(TrackingCode), IsUnique = true)]
     public class Reservation:BaseEntity
     {
         public string FullName { get; set; }
@@ -17,5 +19,9 @@ namespace DoctorEngineApp.Models
         public string Status { get; set; } = "Pending";
         public string? RejectionReason { get; set; }
 
+        // Müştərinin statusu canlı izləməsi üçün gizli kod (32 hex simvol).
+        // Köhnə rezervasiyalarda boş ola bilər.
+        [MaxLength(32)]
+        public string? TrackingCode { get; set; }
     }
 }

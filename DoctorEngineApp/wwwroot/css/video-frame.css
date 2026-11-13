@@ -101,3 +101,159 @@
     .de-video.is-tall { --vf-tall-h: min(480px, 70vh); }
 }
 
+
+/* =====================================================
+   SAYT: video "səhnəsi" + öz play düyməsi
+   - Şaquli (9:16) video brend fonlu səhnənin ortasında
+     telefon/reels kartı kimi durur — yanlarda boş zolaq yoxdur
+   - Üfüqi video səhnəni tam doldurur
+   ===================================================== */
+
+.de-video-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: clamp(18px, 3vw, 32px);
+    border-radius: 26px;
+    background:
+        radial-gradient(circle at 15% 15%, rgba(216, 19, 36, .22), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(216, 19, 36, .14), transparent 45%),
+        linear-gradient(160deg, #0B2154 0%, #16306f 55%, #0B2154 100%);
+    box-shadow: 0 18px 50px rgba(11, 33, 84, .18);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Fonda incə nöqtəli naxış */
+.de-video-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(rgba(255, 255, 255, .09) 1px, transparent 1px);
+    background-size: 18px 18px;
+    mask-image: linear-gradient(180deg, #000, transparent 85%);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 85%);
+}
+
+.de-video.is-site {
+    border-radius: 18px;
+    background: #050a1a;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+/* Şaquli: sabit enli kart, nisbət videonun özündən (yüklənənə qədər 9:16) */
+.de-video.is-site.is-tall {
+    width: min(320px, 100%);
+    height: auto;
+    margin: 0;
+    aspect-ratio: var(--vf-ratio, 9 / 16);
+}
+
+/* Üfüqi: səhnənin bütün enini tutur */
+.de-video.is-site:not(.is-tall) { width: 100%; }
+
+.de-video.is-site .de-video__player { object-fit: cover; }
+.de-video.is-site:not(.is-tall) .de-video__player { object-fit: contain; }
+
+/* ---------- Play düyməsi (bütün kadrı örtür, ortada dairə) ---------- */
+
+.de-video__play {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: linear-gradient(180deg, rgba(5, 10, 26, 0) 40%, rgba(5, 10, 26, .55) 100%);
+    cursor: pointer;
+    transition: opacity .3s ease, visibility .3s;
+}
+
+.de-video__play i {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    padding-left: 5px;          /* üçbucaq vizual olaraq mərkəzdə */
+    border-radius: 50%;
+    background: #D81324;
+    color: #fff;
+    font-size: 26px;
+    box-shadow: 0 0 0 10px rgba(216, 19, 36, .25), 0 12px 30px rgba(0, 0, 0, .35);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.de-video__play:hover i,
+.de-video__play:focus-visible i {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 16px rgba(216, 19, 36, .2), 0 14px 34px rgba(0, 0, 0, .4);
+}
+
+.de-video__play:focus-visible { outline: 3px solid rgba(255, 255, 255, .7); outline-offset: -6px; border-radius: 18px; }
+
+/* Nəbz effekti — diqqəti çəkir */
+@media (prefers-reduced-motion: no-preference) {
+    .de-video__play i { animation: de-pulse 2.4s ease-out infinite; }
+    .de-video__play:hover i { animation: none; }
+}
+
+@keyframes de-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(216, 19, 36, .45), 0 12px 30px rgba(0, 0, 0, .35); }
+    70%  { box-shadow: 0 0 0 22px rgba(216, 19, 36, 0), 0 12px 30px rgba(0, 0, 0, .35); }
+    100% { box-shadow: 0 0 0 0 rgba(216, 19, 36, 0), 0 12px 30px rgba(0, 0, 0, .35); }
+}
+
+/* Oynayarkən düymə gizlənir, brauzerin idarəetmə paneli görünür */
+.de-video.is-playing .de-video__play { opacity: 0; visibility: hidden; }
+
+@media (max-width: 576px) {
+    .de-video-stage { border-radius: 20px; }
+    .de-video.is-site.is-tall { width: min(280px, 100%); }
+    .de-video__play i { width: 64px; height: 64px; font-size: 22px; }
+}
+
+/* Şaquli videoda fon videonun ətrafına yığılır (bütün sütunu tutmur) */
+.de-video-stage:has(.de-video.is-tall) {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    padding: clamp(10px, 1.4vw, 14px);
+    border-radius: 22px;
+}
+
+/* ---------- Səhnə fonu videonun öz kadrından (ambient) ----------
+   video-frame.js kiçik kətana kadr çəkir; burada böyüdülüb bulanıqlaşdırılır.
+   Video oynadıqca fon da kadrlarla birlikdə dəyişir. */
+.de-video-stage { background: #0d1117; }
+
+.de-video-stage__ambient {
+    position: absolute;
+    inset: -20%;
+    z-index: -2;
+    width: 140%;
+    height: 140%;
+    filter: blur(42px) saturate(1.35) brightness(.8);
+    opacity: 0;
+    transform: scale(1.05);
+    transition: opacity .8s ease;
+    pointer-events: none;
+}
+
+.de-video-stage.has-ambient .de-video-stage__ambient { opacity: 1; }
+
+/* Kadr fonun üstündə: nöqtəli naxış daha zəif, kənarlarda yüngül kölgə */
+.de-video-stage.has-ambient::before {
+    background-image: radial-gradient(rgba(255, 255, 255, .06) 1px, transparent 1px);
+    box-shadow: inset 0 0 60px rgba(0, 0, 0, .35);
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+
+.de-video-stage.has-ambient .de-video.is-site { box-shadow: 0 20px 45px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .12); }
+
+@media (prefers-reduced-motion: reduce) {
+    .de-video-stage__ambient { transition: none; }
+}

@@ -1,4 +1,4 @@
-using DoctorEngineApp.Data;
+﻿using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
@@ -12,6 +12,7 @@ namespace DoctorEngineApp.Services
         public const int MaxMessageLength = 1000;
         public const long MaxImageBytes = 10L * 1024 * 1024;   // 10 MB
         public const long MaxVideoBytes = 100L * 1024 * 1024;  // 100 MB
+        public const long MaxAudioBytes = 16L * 1024 * 1024;   // 16 MB (səs mesajı)
 
         private const string UploadFolder = "uploads/chat";
 
@@ -159,6 +160,42 @@ namespace DoctorEngineApp.Services
             return true;
         }
 
+        // ================= OXUNMAMIŞ =================
+
+        public async Task<int> GetUnreadCountAsync(string username)
+        {
+            var lastRead = await _context.Users
+                .Where(u => u.UserName == username)
+                .Select(u => u.LastReadChatMessageId)
+                .FirstOrDefaultAsync();
+
+            // İlk dəfə: köhnə yazışmaların hamısını "yeni" saymırıq
+            if (lastRead == null)
+            {
+                await MarkReadAsync(username, int.MaxValue);
+                return 0;
+            }
+
+            return await _context.ChatMessages
+                .CountAsync(m => !m.SoftDeleted && m.Id > lastRead.Value && m.UserName != username);
+        }
+
+        public async Task MarkReadAsync(string username, int lastId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            if (user == null) return;
+
+            // Mövcud olmayan gələcək Id yazılmasın
+            var maxId = await _context.ChatMessages.MaxAsync(m => (int?)m.Id) ?? 0;
+            var target = Math.Min(lastId, maxId);
+
+            if (user.LastReadChatMessageId is int current && current >= target)
+                return;
+
+            user.LastReadChatMessageId = target;
+            await _context.SaveChangesAsync();
+        }
+
         // ================= KÖMƏKÇİLƏR =================
 
         private static string? Normalize(string? text)
@@ -174,9 +211,14 @@ namespace DoctorEngineApp.Services
         {
             var kind = AllowedUploadAttribute.DetectKind(file);
             if (kind == null)
-                return (null, null, "Yalnız şəkil (jpg, png, webp) və ya video (mp4, webm, mov) göndərilə bilər.");
+                return (null, null, "Yalnız şəkil (jpg, png, webp), video (mp4, webm, mov) və ya səs mesajı göndərilə bilər.");
 
-            var max = kind == UploadKind.Image ? MaxImageBytes : MaxVideoBytes;
+            var max = kind switch
+            {
+                UploadKind.Image => MaxImageBytes,
+                UploadKind.Audio => MaxAudioBytes,
+                _ => MaxVideoBytes
+            };
             if (!AllowedUploadAttribute.IsAllowed(file, kind.Value, out var error, max))
                 return (null, null, error);
 
@@ -193,7 +235,13 @@ namespace DoctorEngineApp.Services
                 await file.CopyToAsync(stream);
             }
 
-            return ($"/{UploadFolder}/{fileName}", kind == UploadKind.Image ? "image" : "video", null);
+            var type = kind switch
+            {
+                UploadKind.Image => "image",
+                UploadKind.Audio => "audio",
+                _ => "video"
+            };
+            return ($"/{UploadFolder}/{fileName}", type, null);
         }
 
         private void DeleteFile(string? url)

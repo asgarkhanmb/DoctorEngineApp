@@ -1,11 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.Helpers
 {
     public enum UploadKind
     {
         Image,
-        Video
+        Video,
+        Audio   // çatda səs mesajları
     }
 
     /// <summary>
@@ -17,9 +18,11 @@ namespace DoctorEngineApp.Helpers
     {
         public static readonly string[] ImageExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
         public static readonly string[] VideoExtensions = { ".mp4", ".webm", ".mov", ".m4v", ".ogg" };
+        public static readonly string[] AudioExtensions = { ".webm", ".ogg", ".m4a", ".mp3" };
 
         public const long DefaultMaxImageBytes = 10L * 1024 * 1024;      // 10 MB
         public const long DefaultMaxVideoBytes = 1024L * 1024 * 1024;    // 1 GB
+        public const long DefaultMaxAudioBytes = 16L * 1024 * 1024;      // 16 MB
 
         private readonly UploadKind _kind;
 
@@ -32,6 +35,10 @@ namespace DoctorEngineApp.Helpers
         public static UploadKind? DetectKind(IFormFile file)
         {
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            // .webm/.ogg həm səs, həm video ola bilər — səs Content-Type ilə ayrılır
+            if (AudioExtensions.Contains(ext) &&
+                (file.ContentType ?? "").StartsWith("audio/", StringComparison.OrdinalIgnoreCase))
+                return UploadKind.Audio;
             if (ImageExtensions.Contains(ext)) return UploadKind.Image;
             if (VideoExtensions.Contains(ext)) return UploadKind.Video;
             return null;
@@ -42,9 +49,12 @@ namespace DoctorEngineApp.Helpers
             error = string.Empty;
             var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
 
-            var (extensions, mimePrefix, maxBytes, label) = kind == UploadKind.Image
-                ? (ImageExtensions, "image/", DefaultMaxImageBytes, "Şəkil")
-                : (VideoExtensions, "video/", DefaultMaxVideoBytes, "Video");
+            var (extensions, mimePrefix, maxBytes, label) = kind switch
+            {
+                UploadKind.Image => (ImageExtensions, "image/", DefaultMaxImageBytes, "Şəkil"),
+                UploadKind.Audio => (AudioExtensions, "audio/", DefaultMaxAudioBytes, "Səs"),
+                _ => (VideoExtensions, "video/", DefaultMaxVideoBytes, "Video")
+            };
 
             if (maxBytesOverride.HasValue)
                 maxBytes = maxBytesOverride.Value;

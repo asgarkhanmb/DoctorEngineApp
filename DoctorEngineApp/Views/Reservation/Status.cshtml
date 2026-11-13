@@ -1,0 +1,50 @@
+@model DoctorEngineApp.ViewModels.Reservations.ReservationStatusVM
+@{
+    ViewData["Title"] = "Rezervasiya statusu";
+}
+
+@section css {
+    <link rel="stylesheet" href="~/css/booking.css" asp-append-version="true" />
+}
+
+<partial name="_PageHeader" model='("Rezervasiya statusu", "Rezervasiyanızın vəziyyəti burada canlı yenilənir.")' />
+
+<div class="bk-status-page">
+    <div class="container">
+        <div class="bk-status" data-bk-status data-code="@Model.Code" data-status="@Model.Status" data-reason="@Model.Reason">
+            @{
+                var (pillCls, pillIcon, pillText) = Model.Status switch
+                {
+                    "Confirmed" => ("is-confirmed", "fa-solid fa-check", "Təsdiqləndi"),
+                    "Rejected" => ("is-rejected", "fa-solid fa-xmark", "Rədd edildi"),
+                    _ => ("is-pending", "fa-regular fa-hourglass-half", "Gözləyir")
+                };
+            }
+            <span data-bk-status-pill>
+                <span class="bk-pill @pillCls"><i class="@pillIcon"></i> @pillText</span>
+            </span>
+
+            <h2>@Model.Service</h2>
+            <div class="bk-status__meta">
+                <span><i class="fa-regular fa-calendar"></i> @Model.Date</span>
+                <span><i class="fa-regular fa-clock"></i> @Model.Time</span>
+            </div>
+
+            <div data-bk-status-tracker></div>
+
+            <div class="bk-live" data-on-text="Canlı: status real vaxtda yenilənir">
+                <span class="bk-live__dot" aria-hidden="true"></span>
+                <span data-bk-live-text>Canlı bağlantı qurulur…</span>
+            </div>
+
+            <div class="bk-status__actions">
+                <a asp-controller="Reservation" asp-action="Index" class="bk-btn bk-btn--ghost"><i class="fa-solid fa-plus"></i> Yeni rezervasiya</a>
+                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="bk-btn bk-btn--primary"><i class="fa-regular fa-comments"></i> Usta ilə çat</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/booking.js" asp-append-version="true"></script>
+}

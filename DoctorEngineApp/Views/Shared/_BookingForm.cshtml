@@ -1,100 +1,181 @@
-@* Rezervasiya bloku. İstifadə: <partial name="_BookingForm" for="Reservation" />
-   ("for" sahə adlarına "Reservation." prefiksini əlavə edir — controller [Bind(Prefix = "Reservation")] gözləyir) *@
+@* Rezervasiya bloku (canlı). İstifadə: <partial name="_BookingForm" for="Reservation" />
+   ("for" sahə adlarına "Reservation." prefiksini əlavə edir — controller [Bind(Prefix = "Reservation")] gözləyir)
+   Addımlar: xidmət → gün → saat → əlaqə. Boş saatlar və status SignalR ilə real vaxtda yenilənir (wwwroot/js/booking.js). *@
 @using DoctorEngineApp.Helpers
 @model ReservationCreateVM
+@inject DoctorEngineApp.Services.Interfaces.IContactInfoService ContactInfo
 @{
+    var contactInfo = await ContactInfo.GetFirstAsync();
+    var callPhone = contactInfo?.Phone;
+    var callHref = new string((callPhone ?? "").Where(c => char.IsDigit(c) || c == '+').ToArray());
     var now = AzTime.Now;
-    var min = now.ToString("yyyy-MM-ddTHH:mm");
-    var max = now.AddDays(10).ToString("yyyy-MM-ddTHH:mm");
+    string[] weekDays = { "B.", "B.e.", "Ç.a.", "Ç.", "C.a.", "C.", "Ş." };   // DayOfWeek: Bazar = 0
+    string[] months = { "Yan", "Fev", "Mar", "Apr", "May", "İyn", "İyl", "Avq", "Sen", "Okt", "Noy", "Dek" };
+
+    // Bu gün iş vaxtı bitibsə, ilk seçilən gün sabah olur
+    var lastSlotToday = now.Date.AddHours(DoctorEngineApp.Services.ReservationService.ClosingHour)
+                                .AddMinutes(-DoctorEngineApp.Services.ReservationService.SlotMinutes);
+    var firstDay = now >= lastSlotToday ? now.Date.AddDays(1) : now.Date;
+    var days = Enumerable.Range(0, DoctorEngineApp.Services.ReservationService.MaxDaysAhead + 1).Select(i => now.Date.AddDays(i)).ToList();
+    // Heç nə seçilməyibsə ilk xidmət seçilir — saatlar dərhal görünür, bölmə boş qalmır
+    var selectedService = Model.ServiceId > 0 ? Model.ServiceId : (Model.Services.FirstOrDefault()?.Id ?? 0);
 }
 
-<div class="container-fluid bg-secondary booking my-5">
+<link rel="stylesheet" href="~/css/booking.css" asp-append-version="true" />
+
+<section class="bk" id="booking"
+         data-bk
+         data-slots-url="@Url.Action("Slots", "Reservation", new { area = "" })"
+         data-lookup-url="@Url.Action("Lookup", "Reservation", new { area = "" })"
+         data-status-url="@Url.Action("Status", "Reservation", new { area = "", id = "__code__" })">
     <div class="container">
-        <div class="row gx-5 align-items-center">
+        <div class="bk-shell">
 
-            <div class="col-lg-6 py-5 wow fadeInUp" data-wow-delay="0.1s">
-                <h6 class="text-primary text-uppercase">Onlayn rezervasiya</h6>
-                <h1 class="text-white mb-4">Etibarlı Avtomobil Təmiri Xidməti</h1>
-                <p class="text-white-50 mb-0">
-                    Müasir avadanlıqlarımız və peşəkar komandamız sayəsində mühərrikinizi sürətli, rahat və
-                    təhlükəsiz şəkildə təmir etdirə bilərsiniz. Öncədən rezerv edin — növbə gözləmədən xidmət alın.
-                </p>
-                <ul class="de-perks">
-                    <li><i class="fa-regular fa-clock"></i> İş saatları: 10:00 – 20:00</li>
-                    <li><i class="fa-brands fa-whatsapp"></i> Təsdiq WhatsApp ilə göndərilir</li>
-                    <li><i class="fa-regular fa-calendar"></i> 10 günə qədər öncədən rezerv</li>
+            <!-- ================= SOL: MƏLUMAT ================= -->
+            <aside class="bk-info wow fadeInUp" data-wow-delay="0.1s">
+                <span class="bk-eyebrow">Onlayn rezervasiya</span>
+                <h2>Növbəni indi götürün</h2>
+                <p>Xidməti, günü və boş saatı seçin — rezervasiyanızın statusunu səhifədən çıxmadan canlı izləyin.</p>
+
+                <div class="bk-live" title="Saatlar real vaxtda yenilənir">
+                    <span class="bk-live__dot" aria-hidden="true"></span>
+                    <span data-bk-live-text>Canlı: boş saatlar real vaxtda yenilənir</span>
+                </div>
+
+                <ul class="bk-perks">
+                    <li><i class="fa-regular fa-clock"></i><span><b>İş saatları</b>10:00 – 20:00</span></li>
+                    <li><i class="fa-brands fa-whatsapp"></i><span><b>Təsdiq</b>WhatsApp ilə göndərilir</span></li>
+                    <li><i class="fa-regular fa-calendar"></i><span><b>Öncədən</b>10 günə qədər rezerv</span></li>
                 </ul>
-            </div>
 
-            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.25s">
-                <div class="bg-primary p-5 text-center">
+                @if (!string.IsNullOrWhiteSpace(callPhone))
+                {
+                    @* Zənglə rezervasiya: sol panelin aşağısı boş qalmasın *@
+                    <a class="bk-call" href="tel:@callHref">
+                        <span class="bk-call__icon"><i class="fa-solid fa-phone"></i></span>
+                        <span><small>Zənglə də rezerv edə bilərsiniz</small><b>@callPhone</b></span>
+                    </a>
+                }
 
-                    <h2 class="text-white mb-1">Öncədən Rezervasiya</h2>
-                    <p class="text-white-50 mb-4">Formu doldurun, sizinlə tezliklə əlaqə saxlayaq.</p>
+                <!-- Bu brauzerdən edilən rezervasiyalar (JS doldurur) -->
+                <div class="bk-mine" data-bk-mine hidden>
+                    <h3><i class="fa-regular fa-bookmark"></i> Rezervasiyalarım</h3>
+                    <ul data-bk-mine-list></ul>
+                </div>
+            </aside>
 
-                    <form id="reservationForm" asp-controller="Reservation" asp-action="CreateReservation" method="post" novalidate>
+            <!-- ================= SAĞ: FORMA ================= -->
+            <div class="bk-card wow fadeInUp" data-wow-delay="0.2s">
 
-                        <div class="row g-3 text-start">
+                <form id="reservationForm" asp-controller="Reservation" asp-action="CreateReservation" asp-area="" method="post" novalidate data-bk-form>
 
-                            <div class="col-12 col-sm-6">
-                                <label class="visually-hidden" asp-for="FullName">Ad Soyad</label>
-                                <input asp-for="FullName" class="form-control" autocomplete="off" required placeholder="Ad Soyad" />
-                            </div>
-
-                            <div class="col-12 col-sm-6">
-                                <label class="visually-hidden" asp-for="Phone">Telefon</label>
-                                <input asp-for="Phone" id="phoneInput" type="tel" class="form-control" autocomplete="off" required placeholder="+994 XX XXX XX XX" />
-                            </div>
-
-                            <div class="col-12 col-sm-6">
-                                <label class="visually-hidden" asp-for="ServiceId">Xidmət</label>
-                                <select asp-for="ServiceId" class="form-select" required>
-                                    <option value="">Xidmət seçin</option>
-                                    @foreach (var s in Model.Services)
-                                    {
-                                        <option value="@s.Id">@s.Name</option>
-                                    }
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-6">
-                                <label class="visually-hidden" asp-for="DateTime">Tarix və saat</label>
-                                <input asp-for="DateTime" type="datetime-local" asp-format="{0:yyyy-MM-ddTHH:mm}"
-                                       min="@min" max="@max" step="60" class="form-control" required />
-                            </div>
-
-                            <div class="col-12">
-                                <label class="visually-hidden" asp-for="Note">Qeyd</label>
-                                <textarea asp-for="Note" class="form-control" rows="3"
-                                          placeholder="Əlavə qeyd (məs: avtomobil modeli, ili, mühərrik həcmi)"></textarea>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="de-check" for="sameAsPhone">
-                                    <input type="checkbox" id="sameAsPhone" />
-                                    WhatsApp nömrəsi telefonla eyni olsun
+                    <!-- 1. Xidmət -->
+                    <fieldset class="bk-step">
+                        <legend><span class="bk-step__num">1</span> Xidmət seçin</legend>
+                        <div class="bk-chips" data-bk-services>
+                            @foreach (var s in Model.Services)
+                            {
+                                <label class="bk-chip">
+                                    <input type="radio" name="@Html.NameFor(m => m.ServiceId)" value="@s.Id" @(s.Id == selectedService ? "checked" : "") required />
+                                    <span><i class="fa-solid fa-screwdriver-wrench"></i> @s.Name</span>
                                 </label>
-                            </div>
-
-                            <div class="col-12">
-                                <label class="visually-hidden" asp-for="WhatsApp">WhatsApp</label>
-                                <input asp-for="WhatsApp" id="whatsappInput" type="tel" class="form-control" required placeholder="WhatsApp: +994 XX XXX XX XX" />
-                            </div>
-
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary w-100 py-3">
-                                    <i class="fa-regular fa-calendar-check me-2"></i> Rezerv Edin
-                                </button>
-                            </div>
-
+                            }
                         </div>
+                    </fieldset>
 
-                        <div id="reservationMessage" class="mt-3" role="status" aria-live="polite"></div>
-                    </form>
+                    <!-- 2. Gün -->
+                    <fieldset class="bk-step">
+                        <legend><span class="bk-step__num">2</span> Gün seçin</legend>
+                        <div class="bk-days" data-bk-days>
+                            @foreach (var d in days)
+                            {
+                                var label = d == now.Date ? "Bu gün" : d == now.Date.AddDays(1) ? "Sabah" : weekDays[(int)d.DayOfWeek];
+                                <label class="bk-day">
+                                    <input type="radio" name="bkDay" value="@d.ToString("yyyy-MM-dd")" @(d == firstDay ? "checked" : "") />
+                                    <span>
+                                        <small>@label</small>
+                                        <b>@d.Day</b>
+                                        <small>@months[d.Month - 1]</small>
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                    </fieldset>
 
+                    <!-- 3. Saat -->
+                    <fieldset class="bk-step">
+                        <legend><span class="bk-step__num">3</span> Saat seçin</legend>
+                        <div class="bk-slots" data-bk-slots aria-live="polite">
+                            <p class="bk-slots__hint"><i class="fa-regular fa-hand-pointer"></i> Boş saatları görmək üçün xidmət seçin.</p>
+                        </div>
+                        <div class="bk-legend" aria-hidden="true">
+                            <span><i class="is-free"></i> Boş</span>
+                            <span><i class="is-busy"></i> Tutulub</span>
+                            <span><i class="is-selected"></i> Seçdiyiniz</span>
+                        </div>
+                        <div class="bk-notice" data-bk-notice hidden role="alert"></div>
+                    </fieldset>
+
+                    <!-- 4. Əlaqə -->
+                    <fieldset class="bk-step">
+                        <legend><span class="bk-step__num">4</span> Əlaqə məlumatları</legend>
+                        <div class="bk-fields">
+                            <div class="bk-field">
+                                <label asp-for="FullName">Ad Soyad</label>
+                                <div class="bk-input"><i class="fa-regular fa-user"></i><input asp-for="FullName" autocomplete="name" required placeholder="Adınız və soyadınız" /></div>
+                            </div>
+                            <div class="bk-field">
+                                <label for="phoneInput">Telefon</label>
+                                <div class="bk-input"><i class="fa-solid fa-phone"></i><input asp-for="Phone" id="phoneInput" type="tel" autocomplete="tel" required placeholder="+994 XX XXX XX XX" /></div>
+                            </div>
+                            <div class="bk-field bk-field--full">
+                                <label class="bk-check" for="sameAsPhone">
+                                    <input type="checkbox" id="sameAsPhone" />
+                                    <span>WhatsApp nömrəsi telefonla eyni olsun</span>
+                                </label>
+                                <div class="bk-input"><i class="fa-brands fa-whatsapp"></i><input asp-for="WhatsApp" id="whatsappInput" type="tel" required placeholder="WhatsApp: +994 XX XXX XX XX" /></div>
+                            </div>
+                            <div class="bk-field bk-field--full">
+                                <label asp-for="Note">Qeyd <small>(ixtiyari)</small></label>
+                                <textarea asp-for="Note" rows="2" placeholder="Məs: avtomobil modeli, ili, mühərrik həcmi"></textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <input type="hidden" name="@Html.NameFor(m => m.DateTime)" data-bk-datetime />
+
+                    <!-- Xülasə + göndər -->
+                    <div class="bk-submit">
+                        <div class="bk-summary" data-bk-summary>
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>Xidmət, gün və saat seçin</span>
+                        </div>
+                        <button type="submit" class="bk-btn bk-btn--primary">
+                            Rezerv et <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div id="reservationMessage" role="status" aria-live="polite"></div>
+                </form>
+
+                <!-- Uğurlu göndərişdən sonra: canlı status -->
+                <div class="bk-done" data-bk-done hidden>
+                    <div class="bk-done__icon"><i class="fa-solid fa-check"></i></div>
+                    <h3>Rezervasiyanız göndərildi!</h3>
+                    <p data-bk-done-summary></p>
+
+                    <div data-bk-done-tracker></div>
+
+                    <div class="bk-done__actions">
+                        <a href="#" class="bk-btn bk-btn--ghost" data-bk-done-link><i class="fa-solid fa-link"></i> İzləmə linki</a>
+                        <button type="button" class="bk-btn bk-btn--primary" data-bk-again><i class="fa-solid fa-plus"></i> Yeni rezervasiya</button>
+                    </div>
+                    <small class="bk-done__hint">Bu səhifəni bağlasanız da, statusu "Rezervasiyalarım" bölməsindən və ya izləmə linkindən görə bilərsiniz.</small>
                 </div>
             </div>
 
         </div>
     </div>
-</div>
+</section>
+
+<script src="~/js/booking.js" asp-append-version="true" defer></script>

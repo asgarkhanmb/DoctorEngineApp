@@ -49,12 +49,9 @@
             <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="adm-nav__link @Active("Dashboard")">
                 <i class="fa-solid fa-gauge-high"></i> İdarə paneli
             </a>
-            <a asp-area="Admin" asp-controller="Reservation" asp-action="Index" class="adm-nav__link @Active("Reservation")">
+            <a asp-area="Admin" asp-controller="Reservation" asp-action="Index" class="adm-nav__link @Active("Reservation")" data-res-link>
                 <i class="fa-regular fa-calendar-check"></i> Rezervasiyalar
-                @if (pendingReservations > 0)
-                {
-                    <span class="adm-nav__badge" title="Gözləyən rezervasiyalar">@pendingReservations</span>
-                }
+                <span class="adm-nav__badge" title="Gözləyən rezervasiyalar" data-res-badge @(pendingReservations > 0 ? "" : "hidden")>@pendingReservations</span>
             </a>
             <a asp-area="Admin" asp-controller="ContactMessage" asp-action="Index" class="adm-nav__link @Active("ContactMessage")">
                 <i class="fa-regular fa-envelope"></i> Əlaqə mesajları
@@ -197,6 +194,9 @@
     <script src="~/js/admin.js" asp-append-version="true"></script>
     <script src="~/js/no-autocomplete.js" asp-append-version="true"></script>
     <script src="~/js/video-frame.js" asp-append-version="true"></script>
+    @* Canlı rezervasiya bildirişləri (SignalR) — bütün admin səhifələrində *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="~/js/admin-live.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

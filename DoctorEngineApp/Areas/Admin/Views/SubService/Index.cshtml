@@ -1,7 +1,19 @@
 ﻿@model List<SubServiceVM>
 @{ ViewData["Title"] = "Kateqoriya videoları"; }
 
-<partial name="_PageHead" model='new AdminPageHead("Kateqoriya videoları", "Hər kateqoriyada bir video göstərilir. Videonu kateqoriyanın öz səhifəsindən də dəyişə bilərsiniz.", "Boş kateqoriyaya video", "Create")' />
+@{
+    // Bütün kateqoriyaların videosu varsa düymə gizlənir; video silinəndə yenidən görünür
+    var hasFree = ViewBag.HasFreeCategory as bool? ?? true;
+}
+<partial name="_PageHead" model='new AdminPageHead("Kateqoriya videoları", "Hər kateqoriyada bir video göstərilir. Videonu kateqoriyanın öz səhifəsindən də dəyişə bilərsiniz.", hasFree ? "Boş kateqoriyaya video" : null, hasFree ? "Create" : null)' />
+
+@if (!hasFree)
+{
+    <div class="alert alert-info d-flex align-items-center gap-2" role="status">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Bütün kateqoriyaların videosu var. Yeni video əlavə etmək üçün əvvəlcə mövcud videolardan birini silin və ya yeni kateqoriya yaradın.</span>
+    </div>
+}
 
 <div class="adm-card">
     @if (!Model.Any())

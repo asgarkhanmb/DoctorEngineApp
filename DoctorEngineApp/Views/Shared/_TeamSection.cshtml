@@ -1,0 +1,67 @@
+@* "Mütəxəssislərimiz" bloku. Bir usta olanda geniş üfüqi kart, çox olanda şəbəkə.
+   Ana səhifə və Haqqımızda səhifəsi. Tələb: services.css + about.css, ətrafda .sv.ab konteyneri. *@
+@model List<DoctorEngineApp.Models.Technician>
+@{
+    var team = Model ?? new();
+}
+
+@if (team.Any())
+{
+    <section class="container ab-team">
+        <div class="sv-head wow fadeInUp" data-wow-delay="0.1s">
+            <span class="sv-eyebrow">Komandamız</span>
+            <h2>Mütəxəssislərimiz</h2>
+            <p>Mühərrikinizə baxacaq ustalarla tanış olun.</p>
+        </div>
+
+        <div class="ab-team__grid @(team.Count == 1 ? "is-single" : "")">
+            @foreach (var t in team)
+            {
+                var hasSocial = !string.IsNullOrEmpty(t.FacebookUrl) || !string.IsNullOrEmpty(t.InstagramUrl) || !string.IsNullOrEmpty(t.TiktokUrl);
+                <article class="ab-member wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="ab-member__photo">
+                        <img src="~/uploads/technicians/@t.Image" alt="@t.FullName" loading="lazy" />
+                    </div>
+                    <div class="ab-member__body">
+                        @if (team.Count == 1)
+                        {
+                            <span class="ab-member__role">@t.Position</span>
+                            <h3>@t.FullName</h3>
+                            @if (!string.IsNullOrWhiteSpace(t.Bio))
+                            {
+                                @* Admin paneldən: Ustalar → Redaktə → Qısa təqdimat *@
+                                <p class="ab-member__note">@t.Bio</p>
+                            }
+                            <div class="ab-member__actions">
+                                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--primary"><i class="fa-regular fa-comments"></i> Ustaya yaz</a>
+                                <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--light">Rezervasiya et <i class="fa-solid fa-arrow-right"></i></a>
+                            </div>
+                        }
+                        else
+                        {
+                            <h3>@t.FullName</h3>
+                            <span class="ab-member__role">@t.Position</span>
+                        }
+                        @if (hasSocial)
+                        {
+                            <div class="ab-member__social">
+                                @if (!string.IsNullOrEmpty(t.FacebookUrl))
+                                {
+                                    <a href="@t.FacebookUrl" target="_blank" rel="noopener" aria-label="@t.FullName — Facebook"><i class="fab fa-facebook-f"></i></a>
+                                }
+                                @if (!string.IsNullOrEmpty(t.InstagramUrl))
+                                {
+                                    <a href="@t.InstagramUrl" target="_blank" rel="noopener" aria-label="@t.FullName — Instagram"><i class="fab fa-instagram"></i></a>
+                                }
+                                @if (!string.IsNullOrEmpty(t.TiktokUrl))
+                                {
+                                    <a href="@t.TiktokUrl" target="_blank" rel="noopener" aria-label="@t.FullName — TikTok"><i class="fab fa-tiktok"></i></a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+}

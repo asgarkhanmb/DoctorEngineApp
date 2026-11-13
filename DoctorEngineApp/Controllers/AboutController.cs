@@ -10,15 +10,18 @@ namespace DoctorEngineApp.Controllers
         private readonly IAboutService _aboutService;
         private readonly IInformService _informService;
         private readonly ITechnicianService _technicianService;
+        private readonly IContactInfoService _contactInfoService;
 
         public AboutController(
             IAboutService aboutService,
             IInformService informService,
-            ITechnicianService technicianService)
+            ITechnicianService technicianService,
+            IContactInfoService contactInfoService)
         {
             _aboutService = aboutService;
             _informService = informService;
             _technicianService = technicianService;
+            _contactInfoService = contactInfoService;
         }
         public async Task<IActionResult> Index()
         {
@@ -40,7 +43,8 @@ namespace DoctorEngineApp.Controllers
                     Description = i.Description,
                     Icon = i.Icon
                 }).ToList(),
-                Technicians = technicians
+                Technicians = technicians,
+                Contact = await _contactInfoService.GetFirstAsync()
             };
 
             return View(model);

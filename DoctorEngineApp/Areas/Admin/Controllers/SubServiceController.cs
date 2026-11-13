@@ -24,10 +24,21 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
             _ctx = ctx;
         }
 
-        public async Task<IActionResult> Index() => View(await _service.GetAllAsync());
+        public async Task<IActionResult> Index()
+        {
+            // Videosu olmayan kateqoriya yoxdursa, "yeni video" düyməsi gizlənir
+            ViewBag.HasFreeCategory = await _ctx.ServiceCategories.AnyAsync(c => !c.SubServices.Any());
+            return View(await _service.GetAllAsync());
+        }
 
         public async Task<IActionResult> Create(int? categoryId = null)
         {
+            if (!await _ctx.ServiceCategories.AnyAsync(c => !c.SubServices.Any()))
+            {
+                TempData["Error"] = "Bütün kateqoriyaların videosu var. Yeni video üçün əvvəlcə mövcud videolardan birini silin.";
+                return RedirectToAction(nameof(Index));
+            }
+
             await FillCategoriesAsync(null);
             return View(new SubServiceCreateVM { CategoryId = categoryId ?? 0 });
         }

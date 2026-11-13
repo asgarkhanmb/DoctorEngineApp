@@ -239,6 +239,206 @@
         return wrap;
     }
 
+    // =====================================================
+    // SƏS MESAJI PLEYERİ (WhatsApp üslubu: oynat düyməsi, dalğa, müddət, sürət)
+    // =====================================================
+
+    const VOICE_BARS = 40;
+    const peaksCache = new Map();   // url -> Promise<{ peaks, duration } | null>
+    let decodeCtx = null;
+    let currentVoice = null;        // eyni anda yalnız bir səs oynasın
+
+    function formatDuration(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        sec = Math.round(sec);
+        return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+    }
+
+    // Fayl olmayanda / dekod alınmayanda: id-yə görə sabit "dalğa"
+    function seededPeaks(seed) {
+        let x = (Number(seed) || 1) * 9301 + 49297;
+        return Array.from({ length: VOICE_BARS }, () => {
+            x = (x * 9301 + 49297) % 233280;
+            return 0.25 + (x / 233280) * 0.75;
+        });
+    }
+
+    /** Səs faylını dekod edib həqiqi dalğa formasını və müddəti qaytarır. */
+    function loadPeaks(url) {
+        if (peaksCache.has(url)) return peaksCache.get(url);
+        const job = (async () => {
+            try {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return null;
+                decodeCtx = decodeCtx || new Ctx();
+                const buf = await (await fetch(url)).arrayBuffer();
+                const audio = await new Promise((res, rej) => {
+                    const p = decodeCtx.decodeAudioData(buf, res, rej);
+                    if (p && p.then) p.then(res, rej);
+                });
+                const data = audio.getChannelData(0);
+                const block = Math.max(1, Math.floor(data.length / VOICE_BARS));
+                const peaks = [];
+                for (let i = 0; i < VOICE_BARS; i++) {
+                    let sum = 0;
+                    for (let j = 0; j < block; j++) sum += Math.abs(data[i * block + j] || 0);
+                    peaks.push(sum / block);
+                }
+                const max = Math.max(...peaks) || 1;
+                return { peaks: peaks.map((p) => 0.15 + 0.85 * (p / max)), duration: audio.duration };
+            } catch (e) {
+                return null;
+            }
+        })();
+        peaksCache.set(url, job);
+        return job;
+    }
+
+    function stopVoiceIn(node) {
+        const v = node.querySelector(".dc-voice");
+        if (v && v._audio) v._audio.pause();
+    }
+
+    function buildVoice(dto) {
+        const wrap = el("div", "dc-voice");
+
+        const playBtn = el("button", "dc-voice__play");
+        playBtn.type = "button";
+        playBtn.setAttribute("aria-label", "Səs mesajını oynat");
+        const playIcon = icon("fa-solid fa-play");
+        playBtn.appendChild(playIcon);
+
+        const main = el("div", "dc-voice__main");
+        const track = el("div", "dc-voice__track");
+        track.setAttribute("role", "slider");
+        track.setAttribute("aria-label", "Səs mesajı");
+        track.tabIndex = 0;
+        const bars = seededPeaks(dto.id).map((h) => {
+            const b = el("span", "dc-voice__bar");
+            b.style.height = Math.round(h * 100) + "%";
+            track.appendChild(b);
+            return b;
+        });
+
+        const info = el("div", "dc-voice__info");
+        const timeEl = el("span", "dc-voice__time", "0:00");
+        const speedBtn = el("button", "dc-voice__speed", "1×");
+        speedBtn.type = "button";
+        speedBtn.title = "Oxutma sürəti";
+        info.append(timeEl, speedBtn);
+        main.append(track, info);
+
+        wrap.append(playBtn, main);
+
+        const audio = new Audio();
+        wrap._audio = audio;   // mesaj silinəndə / yenilənəndə dayandırmaq üçün
+        audio.preload = "metadata";
+        audio.src = dto.attachmentUrl;
+
+        let duration = 0;
+        const getDuration = () => duration || (isFinite(audio.duration) ? audio.duration : 0);
+
+        function render() {
+            const d = getDuration();
+            const pos = audio.currentTime || 0;
+            const ratio = d ? Math.min(1, pos / d) : 0;
+            const played = Math.round(ratio * VOICE_BARS);
+            bars.forEach((b, i) => b.classList.toggle("is-played", i < played));
+            timeEl.textContent = formatDuration(!audio.paused || pos > 0 ? pos : d);
+            track.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
+        }
+
+        // MediaRecorder webm faylında müddət "Infinity" olur — brauzeri onu hesablamağa məcbur et
+        audio.addEventListener("loadedmetadata", () => {
+            if (audio.duration === Infinity) {
+                const fix = () => {
+                    audio.removeEventListener("durationchange", fix);
+                    audio.currentTime = 0;
+                    render();
+                };
+                audio.addEventListener("durationchange", fix);
+                audio.currentTime = 1e101;
+            } else {
+                render();
+            }
+        });
+
+        loadPeaks(dto.attachmentUrl).then((res) => {
+            if (!res) return;
+            duration = res.duration;
+            res.peaks.forEach((h, i) => (bars[i].style.height = Math.round(h * 100) + "%"));
+            render();
+        });
+
+        audio.addEventListener("timeupdate", render);
+        audio.addEventListener("play", () => {
+            if (currentVoice && currentVoice !== audio) currentVoice.pause();
+            currentVoice = audio;
+            playIcon.className = "fa-solid fa-pause";
+            playBtn.setAttribute("aria-label", "Fasilə");
+            wrap.classList.add("is-playing");
+        });
+        audio.addEventListener("pause", () => {
+            playIcon.className = "fa-solid fa-play";
+            playBtn.setAttribute("aria-label", "Səs mesajını oynat");
+            wrap.classList.remove("is-playing");
+        });
+        audio.addEventListener("ended", () => {
+            audio.currentTime = 0;
+            render();
+        });
+        audio.addEventListener("error", () => {
+            wrap.classList.add("is-error");
+            timeEl.textContent = "Fayl açılmadı";
+        });
+
+        playBtn.addEventListener("click", () => {
+            if (audio.paused) audio.play().catch(() => {});
+            else audio.pause();
+        });
+
+        function seek(clientX) {
+            const d = getDuration();
+            if (!d) return;
+            const r = track.getBoundingClientRect();
+            const ratio = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+            audio.currentTime = ratio * d;
+            render();
+        }
+
+        track.addEventListener("pointerdown", (e) => {
+            seek(e.clientX);
+            track.setPointerCapture(e.pointerId);
+            const move = (ev) => seek(ev.clientX);
+            const up = () => {
+                track.removeEventListener("pointermove", move);
+                track.removeEventListener("pointerup", up);
+            };
+            track.addEventListener("pointermove", move);
+            track.addEventListener("pointerup", up);
+        });
+
+        track.addEventListener("keydown", (e) => {
+            const d = getDuration();
+            if (!d) return;
+            if (e.key === "ArrowRight") audio.currentTime = Math.min(d, audio.currentTime + 5);
+            else if (e.key === "ArrowLeft") audio.currentTime = Math.max(0, audio.currentTime - 5);
+            else if (e.key === " " || e.key === "Enter") playBtn.click();
+            else return;
+            e.preventDefault();
+            render();
+        });
+
+        const speeds = [1, 1.5, 2];
+        speedBtn.addEventListener("click", () => {
+            const next = speeds[(speeds.indexOf(audio.playbackRate) + 1) % speeds.length];
+            audio.playbackRate = next;
+            speedBtn.textContent = next + "×";
+        });
+
+        return wrap;
+    }
+
     // Şəkil yüklənəndə hündürlük dəyişir — aşağıdaydısa aşağıda saxla
     let stickToBottom = true;
     function keepBottomOnMediaLoad() {
@@ -280,8 +480,18 @@
 
         const bubble = el("div", "dc-msg__bubble");
 
-        const media = buildMedia(dto);
-        if (media) bubble.appendChild(media);
+        if (dto.attachmentType === "audio" && isSafeUploadUrl(dto.attachmentUrl)) {
+            bubble.classList.add("has-voice");
+            bubble.appendChild(buildVoice(dto));
+        } else {
+            const media = buildMedia(dto);
+            if (media) {
+                bubble.classList.add("has-media");
+                // WhatsApp kimi: başlıqsız şəkildə saat şəklin üstündə görünür
+                if (!dto.message && dto.attachmentType === "image") bubble.classList.add("is-media-only");
+                bubble.appendChild(media);
+            }
+        }
 
         if (dto.message) {
             const text = el("div", "dc-msg__text");
@@ -357,6 +567,7 @@
         if (existing) {
             // Redaktə rejimindədirsə — redaktoru pozma
             if (existing.classList.contains("is-editing")) return node;
+            stopVoiceIn(existing);
             existing.replaceWith(node);
             node.style.animation = "none";
         } else if (prepend) {
@@ -374,6 +585,7 @@
         messages.delete(id);
         const node = list.querySelector('.dc-msg[data-id="' + id + '"]');
         if (!node) return;
+        stopVoiceIn(node);
         node.classList.add("is-removing");
         setTimeout(() => {
             node.remove();
@@ -450,6 +662,228 @@
         }
     }
 
+    // =====================================================
+    // GECİKMİŞ YÜKLƏMƏ + OXUNMAMIŞ MESAJLAR
+    // =====================================================
+
+    let loaded = false;
+    let loadPromise = null;
+    let drawerOpen = false;
+    let unread = 0;
+    let latestId = 0;
+    let markTimer = 0;
+
+    function ensureLoaded() {
+        if (!loadPromise) {
+            loaded = true;   // bu andan canlı mesajlar da siyahıya əlavə olunur (upsert dublikat yaratmır)
+            loadPromise = loadInitial();
+        }
+        return loadPromise;
+    }
+
+    /** İstifadəçi çatı hazırda görürmü? */
+    function isChatVisible() {
+        if (document.visibilityState !== "visible") return false;
+        return cfg.drawer ? drawerOpen : loaded;
+    }
+
+    /** Badge-i yeniləyir (chat-launcher.js "dc:unread" hadisəsini dinləyir). */
+    function setUnread(count, preview, initial) {
+        unread = Math.max(0, count);
+        document.dispatchEvent(new CustomEvent("dc:unread", {
+            detail: { count: unread, preview: preview || null, initial: !!initial }
+        }));
+    }
+
+    async function markRead() {
+        clearTimeout(markTimer);
+        const maxLoaded = messages.size ? Math.max(...messages.keys()) : 0;
+        const lastId = Math.max(latestId, maxLoaded);
+        setUnread(0);
+        if (!lastId) return;
+        const fd = new FormData();
+        fd.append("lastId", String(lastId));
+        await post("/api/chat/read", fd);
+    }
+
+    // ---------- Bildiriş səsi (fayl yoxdur — Web Audio ilə qısa "dinq") ----------
+    const SOUND_KEY = "dc-sound-muted";
+    const soundBtn = root.querySelector("[data-dc-sound]");
+    let soundMuted = false;
+    try { soundMuted = localStorage.getItem(SOUND_KEY) === "1"; } catch (e) { /* yaddaş bağlıdır */ }
+    let chimeCtx = null;
+    let lastChimeAt = 0;
+
+    // Brauzerlər səsə yalnız istifadəçi sayta toxunduqdan sonra icazə verir
+    function unlockAudio() {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        try {
+            chimeCtx = chimeCtx || new Ctx();
+            if (chimeCtx.state === "suspended") chimeCtx.resume().catch(() => {});
+        } catch (e) { /* səs olmadan davam */ }
+    }
+    ["pointerdown", "keydown", "touchstart"].forEach((ev) =>
+        document.addEventListener(ev, unlockAudio, { passive: true }));
+
+    function playChime() {
+        if (soundMuted || !chimeCtx || chimeCtx.state !== "running") return;
+        const now = Date.now();
+        if (now - lastChimeAt < 1200) return;   // ardıcıl mesajlarda səs üst-üstə düşməsin
+        lastChimeAt = now;
+
+        const t = chimeCtx.currentTime;
+        [[880, 0], [1318.5, 0.11]].forEach(([freq, delay]) => {
+            const osc = chimeCtx.createOscillator();
+            const gain = chimeCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.0001, t + delay);
+            gain.gain.exponentialRampToValueAtTime(0.16, t + delay + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.38);
+            osc.connect(gain);
+            gain.connect(chimeCtx.destination);
+            osc.start(t + delay);
+            osc.stop(t + delay + 0.42);
+        });
+    }
+
+    function renderSoundBtn() {
+        if (!soundBtn) return;
+        soundBtn.querySelector("i").className = soundMuted ? "fa-solid fa-bell-slash" : "fa-solid fa-bell";
+        const label = soundMuted ? "Bildiriş səsini aç" : "Bildiriş səsini söndür";
+        soundBtn.title = label;
+        soundBtn.setAttribute("aria-label", label);
+        soundBtn.setAttribute("aria-pressed", String(soundMuted));
+    }
+
+    // ---------- Web Push: sayt bağlı / arxa planda olanda sistem bildirişi + səs ----------
+    const pushBar = root.querySelector(".dc-chat__push");
+    const PUSH_DISMISS_KEY = "dc-push-dismissed";
+    const pushSupported = !!(cfg.pushKey && window.isSecureContext && "serviceWorker" in navigator &&
+        "PushManager" in window && "Notification" in window);
+    let pushActive = false;
+
+    function keyBytes(b64) {
+        const pad = "=".repeat((4 - (b64.length % 4)) % 4);
+        const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
+        return Uint8Array.from(raw, (ch) => ch.charCodeAt(0));
+    }
+
+    function sameKey(buf, bytes) {
+        if (!buf) return false;
+        const a = new Uint8Array(buf);
+        return a.length === bytes.length && a.every((v, i) => v === bytes[i]);
+    }
+
+    function renderPushBar() {
+        if (!pushBar) return;
+        let dismissed = false;
+        try { dismissed = localStorage.getItem(PUSH_DISMISS_KEY) === "1"; } catch (e) { /* yox */ }
+        pushBar.hidden = !pushSupported || soundMuted || dismissed || Notification.permission !== "default";
+    }
+
+    /** askPermission yalnız istifadəçi kliki ilə true olur (brauzer tələbi). */
+    async function enablePush(askPermission) {
+        if (!pushSupported) return false;
+        try {
+            let perm = Notification.permission;
+            if (perm === "default" && askPermission) perm = await Notification.requestPermission();
+            if (perm !== "granted") {
+                pushActive = false;
+                if (perm === "denied" && askPermission) {
+                    showError("Bildirişlər brauzerdə bloklanıb. Ünvan sətrindəki kilid işarəsindən icazə verin.");
+                }
+                return false;
+            }
+
+            await navigator.serviceWorker.register("/sw.js");
+            const reg = await navigator.serviceWorker.ready;
+            const key = keyBytes(cfg.pushKey);
+
+            let sub = await reg.pushManager.getSubscription();
+            // Server açarı dəyişibsə köhnə abunəlik işləməz — yenisini al
+            if (sub && sub.options && sub.options.applicationServerKey && !sameKey(sub.options.applicationServerKey, key)) {
+                await sub.unsubscribe();
+                sub = null;
+            }
+            if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+
+            const json = sub.toJSON();
+            const fd = new FormData();
+            fd.append("endpoint", json.endpoint);
+            fd.append("p256dh", json.keys.p256dh);
+            fd.append("auth", json.keys.auth);
+            pushActive = (await post("/api/chat/push/subscribe", fd)).ok;
+        } catch (e) {
+            console.warn("Push aktivləşmədi:", e);
+            pushActive = false;
+        } finally {
+            renderPushBar();
+        }
+        return pushActive;
+    }
+
+    async function disablePush() {
+        pushActive = false;
+        renderPushBar();
+        if (!pushSupported) return;
+        try {
+            const reg = await navigator.serviceWorker.getRegistration("/");
+            const sub = reg && await reg.pushManager.getSubscription();
+            if (!sub) return;
+            const fd = new FormData();
+            fd.append("endpoint", sub.endpoint);
+            await post("/api/chat/push/unsubscribe", fd);
+            await sub.unsubscribe();
+        } catch (e) { /* növbəti dəfə */ }
+    }
+
+    if (pushBar) {
+        pushBar.querySelector(".dc-chat__push-on").addEventListener("click", () => enablePush(true));
+        pushBar.querySelector(".dc-chat__push-x").addEventListener("click", () => {
+            try { localStorage.setItem(PUSH_DISMISS_KEY, "1"); } catch (e) { /* yox */ }
+            renderPushBar();
+        });
+    }
+
+    if (pushSupported && !soundMuted && Notification.permission === "granted") enablePush(false);
+    renderPushBar();
+
+    if (soundBtn) {
+        soundBtn.addEventListener("click", () => {
+            soundMuted = !soundMuted;
+            try { localStorage.setItem(SOUND_KEY, soundMuted ? "1" : "0"); } catch (e) { /* yox */ }
+            renderSoundBtn();
+            if (soundMuted) {
+                disablePush();
+            } else {
+                unlockAudio();
+                lastChimeAt = 0;
+                setTimeout(playChime, 50);   // nümunə səs
+                enablePush(true);            // klik = istifadəçi jesti, icazə soruşmaq olar
+            }
+        });
+        renderSoundBtn();
+    }
+
+    function markReadSoon() {
+        clearTimeout(markTimer);
+        markTimer = setTimeout(markRead, 800);
+    }
+
+    async function refreshUnread() {
+        if (isChatVisible()) { markReadSoon(); return; }
+        try {
+            const res = await fetch("/api/chat/unread", { headers: { Accept: "application/json" } });
+            if (res.ok) setUnread((await res.json()).count || 0);
+        } catch (e) { /* növbəti dəfə */ }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (isChatVisible() && unread > 0) markRead();
+    });
+
     moreBtn.addEventListener("click", loadOlder);
 
     body.addEventListener("scroll", () => {
@@ -470,12 +904,31 @@
         .build();
 
     connection.on("ReceiveMessage", (dto) => {
-        const wasBottom = isNearBottom();
         const isMine = dto.userName === cfg.currentUser;
-        upsert(dto);
-        refreshLayout();
-        if (wasBottom || isMine) scrollToBottom(true);
-        else jumpBtn.hidden = false;
+        if (dto.id > latestId) latestId = dto.id;
+
+        if (loaded) {
+            const wasBottom = isNearBottom();
+            upsert(dto);
+            refreshLayout();
+            if (wasBottom || isMine) scrollToBottom(true);
+            else jumpBtn.hidden = false;
+        }
+
+        if (isMine) return;
+        // Səhifə arxa plandadırsa və push aktivdirsə, sistem bildirişi səsi çalınır — ikiqat olmasın
+        if (document.visibilityState === "visible" || !pushActive) playChime();
+        if (isChatVisible()) {
+            markReadSoon();
+        } else {
+            setUnread(unread + 1, {
+                userName: dto.userName,
+                isAdmin: !!dto.isAdmin,
+                text: dto.message || (dto.attachmentType === "audio" ? "🎤 Səs mesajı"
+                    : dto.attachmentType === "video" ? "🎬 Video"
+                    : dto.attachmentType === "image" ? "📷 Şəkil" : "")
+            });
+        }
     });
 
     connection.on("EditMessage", (dto) => {
@@ -489,7 +942,8 @@
     connection.onreconnecting(() => setStatus("connecting", "Yenidən qoşulur…"));
     connection.onreconnected(() => {
         setStatus("online", "Onlayn");
-        resync();
+        if (loaded) resync();
+        refreshUnread();
     });
     connection.onclose(() => {
         setStatus("offline", "Bağlantı kəsildi");
@@ -510,9 +964,241 @@
     // GÖNDƏRMƏ
     // =====================================================
 
+    // ---------- Səs yazma ----------
+    const micBtn = root.querySelector(".dc-chat__mic");
+    const rowEl = root.querySelector(".dc-chat__row");
+    const recBar = root.querySelector(".dc-rec");
+    const canRecord = !!(micBtn && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+    const MAX_VOICE_SECONDS = 15 * 60;
+    let rec = null;
+
     function updateSendState() {
         if (!sendBtn) return;
-        sendBtn.disabled = sending || (!input.value.trim() && !pendingFile);
+        const hasContent = !!input.value.trim() || !!pendingFile;
+        // WhatsApp kimi: boş olanda mikrofon, mətn/fayl olanda göndər düyməsi
+        const showMic = canRecord && !hasContent && !sending;
+        sendBtn.hidden = showMic;
+        if (micBtn) micBtn.hidden = !showMic;
+        sendBtn.disabled = sending || !hasContent;
+    }
+
+    function pickRecorderMime() {
+        const types = ["audio/webm;codecs=opus", "audio/ogg;codecs=opus", "audio/mp4", "audio/webm"];
+        return types.find((t) => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
+    }
+
+    function extForAudio(type) {
+        if (type.includes("ogg")) return ".ogg";
+        if (type.includes("mp4") || type.includes("aac")) return ".m4a";
+        if (type.includes("mpeg")) return ".mp3";
+        return ".webm";
+    }
+
+    function recElapsedMs() {
+        if (!rec) return 0;
+        return rec.elapsed + (rec.paused ? 0 : Date.now() - rec.resumedAt);
+    }
+
+    function drawRecWave() {
+        if (!rec) return;
+        const canvas = rec.canvas;
+        const dpr = window.devicePixelRatio || 1;
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        if (canvas.width !== w * dpr) { canvas.width = w * dpr; canvas.height = h * dpr; }
+        const g = canvas.getContext("2d");
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        g.clearRect(0, 0, w, h);
+
+        if (rec.analyser && !rec.paused) {
+            const data = new Uint8Array(rec.analyser.fftSize);
+            rec.analyser.getByteTimeDomainData(data);
+            let peak = 0;
+            for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i] - 128) / 128);
+            const now = Date.now();
+            if (now - rec.lastLevelAt > 90) {
+                rec.levels.push(Math.min(1, peak * 2.2));
+                rec.lastLevelAt = now;
+            }
+        }
+
+        const barW = 3, gap = 2, step = barW + gap;
+        const count = Math.floor(w / step);
+        const levels = rec.levels.slice(-count);
+        g.fillStyle = getComputedStyle(canvas).color;
+        levels.forEach((lv, i) => {
+            const bh = Math.max(3, lv * h);
+            const x = w - (levels.length - i) * step;
+            g.fillRect(x, (h - bh) / 2, barW, bh);
+        });
+
+        rec.raf = requestAnimationFrame(drawRecWave);
+    }
+
+    function tickRecTimer() {
+        if (!rec) return;
+        const sec = recElapsedMs() / 1000;
+        recBar.querySelector(".dc-rec__time").textContent = formatDuration(Math.floor(sec));
+        if (sec >= MAX_VOICE_SECONDS) sendRecording();
+    }
+
+    async function startRecording() {
+        if (rec || sending) return;
+        clearError();
+
+        let stream;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+            });
+        } catch (e) {
+            showError(e && e.name === "NotAllowedError"
+                ? "Mikrofona icazə verilmədi. Brauzerin ünvan sətrindəki kilid işarəsindən icazə verin."
+                : "Mikrofon tapılmadı və ya istifadə olunur.");
+            return;
+        }
+
+        const mime = pickRecorderMime();
+        let recorder;
+        try {
+            recorder = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 32000 } : undefined);
+        } catch (e) {
+            stream.getTracks().forEach((t) => t.stop());
+            showError("Brauzeriniz səs yazmanı dəstəkləmir.");
+            return;
+        }
+
+        rec = {
+            stream, recorder, mime,
+            chunks: [],
+            elapsed: 0,
+            resumedAt: Date.now(),
+            paused: false,
+            levels: [],
+            lastLevelAt: 0,
+            canvas: recBar.querySelector(".dc-rec__wave"),
+            analyser: null,
+            audioCtx: null,
+            raf: 0,
+            timer: 0
+        };
+
+        recorder.ondataavailable = (e) => { if (e.data && e.data.size) rec && rec.chunks.push(e.data); };
+        recorder.start(250);
+
+        try {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            rec.audioCtx = new Ctx();
+            rec.analyser = rec.audioCtx.createAnalyser();
+            rec.analyser.fftSize = 512;
+            rec.audioCtx.createMediaStreamSource(stream).connect(rec.analyser);
+        } catch (e) { /* dalğa olmadan da yazılır */ }
+
+        if (currentVoice) currentVoice.pause();
+
+        rowEl.hidden = true;
+        recBar.hidden = false;
+        recBar.classList.remove("is-paused");
+        recBar.querySelector(".dc-rec__pause i").className = "fa-solid fa-pause";
+        recBar.querySelector(".dc-rec__time").textContent = "0:00";
+        rec.timer = setInterval(tickRecTimer, 200);
+        drawRecWave();
+    }
+
+    function togglePauseRecording() {
+        if (!rec || rec.recorder.state === "inactive") return;
+        const btnIcon = recBar.querySelector(".dc-rec__pause i");
+        if (rec.paused) {
+            rec.recorder.resume();
+            rec.resumedAt = Date.now();
+            rec.paused = false;
+            btnIcon.className = "fa-solid fa-pause";
+        } else {
+            rec.recorder.pause();
+            rec.elapsed += Date.now() - rec.resumedAt;
+            rec.paused = true;
+            btnIcon.className = "fa-solid fa-microphone";
+        }
+        recBar.classList.toggle("is-paused", rec.paused);
+    }
+
+    function stopRecorder() {
+        const r = rec;
+        return new Promise((resolve) => {
+            const finish = () => resolve(new Blob(r.chunks, { type: (r.recorder.mimeType || r.mime || "audio/webm").split(";")[0] }));
+            if (r.recorder.state === "inactive") return finish();
+            r.recorder.onstop = finish;
+            r.recorder.stop();
+        });
+    }
+
+    function cleanupRecording() {
+        if (!rec) return;
+        clearInterval(rec.timer);
+        cancelAnimationFrame(rec.raf);
+        rec.stream.getTracks().forEach((t) => t.stop());
+        if (rec.audioCtx) rec.audioCtx.close().catch(() => {});
+        rec = null;
+        recBar.hidden = true;
+        rowEl.hidden = false;
+        updateSendState();
+    }
+
+    async function cancelRecording() {
+        if (!rec) return;
+        await stopRecorder();
+        cleanupRecording();
+    }
+
+    async function sendRecording() {
+        if (!rec || rec.sending) return;
+        rec.sending = true;
+        const ms = recElapsedMs();
+        const blob = await stopRecorder();
+        cleanupRecording();
+
+        if (ms < 1000 || blob.size === 0) {
+            showError("Səs mesajı çox qısadır.");
+            return;
+        }
+        if (blob.size > cfg.maxAudioBytes) {
+            showError("Səs mesajı maksimum " + Math.round(cfg.maxAudioBytes / 1024 / 1024) + " MB ola bilər.");
+            return;
+        }
+
+        const file = new File([blob], "ses" + extForAudio(blob.type), { type: blob.type });
+        const fd = new FormData();
+        fd.append("File", file, file.name);
+
+        sending = true;
+        updateSendState();
+        progressBar.style.width = "0%";
+        progressEl.hidden = false;
+
+        const res = await post("/api/chat/send", fd, (p) => (progressBar.style.width = Math.round(p * 100) + "%"));
+
+        sending = false;
+        progressEl.hidden = true;
+        updateSendState();
+
+        if (res.ok && res.data && res.data.id) {
+            upsert(res.data);
+            refreshLayout();
+            scrollToBottom(true);
+        } else if (!res.ok) {
+            showError(res.error);
+        }
+    }
+
+    if (canRecord && recBar) {
+        micBtn.addEventListener("click", startRecording);
+        recBar.querySelector(".dc-rec__cancel").addEventListener("click", cancelRecording);
+        recBar.querySelector(".dc-rec__pause").addEventListener("click", togglePauseRecording);
+        recBar.querySelector(".dc-rec__send").addEventListener("click", sendRecording);
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && rec) cancelRecording();
+        });
+        // Səhifədən çıxanda mikrofonu bağla
+        window.addEventListener("pagehide", () => { if (rec) { rec.recorder.stop(); cleanupRecording(); } });
     }
 
     function autosize(textarea) {
@@ -745,8 +1431,9 @@
                 removeBtn.replaceChildren(icon("fa-solid fa-rotate-left"), document.createTextNode(" Ləğv et"));
             } else if (hasExisting) {
                 if (dto.attachmentType === "image") thumb.style.backgroundImage = 'url("' + dto.attachmentUrl + '")';
-                else thumb.appendChild(icon("fa-solid fa-film"));
-                label.textContent = (dto.attachmentType === "image" ? "Şəkil" : "Video") + (removeAttachment ? " silinəcək" : "");
+                else thumb.appendChild(icon(dto.attachmentType === "audio" ? "fa-solid fa-microphone" : "fa-solid fa-film"));
+                const kindName = dto.attachmentType === "image" ? "Şəkil" : dto.attachmentType === "audio" ? "Səs mesajı" : "Video";
+                label.textContent = kindName + (removeAttachment ? " silinəcək" : "");
                 fileRow.hidden = false;
                 fileRow.classList.toggle("is-removed", removeAttachment);
                 changeText.textContent = "Dəyiş";
@@ -935,13 +1622,40 @@
     // START
     // =====================================================
 
-    // Mobil: yazma sahəsi ekrandadırsa saytın üzən WhatsApp düyməsi onu örtməsin
-    if (form && "IntersectionObserver" in window) {
+    // Mobil: yazma sahəsi ekrandadırsa saytın üzən düymələri onu örtməsin (paneldə lazım deyil)
+    if (form && !cfg.drawer && "IntersectionObserver" in window) {
         new IntersectionObserver((entries) => {
             document.body.classList.toggle("dc-composer-visible", entries[0].isIntersecting);
         }).observe(form);
     }
 
     updateSendState();
-    loadInitial().then(startConnection);
+
+    if (cfg.drawer) {
+        // Panel rejimi: mesajlar panel ilk dəfə açılanda yüklənir, bağlantı isə dərhal (bildirişlər üçün)
+        document.addEventListener("dc:drawer-open", () => {
+            drawerOpen = true;
+            ensureLoaded().then(() => {
+                scrollToBottom(false);
+                markRead();
+                if (input) input.focus({ preventScroll: true });
+            });
+        });
+        document.addEventListener("dc:drawer-close", () => {
+            drawerOpen = false;
+            if (rec) cancelRecording();
+            if (currentVoice) currentVoice.pause();
+        });
+        startConnection();
+    } else {
+        ensureLoaded().then(() => {
+            if (isChatVisible()) markRead();
+            startConnection();
+        });
+    }
+
+    // İlk bildiriş: launcher skripti yükləndikdən sonra göndərilir
+    const emitInitial = () => setUnread(Number(cfg.unreadCount) || 0, null, true);
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", emitInitial);
+    else emitInitial();
 })();

@@ -1,4 +1,4 @@
-namespace DoctorEngineApp.Helpers
+﻿namespace DoctorEngineApp.Helpers
 {
     /// <summary>
     /// Faylın həqiqi tipini ilk baytlarına ("magic bytes") görə yoxlayır.
@@ -23,7 +23,8 @@ namespace DoctorEngineApp.Helpers
                 ".jpg" or ".jpeg" => header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF,
                 ".png" => header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47,
                 ".webp" => Ascii(header, 0, "RIFF") && Ascii(header, 8, "WEBP"),
-                ".mp4" or ".mov" or ".m4v" => IsIsoMedia(header),
+                ".mp4" or ".mov" or ".m4v" or ".m4a" => IsIsoMedia(header),
+                ".mp3" => Ascii(header, 0, "ID3") || (header[0] == 0xFF && (header[1] & 0xE0) == 0xE0),
                 ".webm" => header[0] == 0x1A && header[1] == 0x45 && header[2] == 0xDF && header[3] == 0xA3,
                 ".ogg" => Ascii(header, 0, "OggS"),
                 _ => false

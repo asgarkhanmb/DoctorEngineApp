@@ -137,9 +137,19 @@
                                     @if (c.SenderIsAdmin) { <span class="adm-badge is-admin ms-1">Usta</span> }
                                 </div>
                                 <div class="adm-list__sub">
-                                    @if (c.AttachmentType == "image") { <i class="fa-regular fa-image me-1"></i> }
-                                    @if (c.AttachmentType == "video") { <i class="fa-solid fa-film me-1"></i> }
-                                    @(c.Message ?? (c.AttachmentType == "image" ? "Şəkil" : "Video"))
+                                    @switch (c.AttachmentType)
+                                    {
+                                        case "image": <i class="fa-regular fa-image me-1"></i> break;
+                                        case "video": <i class="fa-solid fa-film me-1"></i> break;
+                                        case "audio": <i class="fa-solid fa-microphone me-1"></i> break;
+                                    }
+                                    @(c.Message ?? c.AttachmentType switch
+                                    {
+                                        "image" => "Şəkil",
+                                        "video" => "Video",
+                                        "audio" => "Səs mesajı",
+                                        _ => "Mesaj"
+                                    })
                                 </div>
                             </div>
                             <span class="adm-list__meta">@c.CreatedDate.ToString("dd.MM HH:mm")</span>

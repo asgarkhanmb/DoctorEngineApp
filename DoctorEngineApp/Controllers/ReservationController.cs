@@ -31,7 +31,8 @@ namespace DoctorEngineApp.Controllers
             _db = db;
             _logger = logger;
         }
-        public async Task<IActionResult> Index()
+        // serviceId: Xidmətlər səhifəsindən gələndə həmin xidmət formada əvvəlcədən seçilir
+        public async Task<IActionResult> Index(int? serviceId = null)
         {
             var informs = await _informService.GetAllAsync();
 
@@ -61,7 +62,8 @@ namespace DoctorEngineApp.Controllers
                 Reservation = new ReservationCreateVM
                 {
                     Services = services,
-                    DateTime = AzTime.Now.AddHours(1)
+                    DateTime = AzTime.Now.AddHours(1),
+                    ServiceId = serviceId.HasValue && services.Any(s => s.Id == serviceId.Value) ? serviceId.Value : 0
                 },
 
                 ContactPhone = contactPhone ?? new ContactPhoneVM()
@@ -90,13 +92,43 @@ namespace DoctorEngineApp.Controllers
             try
             {
                 var result = await _reservationService.TryCreateAsync(model);
-                return Json(new { success = result.Success, message = result.Message });
+                return Json(new { success = result.Success, message = result.Message, trackingCode = result.TrackingCode });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Rezervasiya yaradılarkən xəta");
                 return Json(new { success = false, message = "Xəta baş verdi. Yenidən cəhd edin." });
             }
+        }
+
+        // Xidmət və gün üçün saatlar: GET /Reservation/Slots?serviceId=5&date=2026-11-14
+        [HttpGet]
+        public async Task<IActionResult> Slots(int serviceId, DateTime date)
+        {
+            if (serviceId <= 0)
+                return Json(Array.Empty<object>());
+
+            var slots = await _reservationService.GetSlotsAsync(serviceId, date);
+            return Json(slots.Select(s => new { t = s.Time, s = s.State }));
+        }
+
+        // Müştərinin öz rezervasiyaları (brauzerdə saxlanan izləmə kodları ilə)
+        [HttpGet]
+        public async Task<IActionResult> Lookup([FromQuery] string[] codes)
+        {
+            var items = await _reservationService.LookupAsync(codes ?? Array.Empty<string>());
+            return Json(items);
+        }
+
+        // İzləmə səhifəsi: /Reservation/Status/{kod} — status canlı yenilənir
+        [HttpGet]
+        public async Task<IActionResult> Status(string id)
+        {
+            var item = (await _reservationService.LookupAsync(new[] { id ?? "" })).FirstOrDefault();
+            if (item == null)
+                return NotFound();
+
+            return View(item);
         }
     }
 }

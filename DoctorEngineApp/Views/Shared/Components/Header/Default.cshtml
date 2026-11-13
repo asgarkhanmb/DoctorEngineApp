@@ -9,6 +9,8 @@
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
     var userName = User.Identity?.Name ?? "";
     var initial = userName.Length > 0 ? userName.Substring(0, 1) : "?";
+    // Profil şəkli login cookie-sindən gəlir (AppClaimsPrincipalFactory)
+    var avatar = (User as System.Security.Claims.ClaimsPrincipal)?.FindFirst(DoctorEngineApp.Helpers.AppClaimsPrincipalFactory.AvatarClaim)?.Value;
     var returnUrl = Context.Request.Path + Context.Request.QueryString;
     var site = await SiteSettings.GetAsync();
     var contact = await ContactInfo.GetFirstAsync();
@@ -65,8 +67,8 @@
                 <a asp-controller="About" asp-action="Index" class="nav-item nav-link @IsActive("About")" aria-current="@AriaCurrent("About")">Haqqımızda</a>
                 <a asp-controller="Service" asp-action="Index" class="nav-item nav-link @IsActive("Service")" aria-current="@AriaCurrent("Service")">Xidmətlər</a>
                 <a asp-controller="Reservation" asp-action="Index" class="nav-item nav-link @IsActive("Reservation")" aria-current="@AriaCurrent("Reservation")">Rezervasiya</a>
-                <a asp-controller="Assistant" asp-action="Index" class="nav-item nav-link de-nav-ai @IsActive("Assistant")" aria-current="@AriaCurrent("Assistant")"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI Köməkçi</a>
                 <a asp-controller="Contact" asp-action="Index" class="nav-item nav-link @IsActive("Contact", "Chat")" aria-current="@AriaCurrent("Contact", "Chat")">Əlaqə</a>
+                <a asp-controller="Assistant" asp-action="Index" class="nav-item nav-link de-nav-ai @IsActive("Assistant")" aria-current="@AriaCurrent("Assistant")"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI Köməkçi</a>
 
                 <!-- İstifadəçi -->
                 <div class="de-user">
@@ -75,7 +77,14 @@
                         <div class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle de-user-toggle" href="#" id="userDropdown" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="de-avatar" aria-hidden="true">@initial</span>
+                                @if (!string.IsNullOrEmpty(avatar))
+                                {
+                                    <img class="de-avatar" src="~/uploads/avatars/@avatar" alt="" aria-hidden="true" style="object-fit:cover" />
+                                }
+                                else
+                                {
+                                    <span class="de-avatar" aria-hidden="true">@initial</span>
+                                }
                                 <span class="de-user-name">@userName</span>
                             </a>
 
@@ -85,6 +94,11 @@
                                     <small>@(User.IsInRole("Admin") ? "Administrator" : "İstifadəçi")</small>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
+                                        <i class="fa-regular fa-id-card"></i> Profilim
+                                    </a>
+                                </li>
                                 <li>
                                     <a class="dropdown-item" asp-controller="Chat" asp-action="Index">
                                         <i class="fa-regular fa-comments"></i> Canlı çat

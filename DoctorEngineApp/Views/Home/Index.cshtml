@@ -4,6 +4,15 @@
     var about = Model.Abouts?.FirstOrDefault();
 }
 
+@section css {
+    <link rel="stylesheet" href="~/css/services.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/about.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/services.js" asp-append-version="true"></script>
+}
+
 <main>
 
     <!-- Slider -->
@@ -15,107 +24,43 @@
     <!-- Xüsusiyyətlər -->
     <partial name="_InformCards" model="Model.Informs" />
 
-    <!-- Haqqımızda -->
+    <!-- Haqqımızda (Haqqımızda səhifəsi ilə eyni dizayn) -->
     @if (about != null)
     {
-        <div class="container-xxl py-5">
-            <div class="container">
-                <div class="row g-5 align-items-center">
-                    <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
-                        @if (!string.IsNullOrEmpty(about.VideoPath))
-                        {
-                            <partial name="_VideoFrame" model='new VideoFrame(Url.Content(about.VideoPath), Id: "aboutVideo")' />
-                        }
-                    </div>
-                    <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.25s">
-                        <h6 class="text-primary text-uppercase">Haqqımızda</h6>
-                        <h1 class="mb-4">@about.Title</h1>
-                        <p class="mb-4">@about.Description</p>
-                        <ul class="de-checklist mb-4">
-                            @foreach (var inf in Model.Informs)
-                            {
-                                <li><div><h6>@inf.Title</h6><span>@inf.Description</span></div></li>
-                            }
-                        </ul>
-                        <a asp-controller="About" asp-action="Index" class="btn btn-primary py-3 px-5">
-                            Daha ətraflı <i class="fa fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div class="sv ab ab-home">
+            <partial name="_AboutHero" model='new AboutSectionVM(about.Title, about.Description, about.VideoPath, Model.Informs, IsHome: true)' />
         </div>
     }
 
-    <!-- Categories + SubServices -->
-    <div class="container-xxl service py-5">
+    <!-- Xidmətlər (kartlar — Xidmətlər səhifəsi ilə eyni dizayn) -->
+    <section class="sv sv-home">
         <div class="container">
-            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                <h6 class="text-primary text-uppercase">Xidmətlərimiz</h6>
-                <h1 class="mb-5">Xidmətlərimizi Araşdırın</h1>
+            <div class="sv-home__head wow fadeInUp" data-wow-delay="0.1s">
+                <div>
+                    <span class="sv-eyebrow">Xidmətlərimiz</span>
+                    <h2>Xidmətlərimizi araşdırın</h2>
+                    <p>Videolara baxın, işin necə görüldüyünü görün və uyğun xidməti bir kliklə rezervasiya edin.</p>
+                </div>
+                <a asp-controller="Service" asp-action="Index" class="sv-btn sv-btn--ghost">
+                    Bütün xidmətlər <i class="fa-solid fa-arrow-right"></i>
+                </a>
             </div>
 
-            <partial name="_ServiceTabs" model="Model.Categories" />
+            @* Ana səhifədə yalnız ən son yaradılan 3 xidmət (yenisi birinci). Hamısı — Xidmətlər səhifəsində. *@
+            <partial name="_ServiceGrid" model='new ServiceGridVM
+            {
+                Categories = (Model.Categories ?? new()).OrderByDescending(c => c.Id).Take(3).ToList(),
+                ReservationServiceIds = ServiceGridVM.MapReservationIds(Model.Categories, Model.Services),
+                Limit = 3
+            }' />
         </div>
-    </div>
+    </section>
 
     <!-- Rezervasiya -->
     <partial name="_BookingForm" for="Reservation" />
-    <!-- Team Start -->
-    <div class="container-xxl py-5">
-        <div class="container">
 
-            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-                <h6 class="text-primary text-uppercase">Bizim Texniklər</h6>
-                <h1 class="mb-5">Mütəxəssislərimiz</h1>
-            </div>
-
-            <div class="row g-4 justify-content-center">
-
-                @foreach (var t in Model.Technicians)
-                {
-                    <div class="col-lg-3 col-md-6 wow fadeInUp">
-                        <div class="team-item shadow rounded overflow-hidden">
-
-                            <div class="position-relative overflow-hidden">
-                                <img class="img-fluid w-100"
-                                     src="~/uploads/technicians/@t.Image"
-                                     style="height:300px; object-fit:cover;" />
-
-                                <div class="team-overlay position-absolute start-0 top-0 w-100 h-100 d-flex align-items-center justify-content-center">
-
-                                    @if (!string.IsNullOrEmpty(t.FacebookUrl))
-                                    {
-                                        <a class="btn btn-square mx-1" href="@t.FacebookUrl" target="_blank">
-                                            <i class="fab fa-facebook-f"></i>
-                                        </a>
-                                    }
-
-                                    @if (!string.IsNullOrEmpty(t.InstagramUrl))
-                                    {
-                                        <a class="btn btn-square mx-1" href="@t.InstagramUrl" target="_blank">
-                                            <i class="fab fa-instagram"></i>
-                                        </a>
-                                    }
-
-                                    @if (!string.IsNullOrEmpty(t.TiktokUrl))
-                                    {
-                                        <a class="btn btn-square mx-1" href="@t.TiktokUrl" target="_blank">
-                                            <i class="fab fa-tiktok"></i>
-                                        </a>
-                                    }
-                                </div>
-                            </div>
-
-                            <div class="bg-light text-center p-4">
-                                <h5 class="fw-bold mb-0">@t.FullName</h5>
-                                <small>@t.Position</small>
-                            </div>
-
-                        </div>
-                    </div>
-                }
-
-            </div>
-        </div>
+    <!-- Mütəxəssislər (Haqqımızda səhifəsi ilə eyni dizayn) -->
+    <div class="sv ab ab-home-team">
+        <partial name="_TeamSection" model="Model.Technicians" />
     </div>
 </main>

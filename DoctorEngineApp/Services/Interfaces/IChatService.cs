@@ -1,4 +1,4 @@
-using DoctorEngineApp.ViewModels.Chats;
+﻿using DoctorEngineApp.ViewModels.Chats;
 
 namespace DoctorEngineApp.Services.Interfaces
 {
@@ -14,5 +14,11 @@ namespace DoctorEngineApp.Services.Interfaces
 
         /// <summary>Sahibi və ya admin silə bilər. Uğurlu olarsa true.</summary>
         Task<bool> DeleteAsync(int id, string username, bool isAdmin);
+
+        /// <summary>Başqalarından gələn, istifadəçinin hələ oxumadığı mesajların sayı.</summary>
+        Task<int> GetUnreadCountAsync(string username);
+
+        /// <summary>Mesajları lastId-yə qədər oxunmuş kimi qeyd edir (geri getmir).</summary>
+        Task MarkReadAsync(string username, int lastId);
     }
 }

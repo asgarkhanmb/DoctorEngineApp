@@ -280,3 +280,5 @@ C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Release\net6.0\D
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Release\net6.0\DoctorEngineApp.genruntimeconfig.cache
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\obj\Release\net6.0\ref\DoctorEngineApp.dll
 C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Release\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Release\net6.0\BouncyCastle.Crypto.dll
+C:\Users\Əsgərxan\Desktop\DoctorEngineApp\DoctorEngineApp\bin\Release\net6.0\WebPush.dll

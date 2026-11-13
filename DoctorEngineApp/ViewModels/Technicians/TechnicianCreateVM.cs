@@ -9,6 +9,8 @@ namespace DoctorEngineApp.ViewModels.Technicians
         public string FullName { get; set; }
         [Required(ErrorMessage = "Vəzifəni daxil edin")]
         public string Position { get; set; }
+        [StringLength(300, ErrorMessage = "Təqdimat maksimum 300 simvol ola bilər")]
+        public string? Bio { get; set; }
         [Required(ErrorMessage = "Şəkil seçin")]
         [AllowedUpload(UploadKind.Image)]
         public IFormFile? Photo { get; set; }

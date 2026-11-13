@@ -24,11 +24,28 @@
         let raf = 0;
         let last = 0;
 
+        // Səhnə fonu videonun öz kadrından (ambient): bulanıq, videoya uyğun rənglər
+        const stage = frame.closest(".de-video-stage");
+        let amb = null, actx = null;
+        if (stage && !stage.querySelector(".de-video-stage__ambient")) {
+            amb = document.createElement("canvas");
+            amb.className = "de-video-stage__ambient";
+            amb.setAttribute("aria-hidden", "true");
+            amb.width = 36;
+            amb.height = 48;
+            stage.prepend(amb);
+            actx = amb.getContext("2d", { alpha: false });
+        }
+
         const draw = () => {
             if (!video.videoWidth) return;
             try {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 frame.classList.add("has-backdrop");
+                if (actx) {
+                    actx.drawImage(video, 0, 0, amb.width, amb.height);
+                    stage.classList.add("has-ambient");
+                }
             } catch {
                 /* kadr hələ hazır deyil */
             }
@@ -51,6 +68,28 @@
             frame.style.setProperty("--vf-ratio", ratio.toFixed(4));
             frame.classList.toggle("is-tall", ratio < 1);
         };
+
+        // Saytdakı öz play düyməsi: oynayana qədər brauzer düymələri gizlidir
+        const playBtn = frame.querySelector(".de-video__play");
+        if (playBtn) {
+            const reset = () => {
+                frame.classList.remove("is-playing");
+                video.controls = false;
+            };
+            playBtn.addEventListener("click", () => {
+                const p = video.play();
+                if (p && p.catch) p.catch(reset);
+            });
+            video.addEventListener("play", () => {
+                frame.classList.add("is-playing");
+                video.controls = true;
+            });
+            video.addEventListener("ended", reset);
+            video.addEventListener("emptied", reset);   // site.js videonu sıfırlayanda (load())
+            video.addEventListener("pause", () => {
+                if (video.currentTime === 0) reset();
+            });
+        }
 
         video.addEventListener("loadedmetadata", updateOrientation);
         video.addEventListener("loadeddata", draw);

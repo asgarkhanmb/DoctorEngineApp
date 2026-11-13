@@ -1,15 +1,22 @@
-@* =====================================================
+﻿@* =====================================================
    CANLI ÇAT VİDJETİ
    İstifadə: <partial name="_ChatWidget" />
    Tam ekran: <partial name="_ChatWidget" view-data='new ViewDataDictionary(ViewData) { ["ChatFullPage"] = true }' />
+   Sağ panel (layout-da üzən düymə ilə): ViewData["ChatDrawer"] = true
    Mesajlar brauzerdə /api/chat/messages ilə yüklənir, SignalR ilə canlı yenilənir.
    ===================================================== *@
 @using DoctorEngineApp.Helpers.Enums
 @using DoctorEngineApp.Services
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject DoctorEngineApp.Services.Interfaces.IChatService ChatSvc
+@inject DoctorEngineApp.Services.PushService PushSvc
 @{
     var fullPage = ViewData["ChatFullPage"] as bool? ?? false;
+    var drawer = ViewData["ChatDrawer"] as bool? ?? false;
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    var unreadCount = isAuthenticated && User.Identity?.Name is string me
+        ? await ChatSvc.GetUnreadCountAsync(me)
+        : 0;
     var returnUrl = Context.Request.Path + Context.Request.QueryString;
     var loginUrl = Url.Action("Login", "Account", new { returnUrl });
     var registerUrl = Url.Action("Register", "Account");
@@ -23,13 +30,15 @@
         loginUrl,
         maxLength = ChatService.MaxMessageLength,
         maxImageBytes = ChatService.MaxImageBytes,
-        maxVideoBytes = ChatService.MaxVideoBytes
+        maxVideoBytes = ChatService.MaxVideoBytes,
+        maxAudioBytes = ChatService.MaxAudioBytes,
+        drawer,
+        unreadCount,
+        pushKey = isAuthenticated ? PushSvc.PublicKey : null
     };
 }
 
-<link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
-
-<section class="dc-chat @(fullPage ? "dc-chat--full" : "")" id="dcChat" aria-label="Canlı çat">
+<section class="dc-chat @(fullPage ? "dc-chat--full" : "") @(drawer ? "dc-chat--drawer" : "")" id="dcChat" aria-label="Canlı çat">
 
     <!-- BAŞLIQ -->
     <header class="dc-chat__header">
@@ -39,11 +48,18 @@
 
         <div class="dc-chat__heading">
             <h3>Canlı Usta Dəstəyi</h3>
-            <span class="dc-chat__status" data-state="connecting">
+            <span class="dc-chat__status" data-state="@(isAuthenticated ? "connecting" : "offline")">
                 <span class="dc-chat__dot"></span>
-                <span class="dc-chat__status-text">Qoşulur…</span>
+                <span class="dc-chat__status-text">@(isAuthenticated ? "Qoşulur…" : "Giriş tələb olunur")</span>
             </span>
         </div>
+
+        @if (isAuthenticated)
+        {
+            <button type="button" class="dc-chat__icon-btn" data-dc-sound title="Bildiriş səsini söndür" aria-label="Bildiriş səsini söndür" aria-pressed="false">
+                <i class="fa-solid fa-bell"></i>
+            </button>
+        }
 
         @if (!fullPage && isAuthenticated)
         {
@@ -51,8 +67,50 @@
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
             </a>
         }
+
+        @if (drawer)
+        {
+            <button type="button" class="dc-chat__icon-btn" data-dc-close title="Bağla" aria-label="Çatı bağla">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        }
     </header>
 
+    @if (isAuthenticated)
+    {
+        <!-- Bildiriş icazəsi: sayt bağlı / arxa planda olanda da səs və bildiriş -->
+        <div class="dc-chat__push" hidden>
+            <i class="fa-solid fa-bell" aria-hidden="true"></i>
+            <span>Sayt bağlı olanda da yeni mesajdan xəbər tutun.</span>
+            <button type="button" class="dc-chat__push-on">Bildirişləri aç</button>
+            <button type="button" class="dc-chat__push-x" aria-label="Bağla" title="Bağla">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+    }
+
+    @if (!isAuthenticated)
+    {
+        <!-- QONAQ: yazışmalar göstərilmir, yalnız şablon mesaj -->
+        <div class="dc-chat__body" id="dcChatBody">
+            <div class="dc-chat__list">
+                <div class="dc-msg is-admin">
+                    <div class="dc-msg__avatar"><i class="fa-solid fa-wrench" aria-hidden="true"></i></div>
+                    <div class="dc-msg__content">
+                        <div class="dc-msg__name">
+                            <span>DoctorEngine</span>
+                            <span class="dc-badge"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>Usta</span>
+                        </div>
+                        <div class="dc-msg__bubble">
+                            <div class="dc-msg__text">@* pre-wrap: mətn bir sətirdə olmalıdır, yoxsa girinti ekranda görünür *@Salam! 👋 Canlı Usta Dəstəyinə xoş gəlmisiniz.<br />Sualınızı ustalarımıza yaza bilərsiniz. Yazışmaları görmək və mesaj göndərmək üçün hesabınıza daxil olun.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
     <!-- MESAJLAR -->
     <div class="dc-chat__body" id="dcChatBody" role="log" aria-live="polite" aria-relevant="additions">
 
@@ -78,6 +136,7 @@
     <button type="button" class="dc-chat__jump" hidden>
         <i class="fa-solid fa-arrow-down"></i> Yeni mesaj
     </button>
+    }
 
     @if (isAuthenticated)
     {
@@ -116,6 +175,26 @@
                 <button type="submit" class="dc-chat__send" title="Göndər" disabled>
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
+
+                <button type="button" class="dc-chat__send dc-chat__mic" title="Səs mesajı yaz" aria-label="Səs mesajı yaz" hidden>
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+            </div>
+
+            <!-- SƏS YAZMA ZOLAĞI -->
+            <div class="dc-rec" hidden>
+                <button type="button" class="dc-rec__cancel" title="Ləğv et" aria-label="Səs yazmanı ləğv et">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+                <span class="dc-rec__dot" aria-hidden="true"></span>
+                <span class="dc-rec__time" aria-live="off">0:00</span>
+                <canvas class="dc-rec__wave" aria-hidden="true"></canvas>
+                <button type="button" class="dc-rec__pause" title="Fasilə" aria-label="Fasilə">
+                    <i class="fa-solid fa-pause"></i>
+                </button>
+                <button type="button" class="dc-chat__send dc-rec__send" title="Göndər" aria-label="Səs mesajını göndər">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
             </div>
 
             <div class="dc-chat__hint">
@@ -147,6 +226,9 @@
     <img alt="" />
 </div>
 
-<script id="dcChatConfig" type="application/json">@Json.Serialize(config)</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
-<script src="~/js/chat.js" asp-append-version="true"></script>
+@if (isAuthenticated)
+{
+    <script id="dcChatConfig" type="application/json">@Json.Serialize(config)</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

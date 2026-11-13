@@ -22,6 +22,12 @@
                         <input asp-for="Position" class="form-control" placeholder="Məs: Mühərrik ustası" />
                         <span asp-validation-for="Position"></span>
                     </div>
+                    <div class="col-12">
+                        <label asp-for="Bio" class="form-label">Qısa təqdimat <small class="text-muted">(ixtiyari)</small></label>
+                        <textarea asp-for="Bio" class="form-control" rows="3" maxlength="300" placeholder="Məs: İllərin təcrübəsinə malik peşəkar usta — dizel və benzin mühərriklərinin dəqiq diaqnostikası və etibarlı təmiri."></textarea>
+                        <small class="text-muted">Haqqımızda səhifəsində ustanın kartında göstərilir. Maksimum 300 simvol.</small>
+                        <span asp-validation-for="Bio"></span>
+                    </div>
                 </div>
             </div>
 

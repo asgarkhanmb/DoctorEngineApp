@@ -8,6 +8,7 @@ namespace DoctorEngineApp.ViewModels.Technicians
 
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Ad Soyadı daxil edin")] public string FullName { get; set; } = string.Empty;
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Vəzifəni daxil edin")] public string Position { get; set; } = string.Empty;
+        [StringLength(300, ErrorMessage = "Təqdimat maksimum 300 simvol ola bilər")] public string? Bio { get; set; }
 
         public string? ExistingImage { get; set; }
         [AllowedUpload(UploadKind.Image)]

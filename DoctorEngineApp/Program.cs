@@ -1,4 +1,4 @@
-using DoctorEngineApp.Data;
+﻿using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Hubs;
 using DoctorEngineApp.Models;
@@ -24,6 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders()
+    .AddClaimsPrincipalFactory<AppClaimsPrincipalFactory>()   // profil şəkli cookie-də
     .AddErrorDescriber<AzIdentityErrorDescriber>();   // Identity xətaları Azərbaycan dilində
 
 builder.Services.Configure<IdentityOptions>(opt =>
@@ -55,7 +56,7 @@ builder.Services.ConfigureApplicationCookie(opt =>
     // API sorğuları üçün login səhifəsinə yönləndirmə əvəzinə 401/403 qaytar
     opt.Events.OnRedirectToLogin = ctx =>
     {
-        if (ctx.Request.Path.StartsWithSegments("/api"))
+        if (ctx.Request.Path.StartsWithSegments("/api") || ctx.Request.Path.StartsWithSegments("/chatHub"))
             ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
         else
             ctx.Response.Redirect(ctx.RedirectUri);
@@ -92,6 +93,8 @@ builder.Services.AddScoped<IWarrantyService, WarrantyService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IWhatsappService, WhatsappService>();
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<PushService>();   // Web Push: sayt bağlı olanda da yeni mesaj bildirişi
+builder.Services.Configure<PushOptions>(builder.Configuration.GetSection(PushOptions.Section));
 builder.Services.AddScoped<ISiteSettingService, SiteSettingService>();   // sayt adı və loqo
 
 // AI KÖMƏKÇİ (OpenAI-uyğun API; standart: Google Gemini pulsuz versiyası)
@@ -161,6 +164,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHub<ChatHub>("/chatHub");
+app.MapHub<ReservationHub>("/reservationHub");   // rezervasiyalar: boş saatlar, status, admin bildirişləri
 
 // Area routing
 app.MapControllerRoute(

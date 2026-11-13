@@ -48,10 +48,10 @@
             <div class="auth-top">
                 <a asp-controller="Home" asp-action="Index" class="auth-brand auth-brand--mobile">
                     <span class="auth-brand__icon"><partial name="_BrandIcon" model="site" /></span>
-                    @site.SiteName
+                    <span class="auth-brand__name">@site.SiteName</span>
                 </a>
-                <a asp-controller="Home" asp-action="Index" class="auth-back">
-                    <i class="fa-solid fa-arrow-left"></i> Ana səhifə
+                <a asp-controller="Home" asp-action="Index" class="auth-back" aria-label="Ana səhifəyə qayıt">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span class="auth-back__text">Ana səhifə</span>
                 </a>
             </div>
 

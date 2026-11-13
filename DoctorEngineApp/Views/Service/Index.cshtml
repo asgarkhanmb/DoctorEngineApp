@@ -4,17 +4,89 @@
     ViewData["Title"] = "Xidmətlər";
 }
 
+@section css {
+    <link rel="stylesheet" href="~/css/services.css" asp-append-version="true" />
+}
+
 <partial name="_PageHeader" model='("Xidmətlər", "Mühərrik diaqnostikasından tam təmirə qədər — bütün xidmətlərimizi kəşf edin.")' />
 
-<div class="container-xxl service py-5">
-    <div class="container">
+<div class="sv">
 
-        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h6 class="text-primary text-uppercase">Xidmətlərimiz</h6>
-            <h1 class="mb-5">Xidmətlərimizi Araşdırın</h1>
+    <!-- ================= GİRİŞ ================= -->
+    <section class="container sv-intro">
+        <div class="sv-intro__text wow fadeInUp" data-wow-delay="0.1s">
+            <span class="sv-eyebrow">Xidmətlərimiz</span>
+            <h2>Mühərrikiniz üçün peşəkar həllər</h2>
+            <p>Hər xidmətin videosuna baxın, işin necə görüldüyünü öz gözünüzlə görün. Uyğun xidməti seçib bir kliklə rezervasiya edin.</p>
         </div>
+        <ul class="sv-perks wow fadeInUp" data-wow-delay="0.2s">
+            <li><i class="fa-regular fa-calendar-check"></i><span><b>Onlayn rezervasiya</b>Növbə gözləmədən</span></li>
+            <li><i class="fa-regular fa-comments"></i><span><b>Usta ilə canlı çat</b>Şəkil və video göndərin</span></li>
+            <li><i class="fa-solid fa-shield-halved"></i><span><b>Zəmanət sənədi</b>Görülən işə zəmanət</span></li>
+        </ul>
+    </section>
 
-        <partial name="_ServiceTabs" model="Model.Categories" />
+    <!-- ================= XİDMƏTLƏR ================= -->
+    <section class="container sv-list" aria-labelledby="sv-list-title">
+        <h2 id="sv-list-title" class="visually-hidden">Xidmətlərin siyahısı</h2>
 
-    </div>
+        <partial name="_ServiceGrid" model='new ServiceGridVM
+        {
+            Categories = Model.Categories ?? new(),
+            ReservationServiceIds = ServiceGridVM.MapReservationIds(Model.Categories, Model.Services),
+            ShowFilter = true
+        }' />
+    </section>
+
+    <!-- ================= NECƏ İŞLƏYİRİK ================= -->
+    <section class="sv-steps-wrap">
+        <div class="container">
+            <div class="sv-head wow fadeInUp" data-wow-delay="0.1s">
+                <span class="sv-eyebrow">Proses</span>
+                <h2>Necə işləyirik?</h2>
+                <p>Müraciətdən zəmanətə qədər 4 sadə addım.</p>
+            </div>
+            <ol class="sv-steps">
+                <li class="wow fadeInUp" data-wow-delay="0.1s">
+                    <span class="sv-steps__icon"><i class="fa-regular fa-calendar-check"></i></span>
+                    <h3>Müraciət</h3>
+                    <p>Onlayn rezervasiya edin və ya usta ilə çatda problemi yazın.</p>
+                </li>
+                <li class="wow fadeInUp" data-wow-delay="0.2s">
+                    <span class="sv-steps__icon"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
+                    <h3>Diaqnostika</h3>
+                    <p>Usta mühərriki yoxlayır, nasazlığın səbəbini müəyyən edir.</p>
+                </li>
+                <li class="wow fadeInUp" data-wow-delay="0.3s">
+                    <span class="sv-steps__icon"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                    <h3>Təmir</h3>
+                    <p>Razılaşdırılmış işlər peşəkar şəkildə yerinə yetirilir.</p>
+                </li>
+                <li class="wow fadeInUp" data-wow-delay="0.4s">
+                    <span class="sv-steps__icon"><i class="fa-solid fa-shield-halved"></i></span>
+                    <h3>Zəmanət</h3>
+                    <p>Görülən iş üçün zəmanət sənədi təqdim olunur.</p>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- ================= ÇAĞIRIŞ ================= -->
+    <section class="container sv-cta-wrap">
+        <div class="sv-cta wow fadeInUp" data-wow-delay="0.1s">
+            <div>
+                <h2>Problemin nə olduğunu bilmirsiniz?</h2>
+                <p>Əlamətləri AI köməkçiyə yazın və ya birbaşa usta ilə danışın — sizə uyğun xidməti birlikdə tapaq.</p>
+            </div>
+            <div class="sv-cta__actions">
+                <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--primary sv-btn--lg">Rezervasiya et <i class="fa-solid fa-arrow-right"></i></a>
+                <a asp-controller="Assistant" asp-action="Index" class="sv-btn sv-btn--light sv-btn--lg"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Köməkçi</a>
+                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--light sv-btn--lg"><i class="fa-regular fa-comments"></i> Usta ilə çat</a>
+            </div>
+        </div>
+    </section>
 </div>
+
+@section Scripts {
+    <script src="~/js/services.js" asp-append-version="true"></script>
+}

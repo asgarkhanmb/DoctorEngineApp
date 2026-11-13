@@ -1148,15 +1148,15 @@ html, body { overflow-x: clip !important; }
 
 /* ---------- YUXARI QAYIT ---------- */
 
-/* WhatsApp düyməsinin (55px, sağdan 24px) düz üstündə, eyni mərkəz xəttində.
+/* Sol aşağı küncdə (WhatsApp ilə yer dəyişdi — WhatsApp indi sağda, çat düyməsinin üstündədir).
    Ətrafdakı halqa səhifənin nə qədər oxunduğunu göstərir. */
 .de-totop {
     --de-totop-size: 48px;
     --de-progress: 0;
 
     position: fixed;
-    right: calc(24px + (55px - var(--de-totop-size)) / 2);
-    bottom: calc(24px + 55px + 14px + var(--de-float-lift, 0px));
+    left: 4px;
+    bottom: calc(24px + var(--de-float-lift, 0px));
     z-index: 20;
     display: grid;
     place-items: center;
@@ -1237,14 +1237,19 @@ html, body { overflow-x: clip !important; }
 }
 
 @media (max-width: 575.98px) {
-    .de-totop { --de-totop-size: 44px; font-size: 15px; }
+    .de-totop { --de-totop-size: 44px; font-size: 15px; left: 4px; bottom: calc(16px + var(--de-float-lift, 0px)); }
 }
 
-.whatsapp-btn { right: 24px !important; bottom: calc(24px + var(--de-float-lift, 0px)) !important; transition: transform .25s var(--de-ease), opacity .25s, box-shadow .25s, bottom .4s var(--de-ease); }
+.whatsapp-btn { right: 24px !important; left: auto !important; bottom: calc(24px + 55px + 14px + var(--de-float-lift, 0px)) !important; transition: transform .25s var(--de-ease), opacity .25s, box-shadow .25s, bottom .4s var(--de-ease); }
 .whatsapp-btn:hover { transform: scale(1.08); box-shadow: 0 10px 26px rgba(37, 211, 102, .45); }
 
 @media (min-width: 993px) {
     .whatsapp-btn { animation: de-wa-pulse 3s ease-in-out infinite; }
+}
+
+/* Mobil: kiçik çat düyməsinin (52px, sağdan 16px) üstündə */
+@media (max-width: 576px) {
+    .whatsapp-btn { right: 14px !important; bottom: calc(16px + 52px + 12px + var(--de-float-lift, 0px)) !important; }
 }
 
 @keyframes de-wa-pulse {

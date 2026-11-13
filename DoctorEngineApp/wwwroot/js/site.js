@@ -114,57 +114,5 @@
         phoneField.addEventListener("input", sync);
     }
 
-    // Reservation form AJAX submit
-    const reservationForm = document.getElementById("reservationForm");
-    if (reservationForm) {
-        const messageDiv = document.getElementById("reservationMessage");
-        const submitBtn = reservationForm.querySelector("button[type=submit]");
-        const originalLabel = submitBtn ? submitBtn.innerHTML : "";
-
-        function showMessage(success, text) {
-            if (!messageDiv) return;
-            const alertDiv = document.createElement("div");
-            alertDiv.className = "alert d-flex align-items-center gap-2 " + (success ? "alert-success" : "alert-danger");
-            const icon = document.createElement("i");
-            icon.className = success ? "fa-solid fa-circle-check" : "fa-solid fa-circle-exclamation";
-            const span = document.createElement("span");
-            span.textContent = text;
-            alertDiv.append(icon, span);
-            messageDiv.replaceChildren(alertDiv);
-        }
-
-        reservationForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-            if (submitBtn && submitBtn.disabled) return; // təkrar göndərmənin qarşısı
-
-            // Brauzerin öz yoxlaması (boş sahələr və s.)
-            if (!this.checkValidity()) {
-                this.reportValidity();
-                return;
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Göndərilir…';
-            }
-
-            try {
-                const response = await fetch(this.action, { method: "POST", body: new FormData(this) });
-                const data = await response.json();
-                showMessage(!!data.success, data.message || "Xəta baş verdi. Yenidən cəhd edin.");
-                if (data.success) {
-                    this.reset();
-                    if (whatsappField) whatsappField.readOnly = false;
-                }
-            } catch (err) {
-                console.error(err);
-                showMessage(false, "Bağlantı xətası. İnternetinizi yoxlayıb yenidən cəhd edin.");
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalLabel;
-                }
-            }
-        });
-    }
+    // Rezervasiya formasının göndərilməsi və canlı saatlar: wwwroot/js/booking.js
 })();

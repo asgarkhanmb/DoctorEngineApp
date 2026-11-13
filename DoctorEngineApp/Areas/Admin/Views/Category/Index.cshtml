@@ -1,7 +1,20 @@
 ﻿@model List<CategoryVM>
-@{ ViewData["Title"] = "Kateqoriyalar"; }
+@{
+    ViewData["Title"] = "Kateqoriyalar";
+    var max = DoctorEngineApp.Models.ServiceCategory.MaxCount;
+    var full = Model.Count >= max;   // limit dolubsa "Yeni kateqoriya" düyməsi gizlənir
+    var subtitle = $"Saytdakı xidmət kartları ({Model.Count}/{max}). Hər kateqoriyanın bir videosu olur — videonu kateqoriyanın redaktə səhifəsindən əlavə edin və ya dəyişin.";
+}
 
-<partial name="_PageHead" model='new AdminPageHead("Kateqoriyalar", "Xidmətlər səhifəsindəki tablar. Hər kateqoriyanın bir videosu olur — videonu kateqoriyanın redaktə səhifəsindən əlavə edin və ya dəyişin.", "Yeni kateqoriya", "Create")' />
+<partial name="_PageHead" model='new AdminPageHead("Kateqoriyalar", subtitle, full ? null : "Yeni kateqoriya", full ? null : "Create")' />
+
+@if (full)
+{
+    <div class="alert alert-info d-flex align-items-center gap-2" role="status">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Maksimum @max kateqoriyaya çatılıb. Yeni kateqoriya əlavə etmək üçün mövcud kateqoriyalardan birini silin.</span>
+    </div>
+}
 
 <div class="adm-card">
     @if (!Model.Any())

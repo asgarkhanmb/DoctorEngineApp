@@ -1,3 +1,4 @@
+using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Categories;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +15,18 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index() => View(await _service.GetAllAsync());
 
-        public IActionResult Create() => View(new CategoryCreateVM());
+        public async Task<IActionResult> Create()
+        {
+            if (await LimitReachedAsync()) return RedirectToAction(nameof(Index));
+            return View(new CategoryCreateVM());
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create(CategoryCreateVM model)
         {
+            // Limit server tərəfdə də yoxlanılır (düymə gizli olsa da birbaşa sorğu göndərilə bilər)
+            if (await LimitReachedAsync()) return RedirectToAction(nameof(Index));
+
             ValidateVideo(model.VideoFile != null, hasExisting: false, removing: false, model.VideoTitle, model.VideoDescription);
             if (!ModelState.IsValid) return View(model);
 
@@ -62,6 +70,15 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
         {
             await _service.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>Maksimum kateqoriya sayına çatılıbsa, xəbərdarlıq yazır və true qaytarır.</summary>
+        private async Task<bool> LimitReachedAsync()
+        {
+            if (await _service.CountAsync() < ServiceCategory.MaxCount) return false;
+
+            TempData["Error"] = $"Maksimum {ServiceCategory.MaxCount} kateqoriya ola bilər. Yenisini əlavə etmək üçün əvvəlcə birini silin.";
+            return true;
         }
 
         /// <summary>Video qaydaları: video olacaqsa başlıq və təsvir məcburidir.</summary>

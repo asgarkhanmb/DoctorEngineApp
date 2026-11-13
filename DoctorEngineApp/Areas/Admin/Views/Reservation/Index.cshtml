@@ -13,15 +13,21 @@
     };
 }
 
-<partial name="_PageHead" model='new AdminPageHead("Rezervasiyalar", "Müştərilərin onlayn rezervasiyaları — təsdiqləyin, rədd edin və ya WhatsApp ilə yazın.")' />
+<partial name="_PageHead" model='new AdminPageHead("Rezervasiyalar", "Müştərilərin onlayn rezervasiyaları — təsdiqləyin, rədd edin və ya WhatsApp ilə yazın. Yeni rezervasiyalar səhifə yenilənmədən burada görünür.")' />
+
+@* Canlı cədvəl üçün (wwwroot/js/admin-live.js): yeni sətirlərdəki formalar bu token və ünvanlardan istifadə edir *@
+<div id="resLive" hidden
+     data-confirm-url="@Url.Action("Confirm")"
+     data-reject-url="@Url.Action("Reject")"
+     data-delete-url="@Url.Action("Delete")">@Html.AntiForgeryToken()</div>
 
 <div class="adm-card">
     <div class="adm-card__head flex-wrap">
         <div class="btn-group btn-group-sm" role="group" data-status-filter="#resTable" aria-label="Statusa görə filtr">
-            <button type="button" class="btn btn-light active" data-status="all">Hamısı <span class="text-muted">@items.Count</span></button>
-            <button type="button" class="btn btn-light" data-status="Pending">Gözləyir <span class="text-muted">@pending</span></button>
-            <button type="button" class="btn btn-light" data-status="Confirmed">Təsdiqləndi <span class="text-muted">@confirmed</span></button>
-            <button type="button" class="btn btn-light" data-status="Rejected">Rədd edildi <span class="text-muted">@rejected</span></button>
+            <button type="button" class="btn btn-light active" data-status="all">Hamısı <span class="text-muted" data-count="all">@items.Count</span></button>
+            <button type="button" class="btn btn-light" data-status="Pending">Gözləyir <span class="text-muted" data-count="Pending">@pending</span></button>
+            <button type="button" class="btn btn-light" data-status="Confirmed">Təsdiqləndi <span class="text-muted" data-count="Confirmed">@confirmed</span></button>
+            <button type="button" class="btn btn-light" data-status="Rejected">Rədd edildi <span class="text-muted" data-count="Rejected">@rejected</span></button>
         </div>
         <div class="adm-search">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -50,7 +56,7 @@
                 <tbody>
                     @foreach (var r in items)
                     {
-                        <tr data-row data-status="@r.Status">
+                        <tr data-row data-status="@r.Status" data-id="@r.Id">
                             <td>
                                 <div class="adm-cell-title">@r.FullName</div>
                                 <div class="adm-cell-sub"><a href="tel:@r.Phone.Replace(" ", "")" class="text-reset">@r.Phone</a></div>

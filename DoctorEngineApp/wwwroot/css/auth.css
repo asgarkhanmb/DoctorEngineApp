@@ -1,4 +1,4 @@
-﻿/* =====================================================
+/* =====================================================
    DoctorEngine.Az — Giriş / Qeydiyyat səhifələri
    ===================================================== */
 
@@ -433,13 +433,18 @@ h1, h2, h3 { margin: 0; color: var(--a-heading); font-family: "Barlow", sans-ser
 /* ---------- MOBİL ---------- */
 
 @media (max-width: 960px) {
-    .auth-shell { grid-template-columns: 1fr; }
+    /* minmax(0, 1fr): sütun məzmunun min-content enindən dar ola bilsin (320px ekranda səhifə yana sürüşürdü) */
+    .auth-shell { grid-template-columns: minmax(0, 1fr); }
+    .auth-main { min-width: 0; }
     .auth-aside { display: none; }
     .auth-main { min-height: 100vh; padding: 20px 20px 32px; }
     .auth-top { justify-content: space-between; }
     .auth-brand--mobile { display: inline-flex; font-size: 22px; }
     .auth-brand--mobile .auth-brand__icon { width: 36px; height: 36px; font-size: 15px; }
-    .auth-back { padding: 7px 12px; font-size: 13px; }
+    .auth-back { padding: 7px 12px; font-size: 13px; flex-shrink: 0; white-space: nowrap; }
+    /* Uzun sayt adı düyməni ekrandan çıxarmasın — adı '…' ilə qısalsın */
+    .auth-brand--mobile { min-width: 0; }
+    .auth-brand__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .auth-card { padding-top: 28px; }
 }
 
@@ -527,3 +532,9 @@ h1, h2, h3 { margin: 0; color: var(--a-heading); font-family: "Barlow", sans-ser
 @view-transition { navigation: auto; }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; } }
 
+/* Çox dar telefonlar (≤374px): geri düyməsində yalnız ikon */
+@media (max-width: 374.98px) {
+    .auth-brand--mobile { font-size: 19px; }
+    .auth-back { width: 36px; height: 36px; padding: 0; justify-content: center; }
+    .auth-back__text { display: none; }
+}

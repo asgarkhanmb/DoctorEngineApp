@@ -71,6 +71,7 @@ namespace DoctorEngineApp.Services
             {
                 FullName = vm.FullName,
                 Position = vm.Position,
+                Bio = string.IsNullOrWhiteSpace(vm.Bio) ? null : vm.Bio.Trim(),
                 Image = fileName,
                 FacebookUrl = vm.FacebookUrl ?? "",
                 InstagramUrl = vm.InstagramUrl ?? "",
@@ -121,6 +122,7 @@ namespace DoctorEngineApp.Services
 
             tech.FullName = vm.FullName;
             tech.Position = vm.Position;
+            tech.Bio = string.IsNullOrWhiteSpace(vm.Bio) ? null : vm.Bio.Trim();
             tech.FacebookUrl = vm.FacebookUrl ?? "";
             tech.InstagramUrl = vm.InstagramUrl ?? "";
             tech.TiktokUrl = vm.TiktokUrl ?? "";

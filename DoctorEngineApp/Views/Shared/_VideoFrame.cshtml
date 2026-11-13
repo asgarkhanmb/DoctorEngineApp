@@ -1,19 +1,40 @@
-@* Vahid video çərçivəsi: 16:9, kəsilmir, şaquli videoların yanları bulanıq fonla dolur.
+@* Vahid video çərçivəsi.
+   Sayt: video öz nisbətində göstərilir. Şaquli (telefon, 9:16) video brend fonlu "səhnə"nin
+   ortasında kart kimi durur; üstündə saytın dizaynında play düyməsi var.
+   Admin: "compact" (redaktə) və "thumb" (siyahı önizləməsi) variantları.
    İstifadə: <partial name="_VideoFrame" model='new VideoFrame(Url.Content("~/uploads/..."))' /> *@
 @model DoctorEngineApp.ViewModels.VideoFrame
 @{
     var thumb = Model.Variant == "thumb";
+    var site = string.IsNullOrEmpty(Model.Variant);
     // #t=0.5 — ilk qara kadr yerinə videonun əvvəlindən bir kadr görünsün
     var src = Model.Src.Contains('#') ? Model.Src : Model.Src + "#t=0.5";
 }
-<div class="@(string.IsNullOrEmpty(Model.Variant) ? "de-video" : "de-video is-" + Model.Variant)">
-    <canvas class="de-video__backdrop" aria-hidden="true"></canvas>
-    @if (thumb)
-    {
-        <video class="de-video__player" src="@src" preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
-    }
-    else
-    {
-        <video class="de-video__player" id="@Model.Id" src="@src" controls preload="metadata" playsinline></video>
-    }
-</div>
+@if (site)
+{
+    @* Saytdakı videolar əsasən telefonla çəkilir — yer əvvəlcədən şaquli ayrılır ki, yüklənəndə səhifə sıçramasın.
+       Üfüqi video olsa, JS çərçivəni avtomatik geniş formaya keçirir. *@
+    <div class="de-video-stage">
+        <div class="de-video is-site is-tall">
+            <canvas class="de-video__backdrop" aria-hidden="true"></canvas>
+            <video class="de-video__player" id="@Model.Id" src="@src" preload="metadata" playsinline></video>
+            <button type="button" class="de-video__play" aria-label="Videonu oynat">
+                <i class="fa-solid fa-play" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="de-video is-@Model.Variant">
+        <canvas class="de-video__backdrop" aria-hidden="true"></canvas>
+        @if (thumb)
+        {
+            <video class="de-video__player" src="@src" preload="metadata" muted playsinline tabindex="-1" aria-hidden="true"></video>
+        }
+        else
+        {
+            <video class="de-video__player" id="@Model.Id" src="@src" controls preload="metadata" playsinline></video>
+        }
+    </div>
+}

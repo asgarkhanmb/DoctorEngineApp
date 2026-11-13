@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.Models
 {
@@ -19,7 +19,7 @@ namespace DoctorEngineApp.Models
         [MaxLength(300)]
         public string? AttachmentUrl { get; set; }
 
-        // "image" və ya "video"
+        // "image", "video" və ya "audio" (səs mesajı)
         [MaxLength(10)]
         public string? AttachmentType { get; set; }
 

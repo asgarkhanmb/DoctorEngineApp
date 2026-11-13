@@ -23,6 +23,7 @@ namespace DoctorEngineApp.Data
         public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<WhatsappSetting> WhatsappSettings { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<PushSubscription> PushSubscriptions { get; set; } = null!;
         public DbSet<Warranty> Warranties { get; set; }
         public DbSet<WarrantyItem> WarrantyItems { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; } = null!;
