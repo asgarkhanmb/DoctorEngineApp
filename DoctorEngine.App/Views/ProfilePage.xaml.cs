@@ -16,7 +16,7 @@ public partial class ProfilePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _vm.AppearingAsync();
+        try { await _vm.AppearingAsync(); } catch (Exception ex) { Services.CrashLog.Write(ex, "ProfilePage"); }
     }
 
     private async void OnChatClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//chat");

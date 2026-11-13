@@ -20,4 +20,23 @@ public partial class App : Application
             MinimumWidth = 360,
             MinimumHeight = 600
         };
+
+    protected override void OnStart()
+    {
+        base.OnStart();
+        // Əvvəlki açılışda tətbiq xəta ilə bağlanıbsa — mətnini göstər (kopyalayıb göndərmək üçün)
+        var crash = Services.CrashLog.TakeLast();
+        if (crash == null) return;
+        Dispatcher.DispatchDelayed(TimeSpan.FromSeconds(1.5), async () =>
+        {
+            try
+            {
+                var shortText = crash.Length > 900 ? crash[..900] + "…" : crash;
+                var copy = await _shell.DisplayAlertAsync("Tətbiq əvvəlki dəfə xəta ilə bağlandı",
+                    shortText + "\n\nBu mətni kopyalayıb dəstəyə göndərin.", "Kopyala", "Bağla");
+                if (copy) await Clipboard.Default.SetTextAsync(crash);
+            }
+            catch { }
+        });
+    }
 }

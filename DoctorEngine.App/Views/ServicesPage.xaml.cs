@@ -16,6 +16,6 @@ public partial class ServicesPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (_vm.Categories.Count == 0 && !_vm.IsBusy) await _vm.LoadAsync();
+        try { if (_vm.Categories.Count == 0 && !_vm.IsBusy) await _vm.LoadAsync(); } catch (Exception ex) { Services.CrashLog.Write(ex, "ServicesPage"); }
     }
 }

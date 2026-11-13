@@ -17,6 +17,8 @@ public partial class App : MauiWinUIApplication
 	public App()
 	{
 		this.InitializeComponent();
+		// WinUI-də UI axınındakı tutulmamış xəta (0xC000027B) — jurnala yazılır
+		this.UnhandledException += (_, e) => DoctorEngine.App.Services.CrashLog.Write(e.Exception, "WinUI");
 	}
 
 	protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();

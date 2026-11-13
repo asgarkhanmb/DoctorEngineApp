@@ -10,6 +10,8 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        CrashLog.Install();
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -90,13 +92,25 @@ public static class MauiProgram
         Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("DeNoUnderline", (h, _) => NoUnderline(h.PlatformView));
         Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("DeNoUnderline", (h, _) => NoUnderline(h.PlatformView));
 #elif WINDOWS
+        // Diqqət: WinUI ResourceDictionary-yə eyni açarı təkrar yazmaq (mapper bir neçə dəfə işləyir və
+        // MAUI özü də bu açarları qoyur) 0x800F0902 xətası atır və tətbiqi bağlayır — ona görə ehtiyatlı yazılır.
+        static void SetRes(Microsoft.UI.Xaml.ResourceDictionary r, string key, object value)
+        {
+            try
+            {
+                if (r.ContainsKey(key)) r.Remove(key);
+                r.Add(key, value);
+            }
+            catch { /* bəzək üçündür — alınmasa standart görünüş qalır */ }
+        }
         static void NoBorder(Microsoft.UI.Xaml.Controls.Control c)
         {
+            var transparent = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
             c.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
-            c.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
-            c.Resources["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
-            c.Resources["TextControlBackgroundFocused"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
-            c.Resources["TextControlBackgroundPointerOver"] = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            c.Background = transparent;
+            SetRes(c.Resources, "TextControlBorderThemeThicknessFocused", new Microsoft.UI.Xaml.Thickness(0));
+            SetRes(c.Resources, "TextControlBackgroundFocused", transparent);
+            SetRes(c.Resources, "TextControlBackgroundPointerOver", transparent);
         }
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("DeNoBorder", (h, _) => NoBorder(h.PlatformView));
         Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("DeNoBorder", (h, _) => NoBorder(h.PlatformView));

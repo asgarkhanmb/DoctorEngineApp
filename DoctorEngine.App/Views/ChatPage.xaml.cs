@@ -21,6 +21,6 @@ public partial class ChatPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _vm.AppearingAsync();
+        try { await _vm.AppearingAsync(); } catch (Exception ex) { Services.CrashLog.Write(ex, "ChatPage"); }
     }
 }
