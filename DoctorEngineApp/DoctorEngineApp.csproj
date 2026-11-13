@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="MailKit" Version="4.18.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.15" />
     <!-- Microsoft.AspNetCore.Identity (2.3.1) silindi: Identity .NET 10-da çərçivənin (Microsoft.AspNetCore.App) tərkibindədir -->
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.15" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
@@ -25,6 +26,10 @@
     <PackageReference Include="MimeKit" Version="4.18.2" />
     <PackageReference Include="Rotativa.AspNetCore" Version="1.4.0" />
     <PackageReference Include="WebPush" Version="1.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DoctorEngine.Contracts\DoctorEngine.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

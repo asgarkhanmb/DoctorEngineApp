@@ -24,6 +24,7 @@ namespace DoctorEngineApp.Data
         public DbSet<WhatsappSetting> WhatsappSettings { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<PushSubscription> PushSubscriptions { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;   // tətbiqlərin giriş tokenləri
         public DbSet<Warranty> Warranties { get; set; }
         public DbSet<WarrantyItem> WarrantyItems { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; } = null!;
