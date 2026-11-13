@@ -1,9 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android</TargetFrameworks>
+		<!-- Windows-da ilk hədəf Windows olmalıdır: Visual Studio ▶ düyməsi standart olaraq ilk hədəfi işə salır
+		     (əvvəl Android idi — emulyator olmadığı üçün tətbiq heç yerdə açılmırdı). -->
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0;</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks)net10.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('linux'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 		<!-- Yalnız Windows paketi: dotnet publish ... -p:WindowsOnly=true (digər platformaların restore-u lazım olmur) -->
 		<TargetFrameworks Condition="'$(WindowsOnly)' == 'true'">net10.0-windows10.0.19041.0</TargetFrameworks>
 
