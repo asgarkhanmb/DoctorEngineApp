@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:DoctorEngine.App.Views"
+       x:Class="DoctorEngine.App.AppShell"
+       Shell.FlyoutBehavior="Disabled"
+       Title="DoctorEngine">
+
+    <!-- Alt menyu: saytın əsas bölmələri -->
+    <TabBar>
+        <ShellContent Title="Ana səhifə" Icon="tab_home.png" Route="home"
+                      ContentTemplate="{DataTemplate views:HomePage}" />
+        <ShellContent Title="Xidmətlər" Icon="tab_services.png" Route="services"
+                      ContentTemplate="{DataTemplate views:ServicesPage}" />
+        <ShellContent Title="Rezervasiya" Icon="tab_booking.png" Route="booking"
+                      ContentTemplate="{DataTemplate views:BookingPage}" />
+        <ShellContent Title="Çat" Icon="tab_chat.png" Route="chat"
+                      ContentTemplate="{DataTemplate views:ChatPage}" />
+        <ShellContent Title="Profil" Icon="tab_profile.png" Route="profile"
+                      ContentTemplate="{DataTemplate views:ProfilePage}" />
+    </TabBar>
+</Shell>

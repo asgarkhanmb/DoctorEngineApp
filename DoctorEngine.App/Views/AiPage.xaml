@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             x:Class="DoctorEngine.App.Views.AiPage"
+             x:DataType="vm:AiViewModel"
+             Title="AI köməkçi">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Təmizlə" Command="{Binding ClearCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="*,Auto">
+        <CollectionView x:Name="MessagesView" ItemsSource="{Binding Messages}" SelectionMode="None" ItemsUpdatingScrollMode="KeepLastItemInView">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:AiItem">
+                    <Grid Padding="12,4">
+                        <Border IsVisible="{Binding IsUser}" HorizontalOptions="End" MaximumWidthRequest="320" BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="12,8">
+                            <Label Text="{Binding Content}" TextColor="White" FontSize="15" />
+                        </Border>
+                        <Border IsVisible="{Binding IsUser, Converter={StaticResource InvertedBool}}" HorizontalOptions="Start" MaximumWidthRequest="340"
+                                Style="{StaticResource Card}" Padding="12,10">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="✨ AI köməkçi" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                <Label Text="{Binding Content}" FontSize="15" />
+                                <ActivityIndicator IsRunning="True" HeightRequest="18" HorizontalOptions="Start"
+                                                   IsVisible="{Binding Content, Converter={StaticResource HasValue}, ConverterParameter=inv}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Boş vəziyyət: EmptyView əvəzinə ayrıca qat (Windows-da EmptyView → elementlər keçidi tətbiqi çökdürür) -->
+            <VerticalStackLayout Padding="24" Spacing="12" VerticalOptions="Center" IsVisible="{Binding IsEmpty}">
+                <Label Text="✨" FontSize="40" HorizontalOptions="Center" />
+                <Label Text="AI köməkçi" Style="{StaticResource H2}" HorizontalTextAlignment="Center" />
+                <Label Text="Mühərrik problemi barədə sual verin — AI ilkin məsləhət verir. Dəqiq diaqnostika üçün ustaya müraciət edin."
+                       Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+                <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Suggestions}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Border Style="{StaticResource Card}" Padding="12,10">
+                                <Label Text="{Binding .}" FontSize="13" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AiViewModel}}, Path=UseSuggestionCommand, x:DataType=vm:AiViewModel}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8" Padding="10,8" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}">
+            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 22" Padding="14,0">
+                <Editor Text="{Binding Question}" Placeholder="Sualınızı yazın…" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
+            </Border>
+            <Grid Grid.Column="1">
+                <Button Text="➤" WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" FontSize="18" Command="{Binding AskCommand}"
+                        IsEnabled="{Binding CanAsk}" IsVisible="{Binding IsAnswering, Converter={StaticResource InvertedBool}}" />
+                <Button Text="■" WidthRequest="48" HeightRequest="48" CornerRadius="24" Padding="0" FontSize="16" Style="{StaticResource NavyButton}"
+                        Command="{Binding StopCommand}" IsVisible="{Binding IsAnswering}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

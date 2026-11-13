@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             x:Class="DoctorEngine.App.Views.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="Ana səhifə">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+        <ScrollView>
+            <VerticalStackLayout Spacing="0" Padding="0,0,0,24">
+
+                <!-- ===== BAŞLIQ + SLAYDER ===== -->
+                <Grid Background="{StaticResource HeroGradient}" Padding="20,48,20,24" RowSpacing="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <Border WidthRequest="40" HeightRequest="40" StrokeShape="RoundRectangle 11" StrokeThickness="0" BackgroundColor="White" Padding="0">
+                            <Image Source="{Binding LogoUrl, TargetNullValue='logo.png'}" Aspect="AspectFill" />
+                        </Border>
+                        <Label Grid.Column="1" Text="{Binding SiteName}" TextColor="White" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
+                        <Button Grid.Column="2" Text="✨ AI köməkçi" Clicked="OnAiClicked"
+                                BackgroundColor="#33FFFFFF" CornerRadius="12" HeightRequest="40" MinimumHeightRequest="40" Padding="12,0" FontSize="13" />
+                    </Grid>
+
+                    <CarouselView Grid.Row="1" ItemsSource="{Binding Slides}" HeightRequest="190" IndicatorView="SlideIndicator" Loop="False">
+                        <CarouselView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SlideItem">
+                                <Border StrokeShape="RoundRectangle 18" StrokeThickness="0" Padding="0" Margin="0,0,0,0">
+                                    <Grid>
+                                        <Image Source="{Binding BackgroundUrl}" Aspect="AspectFill" />
+                                        <BoxView Color="#990B2154" />
+                                        <VerticalStackLayout VerticalOptions="End" Padding="18" Spacing="4">
+                                            <Label Text="AVTO XİDMƏTLƏR" TextColor="White" FontSize="11" FontAttributes="Bold" CharacterSpacing="1.5" />
+                                            <Label Text="{Binding Title}" TextColor="White" FontSize="20" FontAttributes="Bold" MaxLines="3" LineBreakMode="TailTruncation" />
+                                            <Label Text="{Binding Subtitle}" TextColor="#DDFFFFFF" FontSize="13" MaxLines="2" LineBreakMode="TailTruncation" />
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CarouselView.ItemTemplate>
+                    </CarouselView>
+
+                    <VerticalStackLayout Grid.Row="2" Spacing="12">
+                        <IndicatorView x:Name="SlideIndicator" IndicatorColor="#55FFFFFF" SelectedIndicatorColor="White" HorizontalOptions="Center" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Text="Rezervasiya" Command="{Binding BookCommand}" />
+                            <Button Grid.Column="1" Text="Usta ilə yazış" BackgroundColor="#22FFFFFF" BorderColor="#55FFFFFF" BorderWidth="1"
+                                    Clicked="OnChatClicked" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Oflayn xəbərdarlığı -->
+                <Border Style="{StaticResource ErrorBox}" Margin="16,12,16,0" IsVisible="{Binding IsOffline}">
+                    <Label Text="İnternet yoxdur — son yüklənmiş məlumat göstərilir. Yeniləmək üçün aşağı çəkin." FontSize="13" TextColor="#7F1D1D" />
+                </Border>
+                <Border Style="{StaticResource ErrorBox}" Margin="16,12,16,0" IsVisible="{Binding HasError}">
+                    <Label Text="{Binding ErrorMessage}" FontSize="13" TextColor="#7F1D1D" />
+                </Border>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Margin="0,24" />
+
+                <!-- ===== ÜSTÜNLÜKLƏR ===== -->
+                <VerticalStackLayout Padding="16,20,16,0" Spacing="10" BindableLayout.ItemsSource="{Binding Informs}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:InformItem">
+                            <Border Style="{StaticResource Card}" Padding="14">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                                    <Border WidthRequest="46" HeightRequest="46" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{StaticResource PrimarySoft}" Padding="8">
+                                        <Image Source="{Binding IconUrl}" Aspect="AspectFit" />
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                        <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="15" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding Description}" Style="{StaticResource Muted}" MaxLines="2" LineBreakMode="TailTruncation" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- ===== XİDMƏTLƏR (son 3) ===== -->
+                <Grid Padding="16,28,16,10" ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout>
+                        <Label Text="XİDMƏTLƏRİMİZ" Style="{StaticResource Eyebrow}" />
+                        <Label Text="Xidmətlərimizi araşdırın" Style="{StaticResource H2}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="Hamısı →" Style="{StaticResource LinkButton}" Command="{Binding AllServicesCommand}" VerticalOptions="End" />
+                </Grid>
+
+                <CollectionView ItemsSource="{Binding Categories}" HeightRequest="290" ItemsLayout="HorizontalList" Margin="0,0,0,4">
+                    <CollectionView.Header>
+                        <BoxView WidthRequest="6" Color="Transparent" />
+                    </CollectionView.Header>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CategoryItem">
+                            <Border Style="{StaticResource Card}" Padding="0" WidthRequest="250" Margin="10,4,0,12">
+                                <Grid RowDefinitions="140,*">
+                                    <Grid BackgroundColor="{StaticResource Navy}">
+                                        <Image Source="{Binding IconUrl}" Aspect="AspectFit" HeightRequest="64" />
+                                        <Border IsVisible="{Binding HasVideo}" BackgroundColor="{StaticResource Primary}" StrokeShape="Ellipse" StrokeThickness="0"
+                                                WidthRequest="46" HeightRequest="46" HorizontalOptions="End" VerticalOptions="End" Margin="10">
+                                            <Label Text="▶" TextColor="White" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=PlayVideoCommand, x:DataType=vm:HomeViewModel}"
+                                                                      CommandParameter="{Binding FirstVideoUrl}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                    </Grid>
+                                    <VerticalStackLayout Grid.Row="1" Padding="14,12" Spacing="6">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding Description}" Style="{StaticResource Muted}" MaxLines="2" LineBreakMode="TailTruncation" />
+                                        <Button Text="Rezervasiya et →" FontSize="13" MinimumHeightRequest="38" HeightRequest="38" Margin="0,4,0,0"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=BookCommand, x:DataType=vm:HomeViewModel}"
+                                                CommandParameter="{Binding .}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- ===== USTALAR ===== -->
+                <VerticalStackLayout Padding="16,12,16,10">
+                    <Label Text="KOMANDAMIZ" Style="{StaticResource Eyebrow}" />
+                    <Label Text="Mütəxəssislərimiz" Style="{StaticResource H2}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Padding="16,0" Spacing="12" BindableLayout.ItemsSource="{Binding Technicians}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TechnicianItem">
+                            <Border Style="{StaticResource Card}" Padding="0">
+                                <Grid ColumnDefinitions="120,*">
+                                    <Image Source="{Binding ImageUrl}" Aspect="AspectFill" HeightRequest="160" />
+                                    <VerticalStackLayout Grid.Column="1" Padding="14" Spacing="6" VerticalOptions="Center">
+                                        <Border BackgroundColor="{StaticResource Primary}" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="8,2" HorizontalOptions="Start">
+                                            <Label Text="{Binding Position, Converter={StaticResource UpperAz}}" TextColor="White" FontSize="11" FontAttributes="Bold" />
+                                        </Border>
+                                        <Label Text="{Binding FullName}" FontAttributes="Bold" FontSize="17" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Text="{Binding Bio}" Style="{StaticResource Muted}" MaxLines="4" LineBreakMode="TailTruncation" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- ===== ƏLAQƏ ===== -->
+                <Border Margin="16,24,16,0" StrokeShape="RoundRectangle 20" StrokeThickness="0" Background="{StaticResource HeroGradient}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Mühərrikinizlə bağlı sualınız var?" TextColor="White" FontSize="19" FontAttributes="Bold" />
+                        <Label Text="{Binding Contact.Address}" TextColor="#CCFFFFFF" FontSize="13" />
+                        <Label TextColor="#CCFFFFFF" FontSize="13">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="B.e–Cümə: " />
+                                    <Span Text="{Binding Contact.Weekdays}" FontAttributes="Bold" />
+                                    <Span Text="   Şənbə–Bazar: " />
+                                    <Span Text="{Binding Contact.Weekend}" FontAttributes="Bold" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Text="Zəng et" Command="{Binding CallCommand}" />
+                            <Button Grid.Column="1" Text="WhatsApp" BackgroundColor="#25D366" Command="{Binding OpenWhatsAppCommand}" />
+                        </Grid>
+                        <Button Text="Xəritədə göstər" BackgroundColor="#22FFFFFF" BorderColor="#55FFFFFF" BorderWidth="1" Command="{Binding OpenMapCommand}" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

@@ -14,3 +14,6 @@ obj/
 *.keystore
 *.jks
 .env
+
+# Paketlənmiş tətbiqlər (APK, Windows)
+publish/
