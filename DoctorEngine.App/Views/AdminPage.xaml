@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             xmlns:c="clr-namespace:DoctorEngine.Contracts;assembly=DoctorEngine.Contracts"
+             x:Class="DoctorEngine.App.Views.AdminPage"
+             x:DataType="vm:AdminViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr adm_title}">
+
+    <ContentPage.Resources>
+        <!-- Statistika kartı -->
+        <Style x:Key="StatCard" TargetType="Border" BasedOn="{StaticResource SoftCard}">
+            <Setter Property="Padding" Value="14" />
+        </Style>
+        <Style x:Key="StatValue" TargetType="Label">
+            <Setter Property="FontFamily" Value="BarlowBold" />
+            <Setter Property="FontSize" Value="28" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+        </Style>
+        <Style x:Key="MenuIcon" TargetType="Border">
+            <Setter Property="WidthRequest" Value="42" />
+            <Setter Property="HeightRequest" Value="42" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 13" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Padding" Value="11" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{l:Tr adm_title}" Subtitle="{l:Tr adm_subtitle}" Icon="ic_shield_w.png" />
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCommand}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="16" Padding="16,16,16,32">
+
+                    <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                    </Border>
+
+                    <!-- ================= STATİSTİKA ================= -->
+                    <Grid ClassId="reveal" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                        <Border Style="{StaticResource StatCard}" v:Motion.Press="True">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="–" v:Motion.CountTo="{Binding Stats.PendingReservations}" Style="{StaticResource StatValue}" TextColor="#B45309" />
+                                <Label Text="{l:Tr adm_stat_pending}" Style="{StaticResource Muted}" FontSize="13" />
+                            </VerticalStackLayout>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenReservationsCommand}" CommandParameter="Pending" /></Border.GestureRecognizers>
+                        </Border>
+                        <Border Grid.Column="1" Style="{StaticResource StatCard}" v:Motion.Press="True">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="–" v:Motion.CountTo="{Binding Stats.TodayReservations}" Style="{StaticResource StatValue}" />
+                                <Label Text="{l:Tr adm_stat_today}" Style="{StaticResource Muted}" FontSize="13" />
+                            </VerticalStackLayout>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenReservationsCommand}" /></Border.GestureRecognizers>
+                        </Border>
+                        <Border Grid.Row="1" Style="{StaticResource StatCard}" v:Motion.Press="True">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="–" v:Motion.CountTo="{Binding Stats.MessagesLast7Days}" Style="{StaticResource StatValue}" />
+                                <Label Text="{l:Tr adm_stat_messages}" Style="{StaticResource Muted}" FontSize="13" />
+                            </VerticalStackLayout>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenMessagesCommand}" /></Border.GestureRecognizers>
+                        </Border>
+                        <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource StatCard}" v:Motion.Press="True">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="–" v:Motion.CountTo="{Binding Stats.Users}" Style="{StaticResource StatValue}" />
+                                <Label Text="{l:Tr adm_stat_users}" Style="{StaticResource Muted}" FontSize="13" />
+                            </VerticalStackLayout>
+                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenUsersCommand}" /></Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+
+                    <Label Style="{StaticResource Muted}" FontSize="13" HorizontalTextAlignment="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{l:Tr adm_stat_total}" />
+                                <Span Text="{Binding Stats.TotalReservations, FallbackValue='–'}" FontFamily="BarlowBold" />
+                                <Span Text="  ·  " />
+                                <Span Text="{l:Tr adm_stat_chat}" />
+                                <Span Text="{Binding Stats.ChatMessagesToday, FallbackValue='–'}" FontFamily="BarlowBold" />
+                                <Span Text="  ·  " />
+                                <Span Text="{l:Tr adm_stat_warranties}" />
+                                <Span Text="{Binding Stats.Warranties, FallbackValue='–'}" FontFamily="BarlowBold" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+
+                    <!-- ================= İDARƏETMƏ ================= -->
+                    <Border ClassId="reveal" Style="{StaticResource SoftCard}" Padding="8">
+                        <VerticalStackLayout Spacing="2">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="10" v:Motion.Press="True">
+                                <Border Style="{StaticResource MenuIcon}" Background="{StaticResource PrimaryGradient}"><Image Source="ic_calendar_w.png" /></Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                    <Label Text="{l:Tr adm_reservations}" Style="{StaticResource RowTitle}" />
+                                    <Label Text="{l:Tr adm_reservations_sub}" Style="{StaticResource Muted}" FontSize="12" />
+                                </VerticalStackLayout>
+                                <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenReservationsCommand}" /></Grid.GestureRecognizers>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Margin="66,0,10,0" />
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="10" v:Motion.Press="True">
+                                <Border Style="{StaticResource MenuIcon}" Background="{StaticResource NavyTile}"><Image Source="ic_mail_w.png" /></Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                    <Label Text="{l:Tr adm_messages}" Style="{StaticResource RowTitle}" />
+                                    <Label Text="{l:Tr adm_messages_sub}" Style="{StaticResource Muted}" FontSize="12" />
+                                </VerticalStackLayout>
+                                <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenMessagesCommand}" /></Grid.GestureRecognizers>
+                            </Grid>
+                            <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Margin="66,0,10,0" />
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14" Padding="10" v:Motion.Press="True">
+                                <Border Style="{StaticResource MenuIcon}" Background="{StaticResource VioletTile}"><Image Source="ic_user_w.png" /></Border>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                                    <Label Text="{l:Tr adm_users}" Style="{StaticResource RowTitle}" />
+                                    <Label Text="{l:Tr adm_users_sub}" Style="{StaticResource Muted}" FontSize="12" />
+                                </VerticalStackLayout>
+                                <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                <Grid.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenUsersCommand}" /></Grid.GestureRecognizers>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ================= YAXIN REZERVASİYALAR ================= -->
+                    <Label Text="{l:Tr adm_upcoming}" Style="{StaticResource SectionTitle}" FontSize="19" />
+                    <Label Text="{l:Tr adm_upcoming_empty}" Style="{StaticResource Muted}" IsVisible="{Binding NoUpcoming}" />
+                    <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Upcoming}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="c:AdminReservationDto">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="14">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="2">
+                                        <Label Text="{Binding FullName}" FontFamily="BarlowBold" FontSize="15" LineBreakMode="TailTruncation"
+                                               TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Grid.Row="1" Style="{StaticResource Muted}" FontSize="13" LineBreakMode="TailTruncation">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding ServiceName}" />
+                                                    <Span Text=" · " />
+                                                    <Span Text="{Binding DateTime, StringFormat='{0:dd.MM HH:mm}'}" FontFamily="BarlowBold" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Border Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center" Style="{StaticResource Pill}" Padding="10,5"
+                                                BackgroundColor="{Binding Status, Converter={StaticResource StatusColor}, ConverterParameter=bg}">
+                                            <Label Text="{Binding Status, Converter={StaticResource StatusText}}" FontSize="12" FontFamily="BarlowBold"
+                                                   TextColor="{Binding Status, Converter={StaticResource StatusColor}}" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                    <!-- ================= MƏZMUN BÖLMƏLƏRİ (serverdən) ================= -->
+                    <Label Text="{l:Tr adm_content}" Style="{StaticResource SectionTitle}" FontSize="19" Margin="0,8,0,0" />
+                    <VerticalStackLayout Spacing="14" BindableLayout.ItemsSource="{Binding Groups}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AdminSectionGroup">
+                                <VerticalStackLayout v:Motion.Appear="True" Spacing="8">
+                                    <Label Text="{Binding Name, Converter={StaticResource UpperAz}}" Style="{StaticResource Eyebrow}" />
+                                    <Border Style="{StaticResource SoftCard}" Padding="6">
+                                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding Sections}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="c:AdminSectionDto">
+                                                    <Grid v:Motion.Appear="True" ColumnDefinitions="*,Auto" ColumnSpacing="10" Padding="12,10" v:Motion.Press="True">
+                                                        <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                                            <Label Text="{Binding Title}" Style="{StaticResource RowTitle}" />
+                                                            <Label Text="{Binding Subtitle}" Style="{StaticResource Muted}" FontSize="12" MaxLines="1" LineBreakMode="TailTruncation"
+                                                                   IsVisible="{Binding Subtitle, Converter={StaticResource HasValue}}" />
+                                                        </VerticalStackLayout>
+                                                        <Image Grid.Column="1" Source="ic_arrow_g.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                                        <Grid.GestureRecognizers>
+                                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminViewModel}}, Path=OpenSectionCommand, x:DataType=vm:AdminViewModel}" CommandParameter="{Binding .}" />
+                                                        </Grid.GestureRecognizers>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

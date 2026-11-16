@@ -1,4 +1,4 @@
-﻿@model DoctorEngineApp.ViewModels.Accounts.LoginVM
+@model DoctorEngineApp.ViewModels.Accounts.LoginVM
 
 @{
     Layout = "_AuthLayout";
@@ -8,12 +8,12 @@
 
 <div class="auth-head">
     <div class="auth-head__icon"><i class="fa-solid fa-right-to-bracket"></i></div>
-    <h1>Xoş gəlmisiniz</h1>
-    <p>Hesabınıza daxil olun və usta ilə əlaqədə qalın.</p>
+    <h1>@L.T("Xoş gəlmisiniz")</h1>
+    <p>@L.T("Hesabınıza daxil olun və usta ilə əlaqədə qalın.")</p>
 </div>
 
 <form asp-action="Login" asp-controller="Account" asp-route-returnUrl="@returnUrl" method="post"
-      class="auth-form" novalidate data-loading-text="Daxil olunur…">
+      class="auth-form" novalidate data-loading-text="@L.T("Daxil olunur…")">
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -26,40 +26,40 @@
     <div asp-validation-summary="ModelOnly" role="alert"></div>
 
     <div class="auth-field">
-        <label asp-for="EmailOrUsername">Email və ya istifadəçi adı</label>
+        <label asp-for="EmailOrUsername">@L.T("Email və ya istifadəçi adı")</label>
         <div class="auth-input">
             <i class="fa-regular fa-user"></i>
-            <input asp-for="EmailOrUsername" autocomplete="off" autofocus placeholder="ad@numune.az" />
+            <input asp-for="EmailOrUsername" autocomplete="off" autofocus placeholder="@L.T("ad@numune.az")" />
         </div>
         <span asp-validation-for="EmailOrUsername"></span>
     </div>
 
     <div class="auth-field">
-        <label asp-for="Password">Şifrə</label>
+        <label asp-for="Password">@L.T("Şifrə")</label>
         <div class="auth-input auth-input--password">
             <i class="fa-solid fa-lock"></i>
             <input asp-for="Password" autocomplete="current-password" placeholder="••••••••" />
-            <button type="button" class="auth-eye" data-toggle-password="Password" aria-label="Şifrəni göstər" aria-pressed="false">
+            <button type="button" class="auth-eye" data-toggle-password="Password" aria-label="@L.T("Şifrəni göstər")" aria-pressed="false">
                 <i class="fa-regular fa-eye"></i>
             </button>
         </div>
         <span asp-validation-for="Password"></span>
-        <small class="auth-caps" data-caps-for="Password"><i class="fa-solid fa-triangle-exclamation"></i> Caps Lock açıqdır</small>
+        <small class="auth-caps" data-caps-for="Password"><i class="fa-solid fa-triangle-exclamation"></i> @L.T("Caps Lock açıqdır")</small>
     </div>
 
     <div class="auth-options">
         <label class="auth-check">
             <input asp-for="RememberMe" type="checkbox" />
-            Məni xatırla
+            @L.T("Məni xatırla")
         </label>
-        <a asp-action="ForgotPassword" asp-controller="Account">Şifrəni unutmusunuz?</a>
+        <a asp-action="ForgotPassword" asp-controller="Account">@L.T("Şifrəni unutmusunuz?")</a>
     </div>
 
     <button type="submit" class="auth-btn">
-        Daxil ol <i class="fa-solid fa-arrow-right"></i>
+        @L.T("Daxil ol") <i class="fa-solid fa-arrow-right"></i>
     </button>
 </form>
 
 <div class="auth-switch">
-    Hesabınız yoxdur? <a asp-action="Register" asp-controller="Account">Qeydiyyatdan keçin</a>
+    @L.T("Hesabınız yoxdur?") <a asp-action="Register" asp-controller="Account">@L.T("Qeydiyyatdan keçin")</a>
 </div>

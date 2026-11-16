@@ -1,14 +1,15 @@
-﻿@* Giriş / Qeydiyyat / Şifrə səhifələri üçün layout — saytın brend rəngləri ilə *@
+@* Giriş / Qeydiyyat / Şifrə səhifələri üçün layout — saytın brend rəngləri ilə *@
 @inject DoctorEngineApp.Services.Interfaces.ISiteSettingService SiteSettings
 @{ var site = await SiteSettings.GetAsync(); }
 <!DOCTYPE html>
-<html lang="az">
+<html lang="@L.Lang">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0B2154" />
     <meta name="robots" content="noindex" />
-    <title>@ViewData["Title"] — @site.SiteName</title>
+    <title>@L.T(ViewData["Title"] as string) — @site.SiteName</title>
+    <script src="~/Language/Js?lang=@L.Lang&v=@L.JsVersion"></script>
 
     <link href="~/assets/img/favicon.ico" rel="icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/de-ui.css" asp-append-version="true" />
 </head>
 <body>
 
@@ -29,14 +31,14 @@
             </a>
 
             <div class="auth-aside__content">
-                <span class="auth-aside__eyebrow">Mühərrik təmiri mərkəzi</span>
-                <h2>Mühərrikiniz<br />etibarlı əllərdə.</h2>
-                <p>Hesabınızla usta ilə canlı yazışın, şəkil və video göndərin, rezervasiyalarınızı rahat idarə edin.</p>
+                <span class="auth-aside__eyebrow">@L.T("Mühərrik təmiri mərkəzi")</span>
+                <h2>@L.T("Mühərrikiniz")<br />@L.T("etibarlı əllərdə.")</h2>
+                <p>@L.T("Hesabınızla usta ilə canlı yazışın, şəkil və video göndərin, rezervasiyalarınızı rahat idarə edin.")</p>
 
                 <ul class="auth-perks">
-                    <li><i class="fa-regular fa-comments"></i><span><strong>Canlı usta çatı</strong>Suallarınıza real vaxtda cavab</span></li>
-                    <li><i class="fa-regular fa-images"></i><span><strong>Şəkil və video</strong>Problemi göstərin — daha dəqiq diaqnoz</span></li>
-                    <li><i class="fa-regular fa-calendar-check"></i><span><strong>Onlayn rezervasiya</strong>Növbə gözləmədən xidmət</span></li>
+                    <li><i class="fa-regular fa-comments"></i><span><strong>@L.T("Canlı usta çatı")</strong>@L.T("Suallarınıza real vaxtda cavab")</span></li>
+                    <li><i class="fa-regular fa-images"></i><span><strong>@L.T("Şəkil və video")</strong>@L.T("Problemi göstərin — daha dəqiq diaqnoz")</span></li>
+                    <li><i class="fa-regular fa-calendar-check"></i><span><strong>@L.T("Onlayn rezervasiya")</strong>@L.T("Növbə gözləmədən xidmət")</span></li>
                 </ul>
             </div>
 
@@ -50,9 +52,21 @@
                     <span class="auth-brand__icon"><partial name="_BrandIcon" model="site" /></span>
                     <span class="auth-brand__name">@site.SiteName</span>
                 </a>
-                <a asp-controller="Home" asp-action="Index" class="auth-back" aria-label="Ana səhifəyə qayıt">
-                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span class="auth-back__text">Ana səhifə</span>
+                <a asp-controller="Home" asp-action="Index" class="auth-back" aria-label="@L.T("Ana səhifəyə qayıt")">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span class="auth-back__text">@L.T("Ana səhifə")</span>
                 </a>
+                @{ var authReturn = Context.Request.Path + Context.Request.QueryString; }
+                <details class="auth-lang">
+                    <summary aria-label="@L.T("lang.label")"><i class="fa-solid fa-globe" aria-hidden="true"></i> @L.Lang.ToUpperInvariant()</summary>
+                    <div class="auth-lang__menu">
+                        @foreach (var (code, name) in L.Languages)
+                        {
+                            <a asp-controller="Language" asp-action="Set" asp-route-lang="@code" asp-route-returnUrl="@authReturn"
+                               class="@(code == L.Lang ? "is-active" : "")" lang="@code" hreflang="@code"
+                               aria-current="@(code == L.Lang ? "true" : null)"><b>@code.ToUpperInvariant()</b> @name</a>
+                        }
+                    </div>
+                </details>
             </div>
 
             <div class="auth-card">
@@ -64,6 +78,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/auth.js" asp-append-version="true"></script>
+    <partial name="_Toasts" />
+    <script src="~/js/de-ui.js" asp-append-version="true"></script>
     <script src="~/js/no-autocomplete.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>

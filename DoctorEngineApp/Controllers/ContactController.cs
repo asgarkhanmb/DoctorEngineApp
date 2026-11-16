@@ -1,3 +1,4 @@
+using DoctorEngineApp.Localization;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.ContactMessage;
 using DoctorEngineApp.ViewModels.ContactPhones;
@@ -52,7 +53,7 @@ namespace DoctorEngineApp.Controllers
                 await _contactMessageService.CreateAsync(model.Message);
 
                 TempData["SuccessMessage"] =
-                    "Mesajınız uğurla göndərildi. Tezliklə sizinlə əlaqə saxlanılacaq.";
+                    L.T("Mesajınız uğurla göndərildi. Tezliklə sizinlə əlaqə saxlanılacaq.");
 
                 ModelState.Clear();
                 model.Message = new ContactMessageCreateVM();

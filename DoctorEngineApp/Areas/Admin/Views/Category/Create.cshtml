@@ -14,15 +14,7 @@
                     <input asp-for="Name" class="form-control" placeholder="Məs: Yağ dəyişmə" />
                     <span asp-validation-for="Name"></span>
                 </div>
-                <div class="adm-upload">
-                    <div class="adm-upload__preview is-contain" id="iconPreview" style=""><i class="fa-regular fa-image"></i></div>
-                    <div class="adm-upload__body">
-                        <label asp-for="IconFile" class="form-label">İkon *</label>
-                        <input asp-for="IconFile" type="file" class="form-control" accept="image/png,image/webp,image/jpeg" data-preview="#iconPreview" />
-                        <div class="form-text">Kiçik, kvadrat, şəffaf fonlu PNG.</div>
-                        <span asp-validation-for="IconFile"></span>
-                    </div>
-                </div>
+                <partial name="_IconPicker" model='new DoctorEngineApp.Helpers.CategoryIconPicker(Model.PresetIcon, null, Required: true)' />
             </div>
             <div class="adm-form-section">
                 <h3>Video <small class="text-muted text-lowercase">(hər kateqoriyada bir video)</small></h3>

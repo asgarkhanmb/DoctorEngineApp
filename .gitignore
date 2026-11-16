@@ -1,0 +1,19 @@
+# Build nəticələri və Visual Studio keşi (hər build-də dəyişir, repozitoriyada saxlanmır)
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Tətbiq (MAUI) build nəticələri
+**/bin/
+**/obj/
+
+# Yerli sirlər — heç vaxt commit olunmamalıdır (development: dotnet user-secrets istifadə olunur)
+*.pfx
+*.keystore
+*.jks
+.env
+
+# Paketlənmiş tətbiqlər (APK, Windows)
+publish/

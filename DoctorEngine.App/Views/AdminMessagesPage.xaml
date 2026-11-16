@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             xmlns:c="clr-namespace:DoctorEngine.Contracts;assembly=DoctorEngine.Contracts"
+             x:Class="DoctorEngine.App.Views.AdminMessagesPage"
+             x:DataType="vm:AdminMessagesViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr adm_messages}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{l:Tr adm_messages}" Subtitle="{l:Tr adm_messages_sub}" Icon="ic_mail_w.png" />
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCommand}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="12" Padding="16,16,16,32">
+                    <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                    </Border>
+                    <Label Text="{l:Tr adm_empty}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" Margin="0,24" IsVisible="{Binding IsEmpty}" />
+
+                    <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Items}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="c:AdminMessageDto">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="16" v:Motion.Press="True">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="3">
+                                        <Label Text="{Binding Subject}" FontFamily="BarlowBold" FontSize="16" LineBreakMode="TailTruncation"
+                                               TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Grid.Column="1" Text="{Binding CreatedDate, StringFormat='{0:dd.MM HH:mm}'}" Style="{StaticResource Muted}" FontSize="12" />
+                                        <Label Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Muted}" FontSize="13" LineBreakMode="TailTruncation">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding FullName}" FontFamily="BarlowSemiBold" />
+                                                    <Span Text=" · " />
+                                                    <Span Text="{Binding Email}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Grid.Row="2" Text="{Binding Message}" MaxLines="2" LineBreakMode="TailTruncation" FontSize="14" />
+                                        <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Pill}" BackgroundColor="#FDECEE" Padding="10,5" VerticalOptions="End" v:Motion.Press="True">
+                                            <Label Text="{l:Tr chat_delete_btn}" TextColor="#B00F1D" FontFamily="BarlowBold" FontSize="12" />
+                                            <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminMessagesViewModel}}, Path=DeleteCommand, x:DataType=vm:AdminMessagesViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                        </Border>
+                                    </Grid>
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminMessagesViewModel}}, Path=OpenCommand, x:DataType=vm:AdminMessagesViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

@@ -1,6 +1,7 @@
-﻿using DoctorEngineApp.Data;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Hubs;
+using DoctorEngineApp.Localization;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Reservations;
@@ -36,17 +37,17 @@ namespace DoctorEngineApp.Services
             var now = AzTime.Now;
 
             if (dateTime < now)
-                return ReservationResult.Fail("Keçmiş tarix üçün rezervasiya edilə bilməz.");
+                return ReservationResult.Fail(L.T("Keçmiş tarix üçün rezervasiya edilə bilməz."));
 
             if (dateTime.Hour < OpeningHour || dateTime.Hour >= ClosingHour)
-                return ReservationResult.Fail($"Rezervasiya yalnız {OpeningHour}:00 – {ClosingHour}:00 arası mümkündür.");
+                return ReservationResult.Fail(L.T("Rezervasiya yalnız {0}:00 – {1}:00 arası mümkündür.", OpeningHour, ClosingHour));
 
             if (dateTime > now.AddDays(MaxDaysAhead))
-                return ReservationResult.Fail($"Rezervasiya maksimum {MaxDaysAhead} gün öncədən edilə bilər.");
+                return ReservationResult.Fail(L.T("Rezervasiya maksimum {0} gün öncədən edilə bilər.", MaxDaysAhead));
 
             var service = await _context.Services.FirstOrDefaultAsync(s => s.Id == model.ServiceId);
             if (service == null)
-                return ReservationResult.Fail("Seçilən xidmət tapılmadı.");
+                return ReservationResult.Fail(L.T("Seçilən xidmət tapılmadı."));
 
             var phone = model.Phone.Trim();
             var dayStart = dateTime.Date;
@@ -59,7 +60,7 @@ namespace DoctorEngineApp.Services
                 r.Status != "Rejected");
 
             if (phoneExists)
-                return ReservationResult.Fail("Bu telefon nömrəsi ilə bu gün üçün artıq rezervasiya edilib.");
+                return ReservationResult.Fail(L.T("Bu telefon nömrəsi ilə bu gün üçün artıq rezervasiya edilib."));
 
             // 2️⃣ Eyni dəqiqə – eyni xidmət
             var slotEnd = dateTime.AddMinutes(1);
@@ -69,7 +70,7 @@ namespace DoctorEngineApp.Services
                 r.Status != "Rejected");
 
             if (timeBusy)
-                return ReservationResult.Fail("Seçilən tarix və saat artıq rezerv olunub. Başqa saat seçin.");
+                return ReservationResult.Fail(L.T("Seçilən tarix və saat artıq rezerv olunub. Başqa saat seçin."));
 
             var reservation = new Reservation
             {
@@ -91,7 +92,7 @@ namespace DoctorEngineApp.Services
             await SafeSendAsync(_hub.Clients.All, "SlotTaken", SlotPayload(reservation));
             await SafeSendAsync(_hub.Clients.Group(ReservationHub.AdminsGroup), "ReservationCreated", AdminPayload(reservation, service.Name));
 
-            return ReservationResult.Ok("Rezervasiyanız qəbul edildi! Statusu bu səhifədə canlı izləyə bilərsiniz.", reservation.TrackingCode);
+            return ReservationResult.Ok(L.T("Rezervasiyanız qəbul edildi! Statusu bu səhifədə canlı izləyə bilərsiniz."), reservation.TrackingCode);
         }
 
         // ================= BOŞ SAATLAR =================
@@ -251,11 +252,11 @@ namespace DoctorEngineApp.Services
 
         private static ReservationStatusVM ToStatus(Reservation r) => new(
             r.TrackingCode!,
-            r.Service?.Name ?? "",
+            L.T(r.Service?.Name),   // istifadəçinin dilində (sayt və tətbiq)
             r.DateTime.ToString("dd.MM.yyyy"),
             r.DateTime.ToString("HH:mm"),
             r.Status,
-            r.Status == "Rejected" ? r.RejectionReason : null);
+            r.Status == "Rejected" ? L.T(r.RejectionReason) : null);
 
         // Bildiriş göndərilməsə də əsas əməliyyat (yaratma / təsdiq) uğurlu sayılır
         private async Task SafeSendAsync(IClientProxy clients, string method, object payload)

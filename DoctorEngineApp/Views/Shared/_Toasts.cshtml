@@ -1,0 +1,10 @@
+@* Serverdən gələn bildirişlər → müasir toast (wwwroot/js/de-ui.js).
+   Controller-də:  TempData["Toast"] = "Uğurlu mesaj";  TempData["ToastError"] = "Xəta mesajı"; *@
+@if (TempData["Toast"] is string ok && !string.IsNullOrWhiteSpace(ok))
+{
+    <div hidden data-de-toast="@ok" data-type="success"></div>
+}
+@if (TempData["ToastError"] is string err && !string.IsNullOrWhiteSpace(err))
+{
+    <div hidden data-de-toast="@err" data-type="error"></div>
+}

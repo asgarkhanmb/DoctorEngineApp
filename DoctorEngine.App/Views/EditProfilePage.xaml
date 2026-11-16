@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             x:Class="DoctorEngine.App.Views.EditProfilePage"
+             x:DataType="vm:EditProfileViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr pe_title}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{l:Tr pe_title}" Subtitle="{l:Tr pe_subtitle}" Icon="ic_user_w.png" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16" Padding="16,16,16,32">
+
+                <!-- ================= ŞƏKİL ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Padding="18">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                        <Grid WidthRequest="84" HeightRequest="84">
+                            <Border StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}">
+                                <Grid>
+                                    <Label Text="{Binding Initial}" TextColor="White" FontSize="32" FontFamily="BarlowBold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding HasAvatar}" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="8">
+                            <Label Text="{l:Tr pe_photo}" Style="{StaticResource CardTitle}" />
+                            <Button Text="{l:Tr pe_photo_change}" Style="{StaticResource NavyButton}" HorizontalOptions="Start" Padding="18,0"
+                                    Command="{Binding ChangeAvatarCommand}" IsEnabled="{Binding IsNotBusy}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- ================= AD + İSTİFADƏÇİ ADI ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Padding="18">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="{l:Tr pe_info}" Style="{StaticResource CardTitle}" />
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr field_fullname}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding FullName}" MaxLength="100" /></Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr profile_username}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                                <Entry Text="{Binding UserName}" MaxLength="30" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" Placeholder="{l:Tr profile_username_ph}" />
+                            </Border>
+                        </VerticalStackLayout>
+                        <Button Text="{l:Tr common_save}" Command="{Binding SaveInfoCommand}" IsEnabled="{Binding IsNotBusy}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================= EMAIL ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Padding="18">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="{l:Tr pe_email}" Style="{StaticResource CardTitle}" />
+                        <Label Style="{StaticResource Muted}" FontSize="13">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{l:Tr pe_email_current}" />
+                                    <Span Text="{Binding CurrentEmail}" FontFamily="BarlowBold" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr pe_email_new}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                                <Entry Text="{Binding NewEmail}" Keyboard="Email" IsSpellCheckEnabled="False" Placeholder="{l:Tr profile_email_ph}" />
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr pe_password_current}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding EmailPassword}" IsPassword="True" /></Border>
+                        </VerticalStackLayout>
+                        <Label Text="{l:Tr pe_email_hint}" Style="{StaticResource Muted}" FontSize="12" />
+                        <Button Text="{l:Tr pe_email_send}" Style="{StaticResource NavyButton}" Command="{Binding ChangeEmailCommand}" IsEnabled="{Binding IsNotBusy}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================= ŞİFRƏ ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Padding="18">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="{l:Tr pe_password}" Style="{StaticResource CardTitle}" />
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr pe_password_current}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding CurrentPassword}" IsPassword="True" /></Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr pe_password_new}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding NewPassword}" IsPassword="True" /></Border>
+                            <Label Text="{l:Tr profile_password_rules}" Style="{StaticResource Muted}" FontSize="12" Margin="2,2,0,0" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{l:Tr profile_password2}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding NewPassword2}" IsPassword="True" /></Border>
+                        </VerticalStackLayout>
+                        <Button Text="{l:Tr pe_password_change}" Style="{StaticResource NavyButton}" Command="{Binding ChangePasswordCommand}" IsEnabled="{Binding IsNotBusy}" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}"
+                           HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0" />
+    </Grid>
+</ContentPage>

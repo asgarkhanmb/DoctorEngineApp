@@ -18,11 +18,11 @@
     }
 
     <div class="ab-hero__text wow fadeInUp" data-wow-delay="0.2s">
-        <span class="sv-eyebrow">Haqqımızda</span>
-        <h2>@Model.Title</h2>
+        <span class="sv-eyebrow">@L.T("Haqqımızda")</span>
+        <h2>@L.T(Model.Title)</h2>
         @if (!string.IsNullOrWhiteSpace(Model.Description))
         {
-            <p class="ab-lead">@Model.Description</p>
+            <p class="ab-lead">@L.T(Model.Description)</p>
         }
 
         @if (informs.Any())
@@ -30,22 +30,22 @@
             <ul class="ab-ticks">
                 @foreach (var inf in informs)
                 {
-                    <li><i class="fa-solid fa-check"></i> @inf.Title</li>
+                    <li><i class="fa-solid fa-check"></i> @L.T(inf.Title)</li>
                 }
             </ul>
         }
 
         <div class="ab-hero__actions">
             <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--primary sv-btn--lg">
-                Rezervasiya et <i class="fa-solid fa-arrow-right"></i>
+                @L.T("Rezervasiya et") <i class="fa-solid fa-arrow-right"></i>
             </a>
             @if (Model.IsHome)
             {
-                <a asp-controller="About" asp-action="Index" class="sv-btn sv-btn--ghost sv-btn--lg">Daha ətraflı</a>
+                <a asp-controller="About" asp-action="Index" class="sv-btn sv-btn--ghost sv-btn--lg">@L.T("Daha ətraflı")</a>
             }
             else
             {
-                <a asp-controller="Service" asp-action="Index" class="sv-btn sv-btn--ghost sv-btn--lg">Xidmətlərimiz</a>
+                <a asp-controller="Service" asp-action="Index" class="sv-btn sv-btn--ghost sv-btn--lg">@L.T("Xidmətlərimiz")</a>
             }
         </div>
 
@@ -56,14 +56,14 @@
                 {
                     <li>
                         <span class="ab-contact__icon"><i class="fa-solid fa-phone"></i></span>
-                        <span><small>Zəng edin</small><a href="@telHref">@phone</a></span>
+                        <span><small>@L.T("Zəng edin")</small><a href="@telHref">@phone</a></span>
                     </li>
                 }
                 @if (!string.IsNullOrWhiteSpace(contact.Address))
                 {
                     <li>
                         <span class="ab-contact__icon"><i class="fa-solid fa-location-dot"></i></span>
-                        <span><small>Ünvan</small><a asp-controller="Contact" asp-action="Index">@contact.Address</a></span>
+                        <span><small>@L.T("Ünvan")</small><a asp-controller="Contact" asp-action="Index">@L.T(contact.Address)</a></span>
                     </li>
                 }
             </ul>

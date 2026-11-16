@@ -1,3 +1,4 @@
+using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Categories;
@@ -27,6 +28,7 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
             // Limit server tərəfdə də yoxlanılır (düymə gizli olsa da birbaşa sorğu göndərilə bilər)
             if (await LimitReachedAsync()) return RedirectToAction(nameof(Index));
 
+            ValidateIcon(model.IconFile != null, model.PresetIcon, required: true);
             ValidateVideo(model.VideoFile != null, hasExisting: false, removing: false, model.VideoTitle, model.VideoDescription);
             if (!ModelState.IsValid) return View(model);
 
@@ -47,6 +49,7 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
             var current = await _service.GetForEditAsync(model.Id);
             if (current == null) return NotFound();
 
+            ValidateIcon(model.IconFile != null, model.PresetIcon, required: false);
             ValidateVideo(model.VideoFile != null, hasExisting: current.VideoId != null, removing: model.RemoveVideo,
                           model.VideoTitle, model.VideoDescription);
 
@@ -79,6 +82,15 @@ namespace DoctorEngineApp.Areas.Admin.Controllers
 
             TempData["Error"] = $"Maksimum {ServiceCategory.MaxCount} kateqoriya ola bilər. Yenisini əlavə etmək üçün əvvəlcə birini silin.";
             return true;
+        }
+
+        /// <summary>İkon qaydaları: hazır ikon və ya fayl — yeni kateqoriyada biri məcburidir.</summary>
+        private void ValidateIcon(bool hasFile, string? preset, bool required)
+        {
+            if (!string.IsNullOrEmpty(preset) && !CategoryIconPresets.IsValid(preset))
+                ModelState.AddModelError("PresetIcon", "Seçilən ikon tapılmadı");
+            else if (required && !hasFile && string.IsNullOrEmpty(preset))
+                ModelState.AddModelError("PresetIcon", "Hazır ikonlardan birini seçin və ya öz ikonunuzu yükləyin");
         }
 
         /// <summary>Video qaydaları: video olacaqsa başlıq və təsvir məcburidir.</summary>

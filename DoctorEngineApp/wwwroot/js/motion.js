@@ -16,6 +16,17 @@
     const hoursEl = document.querySelector("[data-de-hours]");
     const statusEl = document.querySelector("[data-de-status]");
 
+    const I18N_AZ = {
+        openSoon: "İndi açığıq · {0} dəq sonra bağlanırıq",
+        openUntil: "İndi açığıq · {0}-dək",
+        opensToday: "Bağlıyıq · bu gün {0}-da açılırıq",
+        opensTomorrow: "Bağlıyıq · sabah {0}-da açılırıq",
+        opensNext: "Bağlıyıq · yaxın gün {0}-da açılırıq",
+        closed: "Bağlıyıq"
+    };
+    let i18n = {};
+    try { i18n = JSON.parse(hoursEl?.dataset.i18n || "{}"); } catch (e) { /* standart: az */ }
+
     /** "10:00 - 20:00" → { open: 600, close: 1200 } (dəqiqə ilə); tanınmırsa null */
     function parseRange(text) {
         const m = (text || "").match(/(\d{1,2})[:.](\d{2})\s*[-–—]\s*(\d{1,2})[:.](\d{2})/);
@@ -48,12 +59,15 @@
         const today = rangeFor(now.day);
         let text, open = false;
 
+        // Seçilmiş dildə mətnlər (Header: data-i18n), "{0}" — vaxt / dəqiqə
+        const t = (key, arg) => (i18n[key] || I18N_AZ[key]).replace("{0}", arg);
+
         if (today && now.minutes >= today.open && now.minutes < today.close) {
             open = true;
             const left = today.close - now.minutes;
-            text = left <= 60 ? `İndi açığıq · ${left} dəq sonra bağlanırıq` : `İndi açığıq · ${fmt(today.close)}-dək`;
+            text = left <= 60 ? t("openSoon", left) : t("openUntil", fmt(today.close));
         } else if (today && now.minutes < today.open) {
-            text = `Bağlıyıq · bu gün ${fmt(today.open)}-da açılırıq`;
+            text = t("opensToday", fmt(today.open));
         } else {
             // Növbəti iş günü
             let next = null, offset = 1;
@@ -61,7 +75,7 @@
                 next = rangeFor((now.day + offset) % 7);
                 if (next) break;
             }
-            text = next ? `Bağlıyıq · ${offset === 1 ? "sabah" : "yaxın gün"} ${fmt(next.open)}-da açılırıq` : "Bağlıyıq";
+            text = next ? t(offset === 1 ? "opensTomorrow" : "opensNext", fmt(next.open)) : t("closed", "");
         }
 
         statusEl.classList.toggle("is-open", open);

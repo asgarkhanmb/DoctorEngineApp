@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<!-- Saytın rəngləri (wwwroot/css/theme.css) -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Color x:Key="Primary">#D81324</Color>
+    <Color x:Key="PrimaryDark">#B00F1D</Color>
+    <Color x:Key="PrimarySoft">#FDECEE</Color>
+    <Color x:Key="Navy">#0B2154</Color>
+    <Color x:Key="Navy2">#16306F</Color>
+    <Color x:Key="Background">#F4F6FA</Color>
+    <Color x:Key="Surface">#FFFFFF</Color>
+    <Color x:Key="Border">#E3E7EF</Color>
+    <Color x:Key="Text">#1D2433</Color>
+    <Color x:Key="Muted">#7A8394</Color>
+    <Color x:Key="Success">#16A34A</Color>
+    <Color x:Key="SuccessSoft">#E9F8EF</Color>
+    <Color x:Key="Warning">#D97706</Color>
+    <Color x:Key="WarningSoft">#FFF6E5</Color>
+
+    <!-- Tünd rejim -->
+    <Color x:Key="BackgroundDark">#0E1424</Color>
+    <Color x:Key="SurfaceDark">#182036</Color>
+    <Color x:Key="BorderDark">#273049</Color>
+    <Color x:Key="TextDark">#EEF1F7</Color>
+    <Color x:Key="MutedDark">#9AA3B5</Color>
+
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}" />
+    <SolidColorBrush x:Key="NavyBrush" Color="{StaticResource Navy}" />
+
+    <LinearGradientBrush x:Key="HeroGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0B2154" Offset="0" />
+        <GradientStop Color="#16306F" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#F0263A" Offset="0" />
+        <GradientStop Color="#B00F1D" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- ===== Yeni dizayn: başlıq və sürətli əməliyyat plitələri ===== -->
+    <LinearGradientBrush x:Key="HeaderGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A1C47" Offset="0" />
+        <GradientStop Color="#14307A" Offset="0.65" />
+        <GradientStop Color="#1D3F9A" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="NavyTile" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2348A8" Offset="0" />
+        <GradientStop Color="#0B2154" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="VioletTile" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#8B5CF6" Offset="0" />
+        <GradientStop Color="#C026D3" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="GreenTile" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#34D399" Offset="0" />
+        <GradientStop Color="#059669" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="AmberTile" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#FBBF24" Offset="0" />
+        <GradientStop Color="#EA580C" Offset="1" />
+    </LinearGradientBrush>
+    <!-- Şəkil üzərində yazı oxunsun deyə: yuxarı şəffaf → aşağı tünd göy -->
+    <LinearGradientBrush x:Key="ImageOverlay" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#000B2154" Offset="0" />
+        <GradientStop Color="#660B2154" Offset="0.45" />
+        <GradientStop Color="#F00A1C47" Offset="1" />
+    </LinearGradientBrush>
+
+    <Color x:Key="Glass">#1FFFFFFF</Color>
+    <Color x:Key="GlassBorder">#33FFFFFF</Color>
+    <Color x:Key="OnHeaderMuted">#B9C6E6</Color>
+    <Color x:Key="Live">#22C55E</Color>
+    <Color x:Key="Skeleton">#E3E8F1</Color>
+    <Color x:Key="SkeletonDark">#233050</Color>
+</ResourceDictionary>

@@ -98,7 +98,7 @@
             if (!btn || btn.disabled) return;
             btn.dataset.label = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>' + (form.dataset.deLoading || "Göndərilir…");
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>' + (form.dataset.deLoading || deT("Göndərilir…"));
         });
     });
 

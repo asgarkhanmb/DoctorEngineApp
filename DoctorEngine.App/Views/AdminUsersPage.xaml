@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             x:Class="DoctorEngine.App.Views.AdminUsersPage"
+             x:DataType="vm:AdminUsersViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr adm_users}">
+
+    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{l:Tr adm_users}" Subtitle="{l:Tr adm_users_sub}" Icon="ic_user_w.png" />
+
+        <Border Grid.Row="1" Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0" Margin="16,12,16,0">
+            <Entry Text="{Binding Query}" Placeholder="{l:Tr adm_search}" ReturnType="Search" ReturnCommand="{Binding LoadCommand}"
+                   IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" />
+        </Border>
+
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCommand}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="10" Padding="16,12,16,32">
+                    <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                    </Border>
+                    <Label Text="{l:Tr adm_users_hint}" Style="{StaticResource Muted}" FontSize="12" />
+
+                    <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Items}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AdminUserItem">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="12" v:Motion.Press="True">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                        <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}">
+                                            <Grid>
+                                                <Label Text="{Binding Initial}" TextColor="White" FontFamily="BarlowBold" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center" />
+                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding AvatarUrl, Converter={StaticResource HasValue}}" />
+                                            </Grid>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                                            <Label Text="{Binding User.FullName}" Style="{StaticResource RowTitle}" />
+                                            <Label Style="{StaticResource Muted}" FontSize="12" LineBreakMode="TailTruncation">
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="@" />
+                                                        <Span Text="{Binding User.UserName}" />
+                                                        <Span Text=" · " />
+                                                        <Span Text="{Binding User.Email}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                            <Label Text="{Binding RolesText}" FontSize="12" FontFamily="BarlowSemiBold" TextColor="{StaticResource Primary}" />
+                                        </VerticalStackLayout>
+                                        <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                    </Grid>
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminUsersViewModel}}, Path=ManageCommand, x:DataType=vm:AdminUsersViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

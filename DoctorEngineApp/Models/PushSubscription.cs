@@ -25,5 +25,10 @@ namespace DoctorEngineApp.Models
         [Required]
         [MaxLength(100)]
         public string Auth { get; set; } = string.Empty;
+
+        // Bildirişin dili (az/en/ru/tr) — saytda seçilmiş dil; hər açılışda abunəlik yenilənəndə güncəllənir
+        [Required]
+        [MaxLength(5)]
+        public string Lang { get; set; } = "az";
     }
 }

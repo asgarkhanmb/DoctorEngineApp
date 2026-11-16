@@ -79,6 +79,29 @@
         });
     });
 
+    // ---------- Hazır ikon seçici (kateqoriya) ----------
+    // Hazır ikon seçiləndə önizləmə yenilənir və yüklənmiş fayl təmizlənir;
+    // fayl seçiləndə isə hazır ikon seçimi götürülür (server faylı üstün tutur).
+    document.querySelectorAll("[data-icon-picker]").forEach((picker) => {
+        const preview = picker.querySelector("#iconPreview");
+        const fileInput = picker.querySelector("input[type=file]");
+        const radios = picker.querySelectorAll("input[type=radio][name=PresetIcon]");
+
+        radios.forEach((r) => r.addEventListener("change", () => {
+            if (!r.checked) return;
+            if (fileInput) fileInput.value = "";
+            if (preview) {
+                preview.replaceChildren();
+                preview.style.backgroundImage = r.dataset.src ? "url('" + r.dataset.src + "')" : "";
+            }
+        }));
+
+        if (fileInput) fileInput.addEventListener("change", () => {
+            if (!fileInput.files.length) return;
+            radios.forEach((r) => { r.checked = false; });
+        });
+    });
+
     // ---------- Cədvəllər: axtarış + status filtri + səhifələmə ----------
     // Bütün .adm-table cədvəllərinə avtomatik tətbiq olunur.
     //   <input data-table-search="#tableId">           — axtarış

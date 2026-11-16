@@ -51,7 +51,7 @@ namespace DoctorEngineApp.Services
         public async Task UpdateAsync(ServiceVM model)
         {
             var service = await _context.Services.FindAsync(model.Id);
-            if (service == null) throw new InvalidOperationException("Service not found");
+            if (service == null) throw new InvalidOperationException("Xidmət tapılmadı — artıq silinmiş ola bilər.");
 
             service.Name = model.Name;
 

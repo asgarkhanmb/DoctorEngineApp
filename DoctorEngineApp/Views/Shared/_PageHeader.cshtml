@@ -4,16 +4,16 @@
 
 <section class="de-page-header">
     <div class="container">
-        <h1>@Model.Title</h1>
+        <h1>@L.T(Model.Title)</h1>
         @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
         {
-            <p>@Model.Subtitle</p>
+            <p>@L.T(Model.Subtitle)</p>
         }
         <nav aria-label="breadcrumb">
             <ol class="de-breadcrumb">
-                <li><a asp-controller="Home" asp-action="Index"><i class="fa-solid fa-house"></i> Ana Səhifə</a></li>
+                <li><a asp-controller="Home" asp-action="Index"><i class="fa-solid fa-house"></i> @L.T("Ana Səhifə")</a></li>
                 <li class="sep" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></li>
-                <li aria-current="page">@Model.Title</li>
+                <li aria-current="page">@L.T(Model.Title)</li>
             </ol>
         </nav>
     </div>

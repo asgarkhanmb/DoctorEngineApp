@@ -1,0 +1,223 @@
+/* =====================================================
+   DoctorEngine — Xəta səhifələri (Views/Error/Status.cshtml)
+   ===================================================== */
+
+:root {
+    --e-primary: #D81324;
+    --e-primary-dark: #b00f1d;
+    --e-navy: #0B2154;
+    --e-navy-2: #16306f;
+    --e-text: #1d2433;
+    --e-muted: #6b7486;
+    --e-border: #e5e8ef;
+    --e-bg: #f4f6fa;
+    --e-ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body.err-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background:
+        radial-gradient(circle at 12% 0%, rgba(216, 19, 36, .08), transparent 38%),
+        radial-gradient(circle at 100% 100%, rgba(11, 33, 84, .09), transparent 42%),
+        radial-gradient(circle at 1px 1px, rgba(11, 33, 84, .06) 1px, transparent 0) 0 0 / 24px 24px,
+        var(--e-bg);
+    color: var(--e-text);
+    font-family: "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Üst ---------- */
+
+.err-top { padding: 22px clamp(16px, 4vw, 48px); }
+
+.err-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--e-primary);
+    font-family: "Barlow", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    text-decoration: none;
+}
+
+.err-brand__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--e-primary);
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 0 6px 16px rgba(216, 19, 36, .35);
+}
+
+/* ---------- Kart ---------- */
+
+.err-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);   /* kart məzmunun min enindən dar ola bilsin (telefonda daşırdı) */
+    place-items: center;
+    padding: 8px 16px 48px;
+}
+
+.err-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 560px;
+    padding: clamp(28px, 5vw, 48px) clamp(20px, 5vw, 44px);
+    border: 1px solid var(--e-border);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .92);
+    box-shadow: 0 24px 60px rgba(11, 33, 84, .12);
+    text-align: center;
+    animation: err-rise .55s var(--e-ease) both;
+}
+
+@keyframes err-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* 4 [ikon] 4 */
+.err-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 2vw, 14px);
+    margin-bottom: 18px;
+    color: var(--e-navy);
+    font-family: "Barlow", sans-serif;
+    font-size: clamp(76px, 18vw, 120px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+/* Dairə ölçüsü rəqəmlərə görə (em), ikon isə dairənin içində ayrıca kiçildilir */
+.err-code__mid i { font-size: .34em; letter-spacing: 0; }
+
+.err-code__mid {
+    display: grid;
+    place-items: center;
+    width: .78em;
+    height: .78em;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--e-primary) 0%, var(--e-primary-dark) 100%);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(216, 19, 36, .35), inset 0 0 0 6px rgba(255, 255, 255, .14);
+    animation: err-float 3.2s ease-in-out infinite;
+}
+
+@keyframes err-float {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-6px) rotate(-6deg); }
+}
+
+.err-card h1 {
+    margin: 0 0 10px;
+    color: var(--e-navy);
+    font-family: "Barlow", sans-serif;
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.err-text {
+    max-width: 420px;
+    margin: 0 auto 26px;
+    color: var(--e-muted);
+    font-size: 15.5px;
+    line-height: 1.55;
+}
+
+/* ---------- Düymələr ---------- */
+
+.err-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+.err-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    padding: 0 20px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font: 500 15px/1 "Ubuntu", system-ui, sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .15s var(--e-ease), box-shadow .2s, background .2s, border-color .2s, color .2s;
+}
+
+.err-btn:active { transform: scale(.97); }
+.err-btn:focus-visible { outline: 3px solid rgba(216, 19, 36, .35); outline-offset: 2px; }
+.err-btn[hidden] { display: none; }
+
+.err-btn--primary { background: var(--e-primary); color: #fff; box-shadow: 0 8px 20px rgba(216, 19, 36, .3); }
+.err-btn--primary:hover { background: var(--e-primary-dark); color: #fff; }
+
+.err-btn--light { border-color: var(--e-border); background: #fff; color: var(--e-navy); }
+.err-btn--light:hover { border-color: var(--e-navy); color: var(--e-navy); }
+
+/* ---------- Faydalı keçidlər ---------- */
+
+.err-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 14px;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px dashed var(--e-border);
+    color: var(--e-muted);
+    font-size: 14px;
+}
+
+.err-links a { display: inline-flex; align-items: center; gap: 6px; color: var(--e-navy); font-weight: 500; text-decoration: none; }
+.err-links a:hover { color: var(--e-primary); }
+.err-links i { color: var(--e-primary); font-size: 13px; }
+
+/* ---------- Sorğu kodu ---------- */
+
+.err-ref { margin: 22px 0 0; color: var(--e-muted); font-size: 12.5px; line-height: 1.6; }
+
+.err-ref__code {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    margin-top: 4px;
+    padding: 3px 10px;
+    border: 1px solid var(--e-border);
+    border-radius: 8px;
+    background: var(--e-bg);
+    color: var(--e-text);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.err-ref__code code { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, Consolas, monospace; }
+.err-ref__code.is-copied { border-color: #16a34a; color: #15803d; }
+.err-ref__code.is-copied i::before { content: "\f00c"; font-weight: 900; }
+
+@media (max-width: 480px) {
+    .err-actions { flex-direction: column; }
+    .err-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .err-card, .err-code__mid { animation: none; }
+}

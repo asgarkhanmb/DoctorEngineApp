@@ -9,9 +9,9 @@
 {
     <section class="container ab-team">
         <div class="sv-head wow fadeInUp" data-wow-delay="0.1s">
-            <span class="sv-eyebrow">Komandamız</span>
-            <h2>Mütəxəssislərimiz</h2>
-            <p>Mühərrikinizə baxacaq ustalarla tanış olun.</p>
+            <span class="sv-eyebrow">@L.T("Komandamız")</span>
+            <h2>@L.T("Mütəxəssislərimiz")</h2>
+            <p>@L.T("Mühərrikinizə baxacaq ustalarla tanış olun.")</p>
         </div>
 
         <div class="ab-team__grid @(team.Count == 1 ? "is-single" : "")">
@@ -25,22 +25,22 @@
                     <div class="ab-member__body">
                         @if (team.Count == 1)
                         {
-                            <span class="ab-member__role">@t.Position</span>
+                            <span class="ab-member__role">@L.T(t.Position)</span>
                             <h3>@t.FullName</h3>
                             @if (!string.IsNullOrWhiteSpace(t.Bio))
                             {
                                 @* Admin paneldən: Ustalar → Redaktə → Qısa təqdimat *@
-                                <p class="ab-member__note">@t.Bio</p>
+                                <p class="ab-member__note">@L.T(t.Bio)</p>
                             }
                             <div class="ab-member__actions">
-                                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--primary"><i class="fa-regular fa-comments"></i> Ustaya yaz</a>
-                                <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--light">Rezervasiya et <i class="fa-solid fa-arrow-right"></i></a>
+                                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--primary"><i class="fa-regular fa-comments"></i> @L.T("Ustaya yaz")</a>
+                                <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--light">@L.T("Rezervasiya et") <i class="fa-solid fa-arrow-right"></i></a>
                             </div>
                         }
                         else
                         {
                             <h3>@t.FullName</h3>
-                            <span class="ab-member__role">@t.Position</span>
+                            <span class="ab-member__role">@L.T(t.Position)</span>
                         }
                         @if (hasSocial)
                         {

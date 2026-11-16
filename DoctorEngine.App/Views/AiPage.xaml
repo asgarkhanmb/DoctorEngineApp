@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             x:Class="DoctorEngine.App.Views.AiPage"
+             x:DataType="vm:AiViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr ai_title}">
+
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{AppThemeBinding Light=#F3F1FB, Dark={StaticResource BackgroundDark}}">
+
+        <!-- ================= BAŞLIQ ================= -->
+        <Border Style="{StaticResource PageHeader}" Padding="12,12,16,16" StrokeShape="RoundRectangle 0,0,24,24">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+                <Border Style="{StaticResource GlassIconButton}" v:Motion.Press="True">
+                    <Image Source="ic_back_w.png" />
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnBackTapped" /></Border.GestureRecognizers>
+                </Border>
+                <Border Grid.Column="1" WidthRequest="44" HeightRequest="44" StrokeShape="RoundRectangle 14" StrokeThickness="0" Background="{StaticResource VioletTile}" Padding="11">
+                    <Image Source="ic_spark_w.png" />
+                </Border>
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
+                    <Label Text="{l:Tr ai_title}" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
+                    <Label Text="{l:Tr ai_subtitle}" TextColor="{StaticResource OnHeaderMuted}" FontSize="12" />
+                </VerticalStackLayout>
+                <Border Grid.Column="3" Style="{StaticResource Pill}" BackgroundColor="{StaticResource Glass}" VerticalOptions="Center" v:Motion.Press="True">
+                    <Label Text="{l:Tr ai_clear}" TextColor="White" FontFamily="BarlowSemiBold" FontSize="13" />
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ClearCommand}" /></Border.GestureRecognizers>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ================= MESAJLAR ================= -->
+        <CollectionView x:Name="MessagesView" Grid.Row="1" ItemsSource="{Binding Messages}" SelectionMode="None" ItemsUpdatingScrollMode="KeepLastItemInView">
+            <CollectionView.Header>
+                <BoxView HeightRequest="8" Color="Transparent" />
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:AiItem">
+                    <Grid v:Motion.Appear="True" Padding="12,5">
+                        <!-- İstifadəçi -->
+                        <Border IsVisible="{Binding IsUser}" HorizontalOptions="End" MaximumWidthRequest="320" Background="{StaticResource PrimaryGradient}"
+                                StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="14,10">
+                            <Label Text="{Binding Content}" TextColor="White" FontSize="15" />
+                        </Border>
+                        <!-- AI -->
+                        <Grid IsVisible="{Binding IsUser, Converter={StaticResource InvertedBool}}" ColumnDefinitions="Auto,*" ColumnSpacing="8" HorizontalOptions="Start">
+                            <Border WidthRequest="32" HeightRequest="32" StrokeShape="RoundRectangle 11" StrokeThickness="0" Background="{StaticResource VioletTile}" Padding="8" VerticalOptions="Start">
+                                <Image Source="ic_spark_w.png" />
+                            </Border>
+                            <Border Grid.Column="1" MaximumWidthRequest="320" Style="{StaticResource SoftCard}" StrokeShape="RoundRectangle 20" Padding="14,10">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding Content}" FontSize="15" />
+                                    <ActivityIndicator IsRunning="True" HeightRequest="18" HorizontalOptions="Start" Color="#8B5CF6"
+                                                       IsVisible="{Binding Content, Converter={StaticResource HasValue}, ConverterParameter=inv}" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <BoxView HeightRequest="10" Color="Transparent" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+        <!-- Boş vəziyyət: EmptyView əvəzinə ayrıca qat (Windows-da EmptyView → elementlər keçidi tətbiqi çökdürür) -->
+        <ScrollView Grid.Row="1" IsVisible="{Binding IsEmpty}">
+            <VerticalStackLayout Padding="24,30,24,20" Spacing="14" VerticalOptions="Center">
+                <Grid HorizontalOptions="Center" WidthRequest="132" HeightRequest="132">
+                    <Ellipse Fill="{AppThemeBinding Light=#E7DFFC, Dark=#2D2350}" />
+                    <Ellipse Fill="{AppThemeBinding Light=#D6C8FA, Dark=#3B2D6B}" Margin="20" />
+                    <Border x:Name="Orb" StrokeShape="RoundRectangle 24" StrokeThickness="0" Background="{StaticResource VioletTile}"
+                            WidthRequest="68" HeightRequest="68" Padding="18" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="ic_spark_w.png" />
+                    </Border>
+                </Grid>
+                <Label Text="{l:Tr ai_empty_title}" Style="{StaticResource SectionTitle}" FontSize="23" HorizontalTextAlignment="Center" />
+                <Label Text="{l:Tr ai_empty_text}"
+                       Style="{StaticResource Muted}" FontSize="15" HorizontalTextAlignment="Center" />
+                <VerticalStackLayout Spacing="10" Margin="0,8,0,0" BindableLayout.ItemsSource="{Binding Suggestions}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="14,12" StrokeShape="RoundRectangle 18" v:Motion.Press="True">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                                    <Image Source="ic_spark_n.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding .}" FontSize="14" FontFamily="BarlowSemiBold" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                    <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                </Grid>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AiViewModel}}, Path=UseSuggestionCommand, x:DataType=vm:AiViewModel}" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ================= YAZMA SAHƏSİ ================= -->
+        <Border Grid.Row="2" StrokeThickness="0" StrokeShape="RoundRectangle 22,22,0,0" Padding="10,10,10,12"
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}">
+            <Border.Shadow>
+                <Shadow Brush="#0B2154" Offset="0,-4" Radius="16" Opacity="0.08" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <Border StrokeShape="RoundRectangle 23" StrokeThickness="0" Padding="16,2" BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}">
+                    <Editor Text="{Binding Question}" Placeholder="{l:Tr ai_placeholder}" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
+                </Border>
+                <Grid Grid.Column="1" VerticalOptions="End">
+                    <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource VioletTile}" Padding="13"
+                            Opacity="0.45" IsVisible="{Binding IsAnswering, Converter={StaticResource InvertedBool}}" v:Motion.Press="True">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding CanAsk}" Value="True"><Setter Property="Opacity" Value="1" /></DataTrigger>
+                        </Border.Triggers>
+                        <Image Source="ic_send_w.png" />
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding AskCommand}" /></Border.GestureRecognizers>
+                    </Border>
+                    <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource NavyTile}"
+                            IsVisible="{Binding IsAnswering}" v:Motion.Press="True">
+                        <BoxView WidthRequest="14" HeightRequest="14" CornerRadius="3" Color="White" HorizontalOptions="Center" VerticalOptions="Center" />
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding StopCommand}" /></Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

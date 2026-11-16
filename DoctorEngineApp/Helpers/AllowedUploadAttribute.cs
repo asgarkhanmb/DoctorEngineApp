@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using DoctorEngineApp.Localization;
+using System.ComponentModel.DataAnnotations;
 
 namespace DoctorEngineApp.Helpers
 {
@@ -51,9 +52,9 @@ namespace DoctorEngineApp.Helpers
 
             var (extensions, mimePrefix, maxBytes, label) = kind switch
             {
-                UploadKind.Image => (ImageExtensions, "image/", DefaultMaxImageBytes, "Şəkil"),
-                UploadKind.Audio => (AudioExtensions, "audio/", DefaultMaxAudioBytes, "Səs"),
-                _ => (VideoExtensions, "video/", DefaultMaxVideoBytes, "Video")
+                UploadKind.Image => (ImageExtensions, "image/", DefaultMaxImageBytes, L.T("Şəkil")),
+                UploadKind.Audio => (AudioExtensions, "audio/", DefaultMaxAudioBytes, L.T("Səs")),
+                _ => (VideoExtensions, "video/", DefaultMaxVideoBytes, L.T("Video"))
             };
 
             if (maxBytesOverride.HasValue)
@@ -61,32 +62,32 @@ namespace DoctorEngineApp.Helpers
 
             if (!extensions.Contains(ext))
             {
-                error = $"{label} formatı düzgün deyil. İcazə verilən: {string.Join(", ", extensions)}";
+                error = L.T("{0} formatı düzgün deyil. İcazə verilən: {1}", label, string.Join(", ", extensions));
                 return false;
             }
 
             if (string.IsNullOrEmpty(file.ContentType) ||
                 !file.ContentType.StartsWith(mimePrefix, StringComparison.OrdinalIgnoreCase))
             {
-                error = $"{label} faylı seçin.";
+                error = L.T("{0} faylı seçin.", label);
                 return false;
             }
 
             if (file.Length == 0)
             {
-                error = "Fayl boşdur.";
+                error = L.T("Fayl boşdur.");
                 return false;
             }
 
             if (file.Length > maxBytes)
             {
-                error = $"{label} ölçüsü maksimum {maxBytes / (1024 * 1024)} MB ola bilər.";
+                error = L.T("{0} ölçüsü maksimum {1} MB ola bilər.", label, maxBytes / (1024 * 1024));
                 return false;
             }
 
             if (!FileSignature.Matches(file, ext))
             {
-                error = $"Fayl həqiqi {label.ToLowerInvariant()} deyil və ya zədələnib.";
+                error = L.T("Fayl həqiqi {0} deyil və ya zədələnib.", label.ToLower(L.Culture));
                 return false;
             }
 

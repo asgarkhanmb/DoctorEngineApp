@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Data;
+﻿using DoctorEngineApp.Localization;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.ContactPhones;
@@ -86,7 +87,7 @@ namespace DoctorEngineApp.Controllers
                     .Select(e => e.ErrorMessage)
                     .FirstOrDefault(m => !string.IsNullOrWhiteSpace(m));
 
-                return Json(new { success = false, message = firstError ?? "Məlumatları düzgün doldurun!" });
+                return Json(new { success = false, message = firstError ?? L.T("Məlumatları düzgün doldurun!") });
             }
 
             try
@@ -97,7 +98,7 @@ namespace DoctorEngineApp.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Rezervasiya yaradılarkən xəta");
-                return Json(new { success = false, message = "Xəta baş verdi. Yenidən cəhd edin." });
+                return Json(new { success = false, message = L.T("Xəta baş verdi. Yenidən cəhd edin.") });
             }
         }
 

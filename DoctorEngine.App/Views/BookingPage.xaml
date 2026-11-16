@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             xmlns:c="clr-namespace:DoctorEngine.Contracts;assembly=DoctorEngine.Contracts"
+             x:Class="DoctorEngine.App.Views.BookingPage"
+             x:DataType="vm:BookingViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="Container"
+             Title="{l:Tr tab_booking}">
+
+    <ContentPage.Resources>
+        <!-- Mərhələ nöqtəsi: tamamlananda qırmızı, əks halda şüşə -->
+        <Style x:Key="StepDot" TargetType="Border">
+            <Setter Property="WidthRequest" Value="30" />
+            <Setter Property="HeightRequest" Value="30" />
+            <Setter Property="StrokeShape" Value="Ellipse" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="BackgroundColor" Value="{StaticResource Glass}" />
+        </Style>
+        <Style x:Key="StepNum" TargetType="Label">
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontFamily" Value="BarlowBold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="StepText" TargetType="Label">
+            <Setter Property="TextColor" Value="{StaticResource OnHeaderMuted}" />
+            <Setter Property="FontFamily" Value="BarlowSemiBold" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+        <!-- Kart başlığı: nömrəli dairə + mətn -->
+        <Style x:Key="CardNum" TargetType="Border">
+            <Setter Property="WidthRequest" Value="30" />
+            <Setter Property="HeightRequest" Value="30" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+        </Style>
+        <Style x:Key="CardTitle" TargetType="Label">
+            <Setter Property="FontFamily" Value="BarlowBold" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+
+        <ScrollView>
+            <VerticalStackLayout Spacing="14" Padding="0,0,0,20">
+
+                <!-- ================= BAŞLIQ + MƏRHƏLƏLƏR ================= -->
+                <Border Style="{StaticResource PageHeader}">
+                    <VerticalStackLayout Spacing="16">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{l:Tr booking_eyebrow}" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
+                            <Label Text="{l:Tr booking_title}" Style="{StaticResource HeaderTitle}" />
+                            <Label Text="{l:Tr booking_subtitle}" Style="{StaticResource HeaderSubtitle}" />
+                        </VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,*,*,*">
+                            <BoxView Color="{StaticResource GlassBorder}" HeightRequest="2" VerticalOptions="Start" Margin="40,14,40,0" Grid.ColumnSpan="4" />
+                            <VerticalStackLayout Spacing="6">
+                                <Border Style="{StaticResource StepDot}">
+                                    <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step1Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
+                                    <Label Text="1" Style="{StaticResource StepNum}" />
+                                </Border>
+                                <Label Text="{l:Tr step_service}" Style="{StaticResource StepText}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                <Border Style="{StaticResource StepDot}">
+                                    <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step2Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
+                                    <Label Text="2" Style="{StaticResource StepNum}" />
+                                </Border>
+                                <Label Text="{l:Tr step_day}" Style="{StaticResource StepText}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2" Spacing="6">
+                                <Border Style="{StaticResource StepDot}">
+                                    <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step3Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
+                                    <Label Text="3" Style="{StaticResource StepNum}" />
+                                </Border>
+                                <Label Text="{l:Tr step_time}" Style="{StaticResource StepText}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="3" Spacing="6">
+                                <Border Style="{StaticResource StepDot}">
+                                    <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step4Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
+                                    <Label Text="4" Style="{StaticResource StepNum}" />
+                                </Border>
+                                <Label Text="{l:Tr step_contact}" Style="{StaticResource StepText}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Uğurlu -->
+                <Border Style="{StaticResource SoftCard}" Margin="16,0" Background="{StaticResource GreenTile}"
+                        IsVisible="{Binding SuccessMessage, Converter={StaticResource HasValue}}">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Border WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#33FFFFFF" Padding="12" VerticalOptions="Start">
+                            <Image Source="ic_check_w.png" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="{l:Tr booking_sent}" TextColor="White" FontFamily="BarlowBold" FontSize="18" />
+                            <Label Text="{Binding SuccessMessage}" TextColor="#F0FFFFFF" FontSize="13" />
+                            <Border Style="{StaticResource Pill}" BackgroundColor="#33FFFFFF" Padding="10,4" IsVisible="{Binding SuccessCode, Converter={StaticResource HasValue}}">
+                                <Label TextColor="White" FontSize="12">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{l:Tr booking_tracking}" />
+                                            <Span Text="{Binding SuccessCode}" FontFamily="BarlowBold" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource ErrorBox}" Margin="16,0" IsVisible="{Binding HasError}">
+                    <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                </Border>
+
+                <!-- ================= 1. XİDMƏT ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,0">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout Spacing="10">
+                            <Border Style="{StaticResource CardNum}"><Label Text="1" Style="{StaticResource StepNum}" /></Border>
+                            <Label Text="{l:Tr booking_choose_service}" Style="{StaticResource CardTitle}" />
+                        </HorizontalStackLayout>
+                        <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,2">
+                            <Picker ItemsSource="{Binding Services}" SelectedItem="{Binding SelectedService}" ItemDisplayBinding="{Binding Name, x:DataType=c:BookableServiceDto}"
+                                    Title="{l:Tr booking_service_picker}" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================= 2. GÜN ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,0" Padding="16,16,0,16">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout Spacing="10">
+                            <Border Style="{StaticResource CardNum}"><Label Text="2" Style="{StaticResource StepNum}" /></Border>
+                            <Label Text="{l:Tr booking_choose_day}" Style="{StaticResource CardTitle}" />
+                        </HorizontalStackLayout>
+                        <CollectionView ItemsSource="{Binding Days}" HeightRequest="84" SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.Footer>
+                                <BoxView WidthRequest="6" Color="Transparent" />
+                            </CollectionView.Footer>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:DayItem">
+                                    <Border v:Motion.Appear="True" WidthRequest="62" HeightRequest="80" Padding="0" StrokeShape="RoundRectangle 18" StrokeThickness="0"
+                                            BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" v:Motion.Press="True">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <VerticalStackLayout Spacing="2" HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Label Text="{Binding Label}" FontSize="12" FontFamily="BarlowSemiBold" HorizontalTextAlignment="Center"
+                                                   TextColor="{Binding IsSelected, Converter={StaticResource SelectedText}}" Opacity="0.8" />
+                                            <Label Text="{Binding Number}" FontSize="24" FontFamily="BarlowBold" HorizontalTextAlignment="Center"
+                                                   TextColor="{Binding IsSelected, Converter={StaticResource SelectedText}}" />
+                                        </VerticalStackLayout>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BookingViewModel}}, Path=SelectDayCommand, x:DataType=vm:BookingViewModel}" CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================= 3. SAAT ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,0">
+                    <VerticalStackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                            <Border Style="{StaticResource CardNum}"><Label Text="3" Style="{StaticResource StepNum}" /></Border>
+                            <Label Grid.Column="1" Text="{l:Tr booking_choose_time}" Style="{StaticResource CardTitle}" />
+                            <ActivityIndicator Grid.Column="2" IsRunning="{Binding IsLoadingSlots}" IsVisible="{Binding IsLoadingSlots}" HeightRequest="22" WidthRequest="22" />
+                        </Grid>
+                        <Label Text="{l:Tr booking_pick_service_first}" Style="{StaticResource Muted}"
+                               IsVisible="{Binding Step1Done, Converter={StaticResource InvertedBool}}" />
+                        <Label Text="{l:Tr booking_no_slots}" Style="{StaticResource Muted}" IsVisible="{Binding NoSlots}" />
+                        <FlexLayout BindableLayout.ItemsSource="{Binding Slots}" Wrap="Wrap" JustifyContent="Start">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SlotItem">
+                                    <!-- Aralıq xarici Grid-in Padding-i ilə: FlexLayout uşaq Margin-ini hündürlükdən çıxıb düyməni kəsir -->
+                                    <Grid v:Motion.Appear="True" Padding="0,0,8,8">
+                                        <Border Padding="0" WidthRequest="72" HeightRequest="42" StrokeShape="RoundRectangle 14" StrokeThickness="0"
+                                                BackgroundColor="{Binding Background}" v:Motion.Press="True">
+                                            <Label Text="{Binding Time}" FontFamily="BarlowBold" FontSize="15" HorizontalOptions="Center" VerticalOptions="Center"
+                                                   TextColor="{Binding Foreground}" TextDecorations="{Binding Decorations}" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BookingViewModel}}, Path=SelectSlotCommand, x:DataType=vm:BookingViewModel}" CommandParameter="{Binding .}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                        <HorizontalStackLayout Spacing="16" IsVisible="{Binding Step1Done}">
+                            <HorizontalStackLayout Spacing="6">
+                                <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="3" Color="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" VerticalOptions="Center" />
+                                <Label Text="{l:Tr slot_free}" FontSize="12" Style="{StaticResource Muted}" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="6">
+                                <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="3" Color="#FDECEE" VerticalOptions="Center" />
+                                <Label Text="{l:Tr slot_busy}" FontSize="12" Style="{StaticResource Muted}" />
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="6">
+                                <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="3" Color="{StaticResource Primary}" VerticalOptions="Center" />
+                                <Label Text="{l:Tr slot_selected}" FontSize="12" Style="{StaticResource Muted}" />
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================= 4. ƏLAQƏ ================= -->
+                <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,0">
+                    <VerticalStackLayout Spacing="12">
+                        <HorizontalStackLayout Spacing="10">
+                            <Border Style="{StaticResource CardNum}"><Label Text="4" Style="{StaticResource StepNum}" /></Border>
+                            <Label Text="{l:Tr booking_contact_title}" Style="{StaticResource CardTitle}" />
+                        </HorizontalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="{l:Tr field_fullname}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding FullName}" Placeholder="{l:Tr field_fullname_ph}" /></Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="{l:Tr field_phone}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding Phone}" Placeholder="+994 XX XXX XX XX" Keyboard="Telephone" /></Border>
+                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                            <!-- WidthRequest: Windows-da CheckBox-un standart minimum eni 120px-dir -->
+                            <CheckBox IsChecked="{Binding SameAsPhone}" WidthRequest="36" MinimumWidthRequest="0" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{l:Tr booking_same_wa}" VerticalOptions="Center" FontSize="14" />
+                        </Grid>
+                        <VerticalStackLayout IsVisible="{Binding SameAsPhone, Converter={StaticResource InvertedBool}}">
+                            <Label Text="WhatsApp" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding WhatsApp}" Placeholder="+994 XX XXX XX XX" Keyboard="Telephone" /></Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="{l:Tr booking_note}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="10,4">
+                                <Editor Text="{Binding Note}" Placeholder="{l:Tr booking_note_ph}" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="76" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ================= MƏNİM REZERVASİYALARIM ================= -->
+                <VerticalStackLayout Spacing="10" Margin="16,8,16,0" IsVisible="{Binding HasMyReservations}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{l:Tr booking_mine}" Style="{StaticResource SectionTitle}" FontSize="19" VerticalOptions="Center" />
+                        <Border Grid.Column="1" Style="{StaticResource Pill}" BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#33D81324}" v:Motion.Press="True">
+                            <Label Text="{l:Tr common_refresh}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LoadMineCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+                    <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding MyReservations}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="c:ReservationStatusDto">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="14">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="2">
+                                        <Border Grid.RowSpan="2" WidthRequest="46" HeightRequest="46" StrokeShape="RoundRectangle 14" StrokeThickness="0"
+                                                BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" Padding="12" VerticalOptions="Center">
+                                            <Image Source="ic_calendar_n.png" />
+                                        </Border>
+                                        <Label Grid.Column="1" Text="{Binding Service}" FontFamily="BarlowBold" FontSize="15" LineBreakMode="TailTruncation"
+                                               TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                        <Label Grid.Column="1" Grid.Row="1" Style="{StaticResource Muted}" FontSize="13">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Date}" />
+                                                    <Span Text=" · " />
+                                                    <Span Text="{Binding Time}" FontFamily="BarlowBold" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Border Grid.Column="2" Grid.RowSpan="2" VerticalOptions="Center" Style="{StaticResource Pill}" Padding="10,5"
+                                                BackgroundColor="{Binding Status, Converter={StaticResource StatusColor}, ConverterParameter=bg}">
+                                            <Label Text="{Binding Status, Converter={StaticResource StatusText}}" FontSize="12" FontFamily="BarlowBold"
+                                                   TextColor="{Binding Status, Converter={StaticResource StatusColor}}" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ================= SABİT ALT PANEL: xülasə + göndər ================= -->
+        <Border Grid.Row="1" StrokeThickness="0" StrokeShape="RoundRectangle 24,24,0,0" Padding="16,12,16,14"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}">
+            <Border.Shadow>
+                <Shadow Brush="#0B2154" Offset="0,-6" Radius="20" Opacity="0.12" />
+            </Border.Shadow>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout VerticalOptions="Center" Spacing="0">
+                    <Label Text="{l:Tr booking_your_choice}" Style="{StaticResource Muted}" FontSize="12" />
+                    <Label Text="{Binding Summary}" FontFamily="BarlowBold" FontSize="14" MaxLines="2" LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                </VerticalStackLayout>
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}"
+                        HeightRequest="52" Padding="20,0" Opacity="0.45" v:Motion.Press="True">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding CanSubmit}" Value="True">
+                            <Setter Property="Opacity" Value="1" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Grid>
+                        <HorizontalStackLayout Spacing="8" VerticalOptions="Center" IsVisible="{Binding IsNotBusy}">
+                            <Label Text="{l:Tr booking_confirm}" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
+                            <Image Source="ic_arrow_w.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <ActivityIndicator Color="White" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="24" WidthRequest="24" />
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SubmitCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

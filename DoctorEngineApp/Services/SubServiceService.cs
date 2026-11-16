@@ -77,7 +77,7 @@ namespace DoctorEngineApp.Services
         public async Task UpdateAsync(SubServiceEditVM vm)
         {
             var entity = await _ctx.SubServices.FindAsync(vm.Id);
-            if (entity == null) throw new Exception("Not found");
+            if (entity == null) throw new Exception("Video tapılmadı — artıq silinmiş ola bilər.");
 
             if (vm.VideoFile != null)
             {

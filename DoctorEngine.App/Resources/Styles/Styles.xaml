@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ================= ÜMUMİ ================= -->
+
+    <Style TargetType="Page" ApplyToDerivedTypes="True">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style TargetType="Shell" ApplyToDerivedTypes="True">
+        <Setter Property="Shell.BackgroundColor" Value="{StaticResource Navy}" />
+        <Setter Property="Shell.ForegroundColor" Value="White" />
+        <Setter Property="Shell.TitleColor" Value="White" />
+        <Setter Property="Shell.NavBarHasShadow" Value="False" />
+        <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
+        <Setter Property="Shell.TabBarForegroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="Shell.TabBarTitleColor" Value="{StaticResource Primary}" />
+        <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+    </Style>
+
+    <!-- Şrift: Barlow (saytın başlıq şrifti). Saytın mətn şrifti Ubuntu-da "ə" hərfi yoxdur — ona görə mətn də Barlow-dur.
+         Qalın yazı üçün FontAttributes="Bold" yox, FontFamily="BarlowBold" (həqiqi qalın fayl; süni qalınlaşdırma pis görünür). -->
+    <Style TargetType="Label">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="15" />
+    </Style>
+
+    <Style x:Key="H1" TargetType="Label">
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <Style x:Key="H2" TargetType="Label">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <Style x:Key="Eyebrow" TargetType="Label">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="TextColor" Value="{StaticResource Primary}" />
+        <Setter Property="CharacterSpacing" Value="1.5" />
+        <!-- TextTransform istifadə olunmur: Windows "ı/i" hərflərini Azərbaycan qaydası ilə böyütmür — mətnlər hazır böyük yazılıb -->
+    </Style>
+
+    <Style x:Key="Muted" TargetType="Label">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+    </Style>
+
+    <!-- ================= KART ================= -->
+
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Shadow Brush="#0B2154" Offset="0,4" Radius="14" Opacity="0.06" />
+        </Setter>
+    </Style>
+
+    <!-- Yeni dizayn: yumşaq kölgəli, daha dəyirmi kart -->
+    <Style x:Key="SoftCard" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 22" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Shadow">
+            <Shadow Brush="#0B2154" Offset="0,8" Radius="22" Opacity="0.12" />
+        </Setter>
+    </Style>
+
+    <!-- Bölmə başlığı: böyük başlıq + sağda "Hamısı" -->
+    <Style x:Key="SectionTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="21" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- Kiçik dəyirmi "pill" (etiket, status) -->
+    <Style x:Key="Pill" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 999" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="HorizontalOptions" Value="Start" />
+    </Style>
+
+    <!-- Şüşə effektli dəyirmi ikon düyməsi (tünd başlıqda) -->
+    <Style x:Key="GlassIconButton" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Glass}" />
+        <Setter Property="Stroke" Value="{StaticResource GlassBorder}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+        <Setter Property="WidthRequest" Value="44" />
+        <Setter Property="HeightRequest" Value="44" />
+        <Setter Property="Padding" Value="11" />
+    </Style>
+
+    <!-- Sürətli əməliyyat plitəsinin ikon qutusu -->
+    <Style x:Key="TileIcon" TargetType="Border">
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+        <Setter Property="WidthRequest" Value="56" />
+        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="Padding" Value="15" />
+        <Setter Property="HorizontalOptions" Value="Center" />
+    </Style>
+
+    <Style x:Key="TileLabel" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowSemiBold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- Skelet yüklənmə qutusu -->
+    <Style x:Key="SkeletonBox" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Skeleton}, Dark={StaticResource SkeletonDark}}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+    </Style>
+
+    <!-- Səhifə başlığı (gradient, aşağı küncləri dəyirmi) -->
+    <Style x:Key="PageHeader" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource HeaderGradient}" />
+        <Setter Property="StrokeThickness" Value="0" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 0,0,28,28" />
+        <Setter Property="Padding" Value="20,18,20,26" />
+    </Style>
+
+    <Style x:Key="HeaderTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="TextColor" Value="White" />
+    </Style>
+
+    <Style x:Key="HeaderSubtitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource OnHeaderMuted}" />
+    </Style>
+
+    <!-- ================= DÜYMƏLƏR ================= -->
+
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="MinimumHeightRequest" Value="52" />
+        <Setter Property="Padding" Value="18,0" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="Opacity" Value="0.5" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{StaticResource PrimaryDark}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <Style x:Key="LightButton" TargetType="Button">
+        <Setter Property="Background" Value="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" />
+        <Setter Property="BorderWidth" Value="1" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="MinimumHeightRequest" Value="48" />
+    </Style>
+
+    <Style x:Key="NavyButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource NavyTile}" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="MinimumHeightRequest" Value="52" />
+    </Style>
+
+    <Style x:Key="LinkButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource Primary}" />
+        <Setter Property="Padding" Value="4,0" />
+        <Setter Property="MinimumHeightRequest" Value="36" />
+    </Style>
+
+    <!-- ================= SAHƏLƏR ================= -->
+
+    <Style TargetType="Entry">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="MinimumHeightRequest" Value="46" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <Style TargetType="Editor">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+    </Style>
+
+    <!-- Sahə qabı: haşiyəli dəyirmi kart (Entry-nin öz xəttini gizlədir) -->
+    <Style x:Key="Field" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}" />
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="12,0" />
+    </Style>
+
+    <Style x:Key="FieldLabel" TargetType="Label">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="Margin" Value="2,0,0,4" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- ================= BİLDİRİŞLƏR ================= -->
+
+    <Style x:Key="ErrorBox" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="#FDF1F2" />
+        <Setter Property="Stroke" Value="#F6C9CE" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="12,10" />
+    </Style>
+
+    <!-- Kart başlığı (Profil redaktəsi, Admin panel; Rezervasiya səhifəsinin öz nüsxəsi də var) -->
+    <Style x:Key="CardTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- Menyu sətrinin mətni (Admin panel) -->
+    <Style x:Key="RowTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowSemiBold" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="LineBreakMode" Value="TailTruncation" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <Style x:Key="SuccessBox" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource SuccessSoft}" />
+        <Setter Property="Stroke" Value="#BFE8CF" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+        <Setter Property="Padding" Value="12,10" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="FontFamily" Value="Barlow" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Text}, Dark={StaticResource TextDark}}" />
+        <Setter Property="TitleColor" Value="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="MinimumHeightRequest" Value="46" />
+    </Style>
+
+    <Style TargetType="CheckBox">
+        <Setter Property="Color" Value="{StaticResource Primary}" />
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource Primary}" />
+    </Style>
+
+    <Style TargetType="RefreshView">
+        <Setter Property="RefreshColor" Value="{StaticResource Primary}" />
+    </Style>
+</ResourceDictionary>

@@ -1,7 +1,9 @@
+using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
+using DoctorEngineApp.Localization;
 using DoctorEngineApp.ViewModels.Chats;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -39,6 +41,7 @@ namespace DoctorEngineApp.Services
                 existing.UserName = username;
                 existing.P256dh = p256dh;
                 existing.Auth = auth;
+                existing.Lang = L.Lang;   // istifadəçi saytın dilini dəyişibsə, bildirişlər də o dildə gəlsin
             }
             else
             {
@@ -48,6 +51,7 @@ namespace DoctorEngineApp.Services
                     Endpoint = endpoint,
                     P256dh = p256dh,
                     Auth = auth,
+                    Lang = L.Lang,
                     CreatedDate = AzTime.Now
                 });
             }
@@ -72,30 +76,47 @@ namespace DoctorEngineApp.Services
                 .ToListAsync();
             if (subs.Count == 0) return;
 
-            var body = msg.Message;
-            if (string.IsNullOrWhiteSpace(body))
+            // Hər abunəçiyə öz dilində (mesajın mətni olduğu kimi qalır — yalnız şablon sözlər tərcümə olunur)
+            var payloads = new Dictionary<string, string>();
+            string PayloadFor(string? lang)
             {
-                body = msg.AttachmentType switch
-                {
-                    "audio" => "🎤 Səs mesajı",
-                    "video" => "🎬 Video",
-                    "image" => "📷 Şəkil",
-                    _ => "Yeni mesaj"
-                };
-            }
-            else if (body.Length > 140)
-            {
-                body = body[..140] + "…";
-            }
+                lang = L.IsSupported(lang) ? lang! : L.Default;
+                if (payloads.TryGetValue(lang, out var cached)) return cached;
 
-            var payload = JsonSerializer.Serialize(new
-            {
-                title = msg.IsAdmin ? $"{msg.UserName} · Usta" : msg.UserName,
-                body,
-                tag = "dc-chat",
-                url = "/?openChat=1",
-                id = msg.Id
-            });
+                var previous = CultureInfo.CurrentUICulture;
+                CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(lang);
+                try
+                {
+                    var body = msg.Message;
+                    if (string.IsNullOrWhiteSpace(body))
+                    {
+                        body = msg.AttachmentType switch
+                        {
+                            "audio" => "🎤 " + L.T("Səs mesajı"),
+                            "video" => "🎬 " + L.T("Video"),
+                            "image" => "📷 " + L.T("Şəkil"),
+                            _ => L.T("Yeni mesaj")
+                        };
+                    }
+                    else if (body.Length > 140)
+                    {
+                        body = body[..140] + "…";
+                    }
+
+                    return payloads[lang] = JsonSerializer.Serialize(new
+                    {
+                        title = msg.IsAdmin ? $"{msg.UserName} · {L.T("Usta")}" : msg.UserName,
+                        body,
+                        tag = "dc-chat",
+                        url = "/?openChat=1",
+                        id = msg.Id
+                    });
+                }
+                finally
+                {
+                    CultureInfo.CurrentUICulture = previous;
+                }
+            }
 
             var vapid = new VapidDetails(Subject(), _options.PublicKey, _options.PrivateKey);
             var client = new WebPushClient();
@@ -106,7 +127,7 @@ namespace DoctorEngineApp.Services
                 try
                 {
                     await client.SendNotificationAsync(
-                        new WebPush.PushSubscription(s.Endpoint, s.P256dh, s.Auth), payload, vapid);
+                        new WebPush.PushSubscription(s.Endpoint, s.P256dh, s.Auth), PayloadFor(s.Lang), vapid);
                 }
                 catch (WebPushException ex) when (ex.StatusCode is HttpStatusCode.Gone or HttpStatusCode.NotFound)
                 {

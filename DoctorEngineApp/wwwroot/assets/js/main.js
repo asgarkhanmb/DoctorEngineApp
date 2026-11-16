@@ -27,7 +27,9 @@
     
     
     // Dropdown on mouse hover
-    const $dropdown = $(".dropdown");
+    // Dil seçimi (.de-lang) hover ilə açılmır — klik ilə: siçan düymədən menyuya enəndə
+    // aradakı boşluqda mouseleave işləyib menyunu bağlayırdı
+    const $dropdown = $(".dropdown").not(".de-lang");
     const $dropdownToggle = $(".dropdown-toggle");
     const $dropdownMenu = $(".dropdown-menu");
     const showClass = "show";

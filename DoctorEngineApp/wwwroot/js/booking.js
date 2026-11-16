@@ -12,10 +12,10 @@
     const MAX_CODES = 10;
 
     const STATUS = {
-        Pending:   { text: "Gözləyir",     icon: "fa-regular fa-hourglass-half", cls: "is-pending" },
-        Confirmed: { text: "Təsdiqləndi",  icon: "fa-solid fa-check",            cls: "is-confirmed" },
-        Rejected:  { text: "Rədd edildi",  icon: "fa-solid fa-xmark",            cls: "is-rejected" },
-        Deleted:   { text: "Ləğv edildi",  icon: "fa-solid fa-ban",              cls: "is-rejected" }
+        Pending:   { text: deT("Gözləyir"),     icon: "fa-regular fa-hourglass-half", cls: "is-pending" },
+        Confirmed: { text: deT("Təsdiqləndi"),  icon: "fa-solid fa-check",            cls: "is-confirmed" },
+        Rejected:  { text: deT("Rədd edildi"),  icon: "fa-solid fa-xmark",            cls: "is-rejected" },
+        Deleted:   { text: deT("Ləğv edildi"),  icon: "fa-solid fa-ban",              cls: "is-rejected" }
     };
 
     // ---------------- Yardımçılar ----------------
@@ -90,27 +90,27 @@
         document.querySelectorAll(".bk-live").forEach((el) => {
             el.classList.toggle("is-off", !ok);
             const t = el.querySelector("[data-bk-live-text]");
-            if (t) t.textContent = ok ? (el.dataset.onText || "Canlı: boş saatlar real vaxtda yenilənir") : "Bağlantı bərpa olunur…";
+            if (t) t.textContent = ok ? (el.dataset.onText || deT("Canlı: boş saatlar real vaxtda yenilənir")) : deT("Bağlantı bərpa olunur…");
         });
     }
 
     // Status izləyicisi: Göndərildi → Baxılır → Təsdiqləndi / Rədd edildi
     function trackerHtml(status, reason) {
-        const final = status === "Confirmed" ? { t: "Təsdiqləndi", i: "fa-solid fa-check", c: "is-done is-ok" }
-                    : status === "Rejected" ? { t: "Rədd edildi", i: "fa-solid fa-xmark", c: "is-done is-bad" }
-                    : status === "Deleted" ? { t: "Ləğv edildi", i: "fa-solid fa-ban", c: "is-done is-bad" }
-                    : { t: "Təsdiq", i: "fa-regular fa-circle-check", c: "" };
+        const final = status === "Confirmed" ? { t: deT("Təsdiqləndi"), i: "fa-solid fa-check", c: "is-done is-ok" }
+                    : status === "Rejected" ? { t: deT("Rədd edildi"), i: "fa-solid fa-xmark", c: "is-done is-bad" }
+                    : status === "Deleted" ? { t: deT("Ləğv edildi"), i: "fa-solid fa-ban", c: "is-done is-bad" }
+                    : { t: deT("Təsdiq"), i: "fa-regular fa-circle-check", c: "" };
         const reviewing = status === "Pending";
 
         let msg = "";
-        if (status === "Pending") msg = '<p class="bk-tracker__msg"><span class="bk-live__dot"></span> Usta rezervasiyanıza baxır — status dəyişən kimi burada görünəcək.</p>';
-        else if (status === "Confirmed") msg = '<p class="bk-tracker__msg is-ok"><i class="fa-solid fa-circle-check"></i> Rezervasiyanız təsdiqləndi! Sizi gözləyirik.</p>';
-        else if (status === "Rejected") msg = `<p class="bk-tracker__msg is-bad"><i class="fa-solid fa-circle-info"></i> Təəssüf ki, rezervasiya təsdiqlənmədi.${reason ? " Səbəb: " + esc(reason) : ""}</p>`;
-        else if (status === "Deleted") msg = '<p class="bk-tracker__msg is-bad"><i class="fa-solid fa-circle-info"></i> Rezervasiya ləğv edilib.</p>';
+        if (status === "Pending") msg = '<p class="bk-tracker__msg"><span class="bk-live__dot"></span> ' + deT('Usta rezervasiyanıza baxır — status dəyişən kimi burada görünəcək.') + '</p>';
+        else if (status === "Confirmed") msg = '<p class="bk-tracker__msg is-ok"><i class="fa-solid fa-circle-check"></i> ' + deT('Rezervasiyanız təsdiqləndi! Sizi gözləyirik.') + '</p>';
+        else if (status === "Rejected") msg = `<p class="bk-tracker__msg is-bad"><i class="fa-solid fa-circle-info"></i> ${deT("Təəssüf ki, rezervasiya təsdiqlənmədi.")}${reason ? " " + deT("Səbəb:") + " " + esc(reason) : ""}</p>`;
+        else if (status === "Deleted") msg = '<p class="bk-tracker__msg is-bad"><i class="fa-solid fa-circle-info"></i> ' + deT('Rezervasiya ləğv edilib.') + '</p>';
 
         return `<ol class="bk-tracker" data-status="${esc(status)}">
-                    <li class="is-done"><span><i class="fa-solid fa-paper-plane"></i></span><b>Göndərildi</b></li>
-                    <li class="${reviewing ? "is-active" : "is-done"}"><span><i class="fa-solid fa-magnifying-glass"></i></span><b>Baxılır</b></li>
+                    <li class="is-done"><span><i class="fa-solid fa-paper-plane"></i></span><b>${deT("Göndərildi")}</b></li>
+                    <li class="${reviewing ? "is-active" : "is-done"}"><span><i class="fa-solid fa-magnifying-glass"></i></span><b>${deT("Baxılır")}</b></li>
                     <li class="${final.c}"><span><i class="${final.i}"></i></span><b>${final.t}</b></li>
                 </ol>${msg}`;
     }
@@ -159,14 +159,14 @@
             hidden.value = day() && selectedTime ? `${day()}T${selectedTime}` : "";
             summary.textContent = serviceId() && day() && selectedTime
                 ? `${serviceName()} · ${dayLabel()} · ${selectedTime}`
-                : "Xidmət, gün və saat seçin";
+                : deT("Xidmət, gün və saat seçin");
             root.querySelector("[data-bk-summary]").classList.toggle("is-ready", !!hidden.value);
         }
 
         async function loadSlots() {
             showNotice("");
             if (!serviceId()) {
-                slotsEl.innerHTML = '<p class="bk-slots__hint"><i class="fa-regular fa-hand-pointer"></i> Boş saatları görmək üçün xidmət seçin.</p>';
+                slotsEl.innerHTML = '<p class="bk-slots__hint"><i class="fa-regular fa-hand-pointer"></i> ' + deT('Boş saatları görmək üçün xidmət seçin.') + '</p>';
                 selectedTime = null; updateSummary();
                 return;
             }
@@ -184,15 +184,15 @@
                 if (selectedTime && !free.some((s) => s.t === selectedTime)) selectedTime = null;
 
                 if (!free.length) {
-                    slotsEl.innerHTML = '<p class="bk-slots__hint"><i class="fa-regular fa-calendar-xmark"></i> Bu gün üçün boş saat qalmayıb — başqa gün seçin.</p>';
+                    slotsEl.innerHTML = '<p class="bk-slots__hint"><i class="fa-regular fa-calendar-xmark"></i> ' + deT('Bu gün üçün boş saat qalmayıb — başqa gün seçin.') + '</p>';
                 } else {
                     slotsEl.innerHTML = slots.map((s) =>
                         `<button type="button" class="bk-slot ${s.s === "free" ? "" : "is-" + s.s} ${s.t === selectedTime ? "is-selected" : ""}"
                                  data-time="${s.t}" ${s.s === "free" ? "" : "disabled"}
-                                 aria-pressed="${s.t === selectedTime}" aria-label="${s.t}${s.s === "busy" ? " — tutulub" : s.s === "past" ? " — keçib" : ""}">${s.t}</button>`).join("");
+                                 aria-pressed="${s.t === selectedTime}" aria-label="${s.t}${s.s === "busy" ? " — " + deT("tutulub") : s.s === "past" ? " — " + deT("keçib") : ""}">${s.t}</button>`).join("");
                 }
             } catch {
-                slotsEl.innerHTML = '<p class="bk-slots__hint is-error"><i class="fa-solid fa-triangle-exclamation"></i> Saatlar yüklənmədi. Səhifəni yeniləyin.</p>';
+                slotsEl.innerHTML = '<p class="bk-slots__hint is-error"><i class="fa-solid fa-triangle-exclamation"></i> ' + deT('Saatlar yüklənmədi. Səhifəni yeniləyin.') + '</p>';
             } finally {
                 if (id === reqId) slotsEl.classList.remove("is-loading");
                 updateSummary();
@@ -239,7 +239,7 @@
             if (selectedTime === d.time && !submitting && !form.hidden) {
                 selectedTime = null;
                 updateSummary();
-                showNotice(`Seçdiyiniz ${d.time} saatı indicə başqa müştəri tərəfindən tutuldu. Zəhmət olmasa başqa saat seçin.`);
+                showNotice(deT("Seçdiyiniz {0} saatı indicə başqa müştəri tərəfindən tutuldu. Zəhmət olmasa başqa saat seçin.", d.time));
             }
         });
 
@@ -266,14 +266,14 @@
             if (submitting) return;
             msgBox.innerHTML = "";
 
-            if (!serviceId()) return showMessage(false, "Xidmət seçin.");
-            if (!selectedTime) return showMessage(false, "Boş saatlardan birini seçin.");
+            if (!serviceId()) return showMessage(false, deT("Xidmət seçin."));
+            if (!selectedTime) return showMessage(false, deT("Boş saatlardan birini seçin."));
             if (!form.checkValidity()) { form.reportValidity(); return; }
 
             submitting = true;
             const label = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Göndərilir…';
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> ' + deT('Göndərilir…');
 
             const chosen = { service: serviceName(), day: dayLabel(), time: selectedTime };
 
@@ -282,7 +282,7 @@
                 const data = await res.json();
 
                 if (!data.success) {
-                    showMessage(false, data.message || "Xəta baş verdi. Yenidən cəhd edin.");
+                    showMessage(false, data.message || deT("Xəta baş verdi. Yenidən cəhd edin."));
                     loadSlots();   // saat tutulubsa siyahı yenilənsin
                     return;
                 }
@@ -297,7 +297,7 @@
                 refreshMine();
             } catch (err) {
                 console.error(err);
-                showMessage(false, "Bağlantı xətası. İnternetinizi yoxlayıb yenidən cəhd edin.");
+                showMessage(false, deT("Bağlantı xətası. İnternetinizi yoxlayıb yenidən cəhd edin."));
             } finally {
                 submitting = false;
                 submitBtn.disabled = false;

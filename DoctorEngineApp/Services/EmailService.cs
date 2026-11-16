@@ -22,7 +22,7 @@ namespace DoctorEngineApp.Services
         public async Task SendAsync(string to, string subject, string html, string from = null)
         {
             if (string.IsNullOrEmpty(from) && string.IsNullOrEmpty(_emailSettings.From))
-                throw new Exception("Email From address is not configured");
+                throw new InvalidOperationException("Email göndərən ünvan (EmailSettings:From) ayarlanmayıb.");
 
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(from ?? _emailSettings.From));

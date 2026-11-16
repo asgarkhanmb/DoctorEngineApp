@@ -77,7 +77,7 @@ namespace DoctorEngineApp.Services
         public async Task UpdateAsync(ContactInfoVm model)
         {
             var entity = await _context.ContactInfos.FindAsync(model.Id);
-            if (entity == null) throw new Exception("Contact not found");
+            if (entity == null) throw new Exception("Əlaqə məlumatı tapılmadı.");
 
             entity.Address = model.Address;
             entity.Phone = model.Phone;

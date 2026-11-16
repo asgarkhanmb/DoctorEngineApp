@@ -1,4 +1,4 @@
-﻿@model HomeVM
+@model HomeVM
 @{
     ViewData["Title"] = "Ana Səhifə";
     var about = Model.Abouts?.FirstOrDefault();
@@ -37,12 +37,12 @@
         <div class="container">
             <div class="sv-home__head wow fadeInUp" data-wow-delay="0.1s">
                 <div>
-                    <span class="sv-eyebrow">Xidmətlərimiz</span>
-                    <h2>Xidmətlərimizi araşdırın</h2>
-                    <p>Videolara baxın, işin necə görüldüyünü görün və uyğun xidməti bir kliklə rezervasiya edin.</p>
+                    <span class="sv-eyebrow">@L.T("Xidmətlərimiz")</span>
+                    <h2>@L.T("Xidmətlərimizi araşdırın")</h2>
+                    <p>@L.T("Videolara baxın, işin necə görüldüyünü görün və uyğun xidməti bir kliklə rezervasiya edin.")</p>
                 </div>
                 <a asp-controller="Service" asp-action="Index" class="sv-btn sv-btn--ghost">
-                    Bütün xidmətlər <i class="fa-solid fa-arrow-right"></i>
+                    @L.T("Bütün xidmətlər") <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
 

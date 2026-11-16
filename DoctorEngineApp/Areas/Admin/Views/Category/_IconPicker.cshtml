@@ -1,0 +1,55 @@
+@using DoctorEngineApp.Helpers
+@model CategoryIconPicker
+@{
+    var hasExisting = !string.IsNullOrEmpty(Model.ExistingIcon);
+    var existingUrl = hasExisting ? Url.Content($"~/uploads/categories/{Model.ExistingIcon}") : null;
+    var selected = CategoryIconPresets.IsValid(Model.SelectedPreset) ? Model.SelectedPreset : null;
+    var previewUrl = selected != null ? Url.Content(CategoryIconPresets.Url(selected)) : existingUrl;
+    var ms = ViewContext.ViewData.ModelState;
+    var errors = new[] { "PresetIcon", "IconFile" }
+        .SelectMany(k => ms.TryGetValue(k, out var e) ? e.Errors.Select(x => x.ErrorMessage) : Enumerable.Empty<string>())
+        .Distinct()
+        .ToList();
+}
+
+<div class="adm-iconpick" data-icon-picker>
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <div class="adm-upload__preview is-contain" id="iconPreview" data-empty-icon
+             style="@(previewUrl == null ? "" : $"background-image:url('{previewUrl}')")">@if (previewUrl == null) { <i class="fa-regular fa-image"></i> }</div>
+        <div>
+            <div class="form-label mb-0">İkon @(Model.Required ? "*" : "")</div>
+            <div class="form-text mt-0">Hazır ikonlardan birini seçin və ya aşağıdan öz ikonunuzu yükləyin.</div>
+        </div>
+    </div>
+
+    <div class="adm-iconpick__grid" role="radiogroup" aria-label="Hazır ikonlar">
+        @if (hasExisting)
+        {
+            <label class="adm-iconpick__opt" title="Hazırkı ikonu saxla">
+                <input type="radio" name="PresetIcon" value="" data-src="@existingUrl" checked="@(selected == null)" />
+                <span class="adm-iconpick__tile"><img src="@existingUrl" alt="" /></span>
+                <span class="adm-iconpick__label">Hazırkı</span>
+            </label>
+        }
+        @foreach (var p in CategoryIconPresets.All)
+        {
+            var src = Url.Content(CategoryIconPresets.Url(p.Key));
+            <label class="adm-iconpick__opt" title="@p.Label">
+                <input type="radio" name="PresetIcon" value="@p.Key" data-src="@src" checked="@(selected == p.Key)" />
+                <span class="adm-iconpick__tile"><img src="@src" alt="" loading="lazy" /></span>
+                <span class="adm-iconpick__label">@p.Label</span>
+            </label>
+        }
+    </div>
+
+    <div class="adm-iconpick__upload">
+        <label for="IconFile" class="form-label mb-1">və ya öz ikonunuzu yükləyin</label>
+        <input id="IconFile" name="IconFile" type="file" class="form-control" accept="image/png,image/webp,image/jpeg" data-preview="#iconPreview" />
+        <div class="form-text">Kiçik, kvadrat, şəffaf fonlu PNG. Fayl seçsəniz hazır ikon nəzərə alınmır.</div>
+    </div>
+
+    @foreach (var e in errors)
+    {
+        <span class="field-validation-error">@e</span>
+    }
+</div>

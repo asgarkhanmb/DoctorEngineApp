@@ -5,6 +5,7 @@ using DoctorEngineApp.Models;
 using DoctorEngineApp.Services;
 using DoctorEngineApp.Services.Implementations;
 using DoctorEngineApp.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -72,6 +73,98 @@ builder.Services.ConfigureApplicationCookie(opt =>
     };
 });
 
+// ---------- TƏTBİQLƏR ÜÇÜN JWT ----------
+// Sayt cookie ilə, mobil/desktop tətbiqlər "Authorization: Bearer <token>" ilə daxil olur.
+// "Smart" sxemi sorğuya görə birini seçir — mövcud [Authorize] atributları hər ikisi ilə işləyir.
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.Section));
+var jwtOptions = builder.Configuration.GetSection(JwtOptions.Section).Get<JwtOptions>() ?? new JwtOptions();
+const string SmartScheme = "Smart";
+
+builder.Services.AddAuthentication(opt =>
+    {
+        opt.DefaultScheme = SmartScheme;
+        opt.DefaultAuthenticateScheme = SmartScheme;
+        opt.DefaultChallengeScheme = SmartScheme;
+        opt.DefaultForbidScheme = SmartScheme;
+    })
+    .AddPolicyScheme(SmartScheme, "Cookie və ya JWT", opt =>
+    {
+        opt.ForwardDefaultSelector = ctx =>
+        {
+            if (SmartAntiforgeryFilter.IsBearer(ctx)) return JwtBearerDefaults.AuthenticationScheme;
+            // SignalR: WebSocket header göndərə bilmir — token "access_token" sorğu parametrindədir
+            if (ctx.Request.Query.ContainsKey("access_token") &&
+                (ctx.Request.Path.StartsWithSegments("/chatHub") || ctx.Request.Path.StartsWithSegments("/reservationHub")))
+                return JwtBearerDefaults.AuthenticationScheme;
+            return IdentityConstants.ApplicationScheme;
+        };
+    })
+    .AddJwtBearer(opt =>
+    {
+        opt.MapInboundClaims = false;   // claim adları olduğu kimi (ClaimTypes.* artıq tam URI kimidir)
+        opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+            ValidateIssuerSigningKey = true,
+            // Açar yoxdursa — heç bir token keçərli olmur (API girişi söndürülüb)
+            IssuerSigningKey = jwtOptions.IsConfigured
+                ? TokenService.SigningKey(jwtOptions)
+                : new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = System.Security.Claims.ClaimTypes.Name,
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role
+        };
+        opt.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = ctx =>
+            {
+                var path = ctx.HttpContext.Request.Path;
+                var token = ctx.Request.Query["access_token"].ToString();
+                if (!string.IsNullOrEmpty(token) &&
+                    (path.StartsWithSegments("/chatHub") || path.StartsWithSegments("/reservationHub")))
+                    ctx.Token = token;
+                return Task.CompletedTask;
+            },
+            // Şifrə / rol dəyişibsə (SecurityStamp fərqlidir) — köhnə token qəbul olunmur
+            OnTokenValidated = async ctx =>
+            {
+                var users = ctx.HttpContext.RequestServices.GetRequiredService<UserManager<AppUser>>();
+                var id = ctx.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var stamp = ctx.Principal?.FindFirst("sstamp")?.Value;
+                var user = id == null ? null : await users.FindByIdAsync(id);
+                if (user == null || user.SecurityStamp != stamp || await users.IsLockedOutAsync(user))
+                    ctx.Fail("Token artıq etibarlı deyil.");
+            }
+        };
+    });
+
+builder.Services.AddScoped<TokenService>();
+
+// Giriş / qeydiyyat / formalarda brute-force və spam qoruması (Identity lockout-a əlavə olaraq, IP üzrə).
+// 20/dəq: mobil operatorlarda yüzlərlə istifadəçi eyni IP-ni paylaşa bilər (CGNAT) — daha sərt limit real istifadəçiləri bloklayardı.
+builder.Services.AddRateLimiter(opt =>
+{
+    opt.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    opt.AddPolicy("auth", ctx => System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+        ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0
+        }));
+    opt.OnRejected = async (ctx, ct) =>
+    {
+        ctx.HttpContext.Response.ContentType = "application/json; charset=utf-8";
+        await ctx.HttpContext.Response.WriteAsJsonAsync(
+            new DoctorEngine.Contracts.ApiError("Çox sayda cəhd. Bir dəqiqə gözləyib yenidən cəhd edin.", 429), ct);
+    };
+});
+
 // EMAIL SETTINGS
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
@@ -103,6 +196,13 @@ builder.Services.Configure<AiOptions>(builder.Configuration.GetSection(AiOptions
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<AiAssistantService>(client => client.Timeout = TimeSpan.FromSeconds(90));
 
+// ÇOXDİLLİLİK (az/en/ru/tr): bazadan gələn mətnlər AI ilə arxa planda tərcümə olunur (Localization/ContentTranslationWorker)
+builder.Services.AddSingleton<DoctorEngineApp.Localization.TranslationStore>();
+builder.Services.AddHostedService<DoctorEngineApp.Localization.ContentTranslationWorker>();
+builder.Services.AddHttpClient("ai-translate", client => client.Timeout = TimeSpan.FromSeconds(120));
+// Validasiya mesajları və [Display] adları da L.T ilə tərcümə olunur
+builder.Services.AddSingleton<Microsoft.Extensions.Localization.IStringLocalizerFactory, DoctorEngineApp.Localization.LStringLocalizerFactory>();
+
 builder.Services.AddSignalR();
 
 // Upload limit
@@ -125,11 +225,16 @@ builder.Services.AddAntiforgery(opt => opt.HeaderName = "RequestVerificationToke
 // MVC — bütün POST/PUT/DELETE sorğularında antiforgery token avtomatik yoxlanılır (CSRF qoruması)
 builder.Services.AddControllersWithViews(opt =>
     {
-    opt.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    // Sayt (cookie) sorğularında CSRF yoxlanılır; tətbiqlərin Bearer sorğularında lazım deyil (bax: SmartAntiforgeryFilter)
+    opt.Filters.Add<SmartAntiforgeryFilter>();
     opt.Filters.Add<DoctorEngineApp.Helpers.AdminFlashFilter>();   // admin əməliyyatlarından sonra bildiriş
-});
+    opt.Filters.Add<DoctorEngineApp.Helpers.AdminExceptionFilter>(); // admin xətaları → qırmızı bildiriş, xəta səhifəsi yox
+})
+    .AddDataAnnotationsLocalization();   // [Required(ErrorMessage=...)] → LStringLocalizer → L.T
 
 var app = builder.Build();
+
+DoctorEngineApp.Localization.L.Store = app.Services.GetRequiredService<DoctorEngineApp.Localization.TranslationStore>();
 
 // ROTATIVA
 RotativaConfiguration.Setup(
@@ -137,14 +242,32 @@ RotativaConfiguration.Setup(
     "Rotativa"
 );
 
-// Middleware
+// ---------- XƏTALAR ----------
+// Tutulmamış exception → /Error (ErrorController: loga yazır, istifadəçiyə səliqəli səhifə, API-yə JSON).
+// Development-də proqramçı üçün ətraflı səhifə qalır; nəticəni görmək üçün: /Error/500, /Error/404 ...
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Boş cavablı 4xx/5xx (404 tapılmadı, 403 qadağan ...):
+//  - səhifələr → /Error/{kod} (eyni ünvanda, yönləndirmə olmadan)
+//  - API / hub-lar → qısa JSON { error, code }
+app.UseWhen(ctx => !ErrorPages.IsNonPageRequest(ctx.Request.Path),
+    branch => branch.UseStatusCodePagesWithReExecute("/Error/{0}"));
+app.UseWhen(ctx => ctx.Request.Path.StartsWithSegments("/api"),
+    branch => branch.UseStatusCodePages(async ctx =>
+    {
+        var res = ctx.HttpContext.Response;
+        res.ContentType = "application/json; charset=utf-8";
+        await res.WriteAsJsonAsync(new { error = ErrorPages.For(res.StatusCode).Message, code = res.StatusCode });
+    }));
+
+// Development-də HTTP → HTTPS yönləndirmə yoxdur: mobil tətbiq (Android emulyatoru 10.0.2.2, telefon LAN IP)
+// lokal serverə HTTP ilə qoşulur və "localhost:7192"-yə yönləndirmə ona çatmır. Production-da həmişə HTTPS.
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions
 {
     OnPrepareResponse = ctx =>
@@ -158,10 +281,18 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 
+// Sayt dili (az/en/ru/tr): "de_lang" kukisindən — yalnız UI dili, tarix/rəqəm formatı dəyişmir
+app.Use(async (ctx, next) =>
+{
+    DoctorEngineApp.Localization.L.Apply(ctx);
+    await next();
+});
+
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();   // api/v1/auth: IP üzrə limit
 
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<ReservationHub>("/reservationHub");   // rezervasiyalar: boş saatlar, status, admin bildirişləri
