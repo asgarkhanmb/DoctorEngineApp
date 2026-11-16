@@ -1,10 +1,11 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
+using DoctorEngineApp.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -145,11 +146,15 @@ namespace DoctorEngineApp.Services
                                                           [EnumeratorCancellation] CancellationToken ct)
         {
             if (!_options.IsConfigured)
-                throw new AiException("AI köməkçi hələ ayarlanmayıb.", HttpStatusCode.ServiceUnavailable);
+                throw new AiException(L.T("AI köməkçi hələ ayarlanmayıb."), HttpStatusCode.ServiceUnavailable);
 
             var system = await BuildSystemPromptAsync(ct);
 
             var messages = new List<object> { new { role = "system", content = system } };
+
+            // Saytın seçilmiş dili: müştərinin yazdığı dil aydın deyilsə (məs. "salam"), cavab bu dildə olsun
+            var uiLanguage = L.Lang switch { "en" => "English", "ru" => "Russian (русский)", "tr" => "Turkish (Türkçe)", _ => "Azerbaijani (Azərbaycan dili)" };
+            messages.Add(new { role = "system", content = $"Website interface language: {uiLanguage}. Reply in the language the customer writes in; if unclear, reply in {uiLanguage}." });
             messages.AddRange(history.Select(m => new { role = m.Role, content = m.Content }));
 
             var payload = new
@@ -176,7 +181,7 @@ namespace DoctorEngineApp.Services
             catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
             {
                 _logger.LogWarning(ex, "AI xidmətinə qoşulmaq mümkün olmadı");
-                throw new AiException("AI xidmətinə qoşulmaq mümkün olmadı. Bir azdan yenidən cəhd edin.", HttpStatusCode.BadGateway);
+                throw new AiException(L.T("AI xidmətinə qoşulmaq mümkün olmadı. Bir azdan yenidən cəhd edin."), HttpStatusCode.BadGateway);
             }
 
             using (response)
@@ -188,9 +193,9 @@ namespace DoctorEngineApp.Services
 
                     throw response.StatusCode switch
                     {
-                        HttpStatusCode.TooManyRequests => new AiException("Hazırda çox sorğu var. Bir dəqiqə sonra yenidən cəhd edin.", HttpStatusCode.TooManyRequests),
-                        HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => new AiException("AI köməkçi düzgün ayarlanmayıb (API açarı).", HttpStatusCode.ServiceUnavailable),
-                        _ => new AiException("AI cavab verə bilmədi. Yenidən cəhd edin.", HttpStatusCode.BadGateway)
+                        HttpStatusCode.TooManyRequests => new AiException(L.T("Hazırda çox sorğu var. Bir dəqiqə sonra yenidən cəhd edin."), HttpStatusCode.TooManyRequests),
+                        HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => new AiException(L.T("AI köməkçi düzgün ayarlanmayıb (API açarı)."), HttpStatusCode.ServiceUnavailable),
+                        _ => new AiException(L.T("AI cavab verə bilmədi. Yenidən cəhd edin."), HttpStatusCode.BadGateway)
                     };
                 }
 

@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Helpers.Enums;
+﻿using DoctorEngineApp.Localization;
+using DoctorEngineApp.Helpers.Enums;
 using DoctorEngineApp.Hubs;
 using DoctorEngineApp.Services;
 using DoctorEngineApp.Services.Interfaces;
@@ -97,12 +98,12 @@ namespace DoctorEngineApp.Controllers
             if (string.IsNullOrEmpty(username))
                 return Unauthorized();
             if (!_push.IsConfigured)
-                return BadRequest(new { error = "Bildirişlər serverdə qurulmayıb." });
+                return BadRequest(new { error = L.T("Bildirişlər serverdə qurulmayıb.") });
 
             if (!IsAllowedPushEndpoint(endpoint) ||
                 string.IsNullOrWhiteSpace(p256dh) || p256dh.Length > 200 ||
                 string.IsNullOrWhiteSpace(auth) || auth.Length > 100)
-                return BadRequest(new { error = "Abunəlik məlumatı düzgün deyil." });
+                return BadRequest(new { error = L.T("Abunəlik məlumatı düzgün deyil.") });
 
             await _push.SubscribeAsync(username, endpoint, p256dh, auth);
             return Ok();
@@ -159,7 +160,7 @@ namespace DoctorEngineApp.Controllers
 
             var result = await _service.EditAsync(vm, username);
             if (result.Status == ChatResultStatus.NotFound)
-                return NotFound(new { error = "Mesaj tapılmadı." });
+                return NotFound(new { error = L.T("Mesaj tapılmadı.") });
             if (result.Status == ChatResultStatus.Invalid)
                 return BadRequest(new { error = result.Error });
 
@@ -175,7 +176,7 @@ namespace DoctorEngineApp.Controllers
                 return Unauthorized();
 
             if (!await _service.DeleteAsync(id, username, IsAdmin))
-                return NotFound(new { error = "Mesaj tapılmadı." });
+                return NotFound(new { error = L.T("Mesaj tapılmadı.") });
 
             await _hub.Clients.All.SendAsync("DeleteMessage", id);
             return Ok();

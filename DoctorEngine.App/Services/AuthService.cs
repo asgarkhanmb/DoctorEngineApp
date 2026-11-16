@@ -45,4 +45,45 @@ public class AuthService
         await _api.LogoutAsync();
         Changed?.Invoke(this, EventArgs.Empty);
     }
+
+    // ================= PROFİL REDAKTƏSİ (api/v1/profile) =================
+
+    public async Task UpdateProfileAsync(string fullName, string userName)
+    {
+        var user = await _api.PutAsync<UserDto>("api/v1/profile", new UpdateProfileRequest(fullName.Trim(), userName.Trim()));
+        await _api.ForceRefreshAsync();   // tokendəki istifadəçi adı da yenilənsin (çat bunu istifadə edir)
+        await SetUserAsync(user);
+    }
+
+    public Task<MessageResponse> ChangeEmailAsync(string newEmail, string currentPassword) =>
+        _api.PostAsync<MessageResponse>("api/v1/profile/email", new ChangeEmailRequest(newEmail.Trim(), currentPassword));
+
+    public async Task<MessageResponse> ChangePasswordAsync(string currentPassword, string newPassword)
+    {
+        var result = await _api.PostAsync<MessageResponse>("api/v1/profile/password", new ChangePasswordRequest(currentPassword, newPassword));
+        await _api.ForceRefreshAsync();   // şifrə dəyişəndə köhnə access token etibarsız olur
+        return result;
+    }
+
+    public async Task UploadAvatarAsync(FileResult photo)
+    {
+        var user = await _api.PostFormAsync<UserDto>("api/v1/profile/avatar", () =>
+        {
+            var form = new MultipartFormDataContent();
+            var content = new StreamContent(File.OpenRead(photo.FullPath));
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                string.IsNullOrEmpty(photo.ContentType) ? "image/jpeg" : photo.ContentType);
+            form.Add(content, "photo", photo.FileName);
+            return form;
+        });
+        await SetUserAsync(user);
+    }
+
+    public async Task RemoveAvatarAsync() => await SetUserAsync(await _api.DeleteAsync<UserDto>("api/v1/profile/avatar"));
+
+    private async Task SetUserAsync(UserDto user)
+    {
+        await _api.Tokens.SaveUserAsync(user);
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
 }

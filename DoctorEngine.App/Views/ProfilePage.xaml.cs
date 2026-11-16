@@ -18,6 +18,7 @@ public partial class ProfilePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        Motion.Enter(this);   // tab dəyişəndə məzmun yumşaq daxil olur
         if (!_revealed) { _revealed = true; Motion.RevealSections(this); }
         try { await _vm.AppearingAsync(); } catch (Exception ex) { Services.CrashLog.Write(ex, "ProfilePage"); }
     }
@@ -25,6 +26,8 @@ public partial class ProfilePage : ContentPage
     private void OnChatClicked(object? sender, EventArgs e) => Go("//chat");
     private void OnBookingClicked(object? sender, EventArgs e) => Go("//booking");
     private void OnAiClicked(object? sender, EventArgs e) => Go("ai");
+    private void OnEditProfileClicked(object? sender, EventArgs e) => Go("profile-edit");
+    private void OnAdminClicked(object? sender, EventArgs e) => Go("admin");
 
     private static async void Go(string route)
     {

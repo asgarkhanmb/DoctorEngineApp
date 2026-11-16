@@ -34,6 +34,12 @@ public static class MauiProgram
 
         RemoveNativeFieldChrome();
 
+        // Bütün düymələr basanda yayla sıxılır ("canlı" toxunuş)
+        Microsoft.Maui.Handlers.ButtonHandler.Mapper.AppendToMapping("DePress", (_, view) =>
+        {
+            if (view is Button b) Motion.AttachButtonPress(b);
+        });
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
@@ -48,6 +54,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AiClient>();
         builder.Services.AddSingleton<IVoiceRecorder, VoiceRecorder>();
         builder.Services.AddSingleton<IAudioPlayback, AudioPlayback>();
+        builder.Services.AddSingleton<AdminClient>();
 
         // Ekranlar və onların məntiqi (tablar yaddaşda qalır)
         builder.Services.AddSingleton<HomeViewModel>();
@@ -63,6 +70,22 @@ public static class MauiProgram
         builder.Services.AddSingleton<ChatPage>();
         builder.Services.AddSingleton<ProfilePage>();
         builder.Services.AddTransient<AiPage>();
+
+        // Profil redaktəsi və mobil admin panel — hər açılışda yeni nüsxə
+        builder.Services.AddTransient<EditProfileViewModel>();
+        builder.Services.AddTransient<EditProfilePage>();
+        builder.Services.AddTransient<AdminViewModel>();
+        builder.Services.AddTransient<AdminPage>();
+        builder.Services.AddTransient<AdminReservationsViewModel>();
+        builder.Services.AddTransient<AdminReservationsPage>();
+        builder.Services.AddTransient<AdminMessagesViewModel>();
+        builder.Services.AddTransient<AdminMessagesPage>();
+        builder.Services.AddTransient<AdminUsersViewModel>();
+        builder.Services.AddTransient<AdminUsersPage>();
+        builder.Services.AddTransient<AdminSectionViewModel>();
+        builder.Services.AddTransient<AdminSectionPage>();
+        builder.Services.AddTransient<AdminFormViewModel>();
+        builder.Services.AddTransient<AdminFormPage>();
         builder.Services.AddSingleton<AppShell>();
 
         var app = builder.Build();

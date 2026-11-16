@@ -32,8 +32,8 @@ public partial class App : Application
             try
             {
                 var shortText = crash.Length > 900 ? crash[..900] + "…" : crash;
-                var copy = await _shell.DisplayAlertAsync("Tətbiq əvvəlki dəfə xəta ilə bağlandı",
-                    shortText + "\n\nBu mətni kopyalayıb dəstəyə göndərin.", "Kopyala", "Bağla");
+                var copy = await _shell.DisplayAlertAsync(Localization.Lang.T("crash_title"),
+                    shortText + "\n\n" + Localization.Lang.T("crash_body"), Localization.Lang.T("common_copy"), Localization.Lang.T("common_close"));
                 if (copy) await Clipboard.Default.SetTextAsync(crash);
             }
             catch { }

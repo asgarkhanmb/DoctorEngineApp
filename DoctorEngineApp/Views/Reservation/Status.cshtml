@@ -15,9 +15,9 @@
             @{
                 var (pillCls, pillIcon, pillText) = Model.Status switch
                 {
-                    "Confirmed" => ("is-confirmed", "fa-solid fa-check", "Təsdiqləndi"),
-                    "Rejected" => ("is-rejected", "fa-solid fa-xmark", "Rədd edildi"),
-                    _ => ("is-pending", "fa-regular fa-hourglass-half", "Gözləyir")
+                    "Confirmed" => ("is-confirmed", "fa-solid fa-check", L.T("Təsdiqləndi")),
+                    "Rejected" => ("is-rejected", "fa-solid fa-xmark", L.T("Rədd edildi")),
+                    _ => ("is-pending", "fa-regular fa-hourglass-half", L.T("Gözləyir"))
                 };
             }
             <span data-bk-status-pill>
@@ -32,14 +32,14 @@
 
             <div data-bk-status-tracker></div>
 
-            <div class="bk-live" data-on-text="Canlı: status real vaxtda yenilənir">
+            <div class="bk-live" data-on-text="@L.T("Canlı: status real vaxtda yenilənir")">
                 <span class="bk-live__dot" aria-hidden="true"></span>
-                <span data-bk-live-text>Canlı bağlantı qurulur…</span>
+                <span data-bk-live-text>@L.T("Canlı bağlantı qurulur…")</span>
             </div>
 
             <div class="bk-status__actions">
-                <a asp-controller="Reservation" asp-action="Index" class="bk-btn bk-btn--ghost"><i class="fa-solid fa-plus"></i> Yeni rezervasiya</a>
-                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="bk-btn bk-btn--primary"><i class="fa-regular fa-comments"></i> Usta ilə çat</a>
+                <a asp-controller="Reservation" asp-action="Index" class="bk-btn bk-btn--ghost"><i class="fa-solid fa-plus"></i> @L.T("Yeni rezervasiya")</a>
+                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="bk-btn bk-btn--primary"><i class="fa-regular fa-comments"></i> @L.T("Usta ilə çat")</a>
             </div>
         </div>
     </div>

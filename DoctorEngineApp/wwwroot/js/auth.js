@@ -12,7 +12,7 @@
             const show = input.type === "password";
             input.type = show ? "text" : "password";
             btn.setAttribute("aria-pressed", String(show));
-            btn.setAttribute("aria-label", show ? "Şifrəni gizlət" : "Şifrəni göstər");
+            btn.setAttribute("aria-label", show ? deT("Şifrəni gizlət") : deT("Şifrəni göstər"));
             const icon = btn.querySelector("i");
             if (icon) icon.className = show ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
             input.focus({ preventScroll: true });
@@ -70,7 +70,7 @@
             const ok = has && confirm.value === original.value;
             hint.classList.toggle("is-ok", ok);
             hint.classList.toggle("is-bad", has && !ok);
-            hint.querySelector("span").textContent = ok ? "Şifrələr eynidir" : "Şifrələr eyni deyil";
+            hint.querySelector("span").textContent = ok ? deT("Şifrələr eynidir") : deT("Şifrələr eyni deyil");
             hint.querySelector("i").className = ok ? "fa-solid fa-circle-check" : "fa-solid fa-circle-xmark";
         };
 

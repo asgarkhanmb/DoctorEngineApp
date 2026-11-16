@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DoctorEngine.App.Localization;
 using DoctorEngine.App.Services;
 using DoctorEngine.Contracts;
 
@@ -28,8 +29,8 @@ public partial class HomeViewModel : BaseViewModel
     private readonly AuthService _auth;
 
     // ---- Başlıq: salamlama + iş vəziyyəti ("canlı" status) ----
-    [ObservableProperty] private string greeting = "Xoş gəlmisiniz";
-    [ObservableProperty] private string greetingName = "DoctorEngine-ə xoş gəldiniz";
+    [ObservableProperty] private string greeting = "";
+    [ObservableProperty] private string greetingName = "";
     [ObservableProperty] private bool isOpenNow;
     [ObservableProperty] private string openStatus = "";
     [ObservableProperty] private string todayHours = "";
@@ -59,13 +60,13 @@ public partial class HomeViewModel : BaseViewModel
         var h = DateTime.Now.Hour;
         Greeting = h switch
         {
-            >= 5 and < 12 => "Sabahınız xeyir",
-            >= 12 and < 18 => "Günortanız xeyir",
-            >= 18 and < 23 => "Axşamınız xeyir",
-            _ => "Gecəniz xeyrə qalsın"
+            >= 5 and < 12 => Lang.T("greet_morning"),
+            >= 12 and < 18 => Lang.T("greet_afternoon"),
+            >= 18 and < 23 => Lang.T("greet_evening"),
+            _ => Lang.T("greet_night")
         };
         var first = _auth.User?.FullName?.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-        GreetingName = string.IsNullOrWhiteSpace(first) ? "Xoş gəlmisiniz!" : $"{first}, xoş gəldiniz";
+        GreetingName = string.IsNullOrWhiteSpace(first) ? Lang.T("greet_welcome_excl") : Lang.T("greet_welcome_name", first);
     }
 
     /// <summary>Saytdakı iş saatlarından ("10:00 - 20:00") hazırda açıq olub-olmadığını hesablayır.</summary>
@@ -82,8 +83,16 @@ public partial class HomeViewModel : BaseViewModel
         var t = now.TimeOfDay;
         IsOpenNow = t >= open && t < close;
         OpenStatus = IsOpenNow
-            ? $"İndi açıqdır · {close:hh\\:mm}-dək"
-            : t < open ? $"Bağlıdır · {open:hh\\:mm}-da açılır" : "Bağlıdır · sabah açılır";
+            ? Lang.T("open_now", close.ToString(@"hh\:mm"))
+            : t < open ? Lang.T("closed_opens_at", open.ToString(@"hh\:mm")) : Lang.T("closed_tomorrow");
+    }
+
+    protected override void OnLanguageChanged()
+    {
+        UpdateGreeting();
+        UpdateOpenStatus();
+        // Kartlardakı standart mətnlər (təsvir yoxdursa) yenidən çəkilsin
+        Categories.Rebind();
     }
 
     [RelayCommand] private Task OpenChat() => Shell.Current.GoToAsync("//chat");
@@ -122,7 +131,7 @@ public partial class HomeViewModel : BaseViewModel
     {
         if (string.IsNullOrWhiteSpace(PrimaryPhone)) return;
         try { PhoneDialer.Default.Open(PrimaryPhone.Replace(" ", "")); }
-        catch { await Alert("Zəng", $"Zəng etmək mümkün olmadı. Nömrə: {PrimaryPhone}"); }
+        catch { await Alert(Lang.T("call_title"), Lang.T("call_failed", PrimaryPhone)); }
     }
 
     [RelayCommand] private Task OpenWhatsApp() => OpenAsync(WhatsApp?.Link);
@@ -139,24 +148,27 @@ public partial class HomeViewModel : BaseViewModel
 
     [RelayCommand] private Task AllServices() => Shell.Current.GoToAsync("//services");
 
-    private static void Replace<T>(ObservableCollection<T> target, IEnumerable<T> items)
-    {
-        target.Clear();
-        foreach (var i in items) target.Add(i);
-    }
+    /// <summary>Clear() yox — Windows-da yeniləmə zamanı çökmənin qarşısını alır (bax CollectionSync).</summary>
+    private static void Replace<T>(ObservableCollection<T> target, IEnumerable<T> items) => target.SyncWith(items);
 }
 
 public record SlideItem(string? Title, string? Subtitle, string? BackgroundUrl, string? SideImageUrl);
 public record InformItem(string? Title, string? Description, string? IconUrl);
 public record TechnicianItem(string FullName, string? Position, string? Bio, string? ImageUrl);
 
-public record VideoItem(string? Title, string? Description, string? VideoUrl);
+public record VideoItem(string? Title, string? Description, string? VideoUrl)
+{
+    public string DisplayTitle => string.IsNullOrWhiteSpace(Title) ? Lang.T("common_watch_video") : Title;
+}
 
 public record CategoryItem(int Id, string Name, string? IconUrl, int? ReservationServiceId, IReadOnlyList<VideoItem> Videos)
 {
     public bool HasVideo => Videos.Count > 0;
     public string? FirstVideoUrl => Videos.FirstOrDefault()?.VideoUrl;
     public string? Description => Videos.FirstOrDefault()?.Description;
+    /// <summary>Təsvir yoxdursa — seçilmiş dildə standart mətn (ana səhifə / xidmətlər).</summary>
+    public string ShortDescription => string.IsNullOrWhiteSpace(Description) ? Lang.T("cat_desc_short") : Description;
+    public string LongDescription => string.IsNullOrWhiteSpace(Description) ? Lang.T("cat_desc_long") : Description;
 
     public static CategoryItem From(CategoryDto c) => new(
         c.Id, c.Name, AppConfig.Absolute(c.IconUrl), c.ReservationServiceId,

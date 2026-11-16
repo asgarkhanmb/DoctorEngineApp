@@ -1,4 +1,4 @@
-﻿@model ContactInfoVm
+@model ContactInfoVm
 @inject DoctorEngineApp.Services.Interfaces.ISiteSettingService SiteSettings
 
 @{
@@ -22,8 +22,7 @@
                         <span class="de-footer-brand__icon"><partial name="_BrandIcon" model="site" /></span> @site.SiteName
                     </a>
                     <p class="mb-0">
-                        Yeni model dizel və benzin mühərriklərinin peşəkar diaqnostikası və təmiri.
-                        Müasir avadanlıq, təcrübəli ustalar, etibarlı nəticə.
+                        @L.T("footer.about")
                     </p>
 
                     <div class="de-social">
@@ -48,11 +47,11 @@
 
                 <!-- Əlaqə -->
                 <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-4">Əlaqə</h4>
+                    <h4 class="text-light mb-4">@L.T("nav.contact")</h4>
 
                     @if (!string.IsNullOrEmpty(Model?.Address))
                     {
-                        <p class="mb-3 d-flex"><i class="fa fa-map-marker-alt me-3 mt-1"></i><span>@Model.Address</span></p>
+                        <p class="mb-3 d-flex"><i class="fa fa-map-marker-alt me-3 mt-1"></i><span>@L.T(Model.Address)</span></p>
                     }
                     @if (phoneHref != null)
                     {
@@ -66,16 +65,16 @@
 
                 <!-- İş saatları -->
                 <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-4">İş Saatları</h4>
+                    <h4 class="text-light mb-4">@L.T("footer.hours")</h4>
                     <div class="de-hours">
-                        <div data-de-days="weekdays"><span>B.e – Cümə</span><strong>@Model?.Weekdays</strong></div>
-                        <div data-de-days="weekend"><span>Şənbə – Bazar</span><strong>@Model?.Weekend</strong></div>
+                        <div data-de-days="weekdays"><span>@L.T("topbar.weekdays")</span><strong>@Model?.Weekdays</strong></div>
+                        <div data-de-days="weekend"><span>@L.T("topbar.weekend")</span><strong>@Model?.Weekend</strong></div>
                     </div>
                 </div>
 
                 <!-- Keçidlər -->
                 <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-4">Xidmətlər</h4>
+                    <h4 class="text-light mb-4">@L.T("nav.services")</h4>
 
                     @* Yalnız xidmətlər: ən son əlavə olunan 5-i (çox olsa da footer böyümür) *@
                     @if (Model?.Services != null && Model.Services.Any())
@@ -84,18 +83,18 @@
                             @foreach (var service in Model.Services)
                             {
                                 <li>
-                                    <a class="btn btn-link" asp-controller="Service" asp-action="Index" asp-fragment="cat-@service.Id" title="@service.Name">@service.Name</a>
+                                    <a class="btn btn-link" asp-controller="Service" asp-action="Index" asp-fragment="cat-@service.Id" title="@L.T(service.Name)">@L.T(service.Name)</a>
                                 </li>
                             }
                         </ul>
                         @if ((ViewData["ServiceTotal"] as int? ?? 0) > Model.Services.Count)
                         {
-                            <a class="de-footer-more" asp-controller="Service" asp-action="Index">Bütün xidmətlər <i class="fa-solid fa-arrow-right"></i></a>
+                            <a class="de-footer-more" asp-controller="Service" asp-action="Index">@L.T("footer.allServices") <i class="fa-solid fa-arrow-right"></i></a>
                         }
                     }
                     else
                     {
-                        <p class="mb-0">Xidmətlər tezliklə əlavə olunacaq.</p>
+                        <p class="mb-0">@L.T("footer.noServices")</p>
                     }
                 </div>
 
@@ -104,7 +103,7 @@
 
         <div class="container">
             <div class="copyright">
-                <span>© @DateTime.Now.Year @site.SiteName — Bütün hüquqlar qorunur.</span>
+                <span>© @DateTime.Now.Year @site.SiteName — @L.T("footer.rights")</span>
                 <span>
                     Developed by
                     <a href="https://www.linkedin.com/in/asgarkhanb/"

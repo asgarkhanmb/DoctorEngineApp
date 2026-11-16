@@ -29,7 +29,7 @@
         drawer.setAttribute("aria-hidden", String(!open));
         btn.classList.toggle("is-open", open);
         btn.setAttribute("aria-expanded", String(open));
-        btn.setAttribute("aria-label", open ? "Çatı bağla" : "Canlı çatı aç");
+        btn.setAttribute("aria-label", open ? deT("Çatı bağla") : deT("Canlı çatı aç"));
         document.body.classList.toggle("dc-drawer-open", open);
         if (open) hideToast();
         try { sessionStorage.setItem(STORE_KEY, open ? "1" : "0"); } catch (e) { /* yaddaş bağlıdır */ }
@@ -135,7 +135,7 @@
         const close = document.createElement("button");
         close.type = "button";
         close.className = "dc-toast__close";
-        close.setAttribute("aria-label", "Bildirişi bağla");
+        close.setAttribute("aria-label", deT("Bildirişi bağla"));
         const x = document.createElement("i");
         x.className = "fa-solid fa-xmark";
         x.setAttribute("aria-hidden", "true");
@@ -169,11 +169,11 @@
         if (!count || open) return;
 
         if (initial) {
-            showToast("Yeni mesajınız var", count === 1
-                ? "Çatda sizin üçün 1 oxunmamış mesaj var."
-                : "Çatda sizin üçün " + count + " oxunmamış mesaj var.", false);
+            showToast(deT("Yeni mesajınız var"), count === 1
+                ? deT("Çatda sizin üçün 1 oxunmamış mesaj var.")
+                : deT("Çatda sizin üçün {0} oxunmamış mesaj var.", count), false);
         } else if (preview) {
-            showToast(preview.userName + (preview.isAdmin ? " · Usta" : ""), preview.text || "Yeni mesaj", preview.isAdmin);
+            showToast(preview.userName + (preview.isAdmin ? " · " + deT("Usta") : ""), preview.text || deT("Yeni mesaj"), preview.isAdmin);
         }
     });
 })();

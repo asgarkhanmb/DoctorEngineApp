@@ -35,6 +35,24 @@ APK hazırda **debug açarı** ilə imzalanır (test üçün). Google Play üç�
 Mac (Xcode) və Apple Developer hesabı tələb edir. Kod hazırdır; Mac-da
 `dotnet build -f net10.0-ios` və ya GitHub Actions `macos` runner ilə yığmaq olar.
 
+## Dillər (az / en / ru / tr)
+- Seçim: **Profil → Dil**. Mətnlər dərhal dəyişir, seçim cihazda yadda qalır.
+  İlk açılışda cihazın dili (dəstəklənirsə), yoxsa Azərbaycan dili.
+- Mətnlər: `Localization/Strings.Az.cs`, `Strings.En.cs`, `Strings.Ru.cs`, `Strings.Tr.cs` — yeni açarı 4 faylın hamısına yazın.
+- XAML: `Text="{l:Tr açar}"` (`xmlns:l="clr-namespace:DoctorEngine.App.Localization"`), C#: `Lang.T("açar", arg...)`.
+- Serverdən gələn məzmun (xidmət adları, slayderlər, serverin xəta mesajları) admin paneldə necə yazılıbsa elə göstərilir.
+  Sorğulara `Accept-Language` başlığı əlavə olunur — server tərəfdə lokalizasiya üçün hazırdır.
+
+## Profil redaktəsi və mobil admin panel
+- **Profil → Profili redaktə et**: şəkil, ad / istifadəçi adı, email (yeni ünvana təsdiq linki), şifrə.
+  Server: `api/v1/profile` (saytın "Profilim" qaydaları ilə eyni).
+- **Profil → Admin panel** (yalnız `Admin` rolu): statistika, rezervasiyalar (təsdiq / rədd / sil / zəng / WhatsApp),
+  əlaqə mesajları, istifadəçilər (rol ver / götür) və saytın bütün məzmun bölmələri.
+  Server: `api/v1/admin/*` (`AdminController`, `AdminContentController`).
+- Məzmun bölmələrinin formaları serverdən gələn sxemlə qurulur (`Controllers/Api/V1/AdminSections/*.cs`):
+  yeni bölmə və ya sahə əlavə etmək üçün tətbiqi dəyişmək lazım deyil. Saytdakı eyni VM, servis və yoxlamalar istifadə olunur.
+  Bölmə və sahə adları (server tərəfi) Azərbaycan dilindədir — saytın admin paneli kimi.
+
 ## Qeydlər
 - Səs mesajı AAC/M4A (`audio/mp4`) yazılır — server qəbul edir. Android 12+ tələb edir.
 - Tokenlər SecureStorage-dadır (Android Keystore / iOS Keychain / Windows DPAPI).

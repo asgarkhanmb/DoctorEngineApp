@@ -9,9 +9,13 @@ namespace DoctorEngineApp.ViewModels.Categories
         [StringLength(100)]
         public string Name { get; set; } = null!;
 
-        [Required(ErrorMessage = "İkon seçin")]
+        // İkon: ya hazır ikonlardan biri (PresetIcon), ya da yüklənmiş fayl (IconFile).
+        // "Hər ikisi boş olmasın" yoxlaması controller-dədir.
         [AllowedUpload(UploadKind.Image)]
         public IFormFile? IconFile { get; set; }
+
+        /// <summary>Hazır ikonun açarı (bax: CategoryIconPresets).</summary>
+        public string? PresetIcon { get; set; }
 
         // ===== Video (ixtiyari — sonra da əlavə etmək olar) =====
 

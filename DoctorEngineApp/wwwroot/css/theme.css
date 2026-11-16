@@ -262,6 +262,18 @@ html, body { overflow-x: clip !important; }
 
 .de-login-btn:hover { background: var(--de-primary-dark); transform: translateY(-2px); box-shadow: 0 10px 22px rgba(216, 19, 36, .38); }
 
+.de-login-btn__icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Böyük ekran: "Daxil ol" — yalnız ikon, dairəvi düymə */
+@media (min-width: 992px) {
+    .de-login-btn { width: 44px; height: 44px; padding: 0; justify-content: center; }
+    .de-login-btn__icon { width: 21px; height: 21px; }
+    .de-login-btn__text {
+        position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+        overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+}
+
 .de-user-toggle {
     display: inline-flex !important;
     align-items: center;

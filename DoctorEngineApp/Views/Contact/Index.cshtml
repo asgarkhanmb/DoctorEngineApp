@@ -1,4 +1,4 @@
-﻿@model ContactPageVM
+@model ContactPageVM
 
 @{
     ViewData["Title"] = "Əlaqə";
@@ -17,9 +17,9 @@
     <div class="container">
 
         <div class="text-center mb-4 wow fadeInUp" data-wow-delay="0.1s">
-            <h6 class="text-primary text-uppercase">Canlı Əlaqə</h6>
-            <h2 class="mb-3">Usta ilə Birbaşa Yazışın</h2>
-            <p class="mb-0">Probleminizi yazın, şəkil və ya video göndərin — ustalarımız tezliklə cavab verəcək.</p>
+            <h6 class="text-primary text-uppercase">@L.T("Canlı Əlaqə")</h6>
+            <h2 class="mb-3">@L.T("Usta ilə Birbaşa Yazışın")</h2>
+            <p class="mb-0">@L.T("Probleminizi yazın, şəkil və ya video göndərin — ustalarımız tezliklə cavab verəcək.")</p>
         </div>
 
         <partial name="_ChatWidget" />
@@ -35,8 +35,8 @@
     <div class="container">
 
         <div class="text-center mb-5 wow fadeInUp" data-wow-delay="0.1s">
-            <h6 class="text-primary text-uppercase">Bizimlə Əlaqə</h6>
-            <h1 class="mb-0">İstənilən sual üçün əlaqə saxlayın</h1>
+            <h6 class="text-primary text-uppercase">@L.T("Bizimlə Əlaqə")</h6>
+            <h1 class="mb-0">@L.T("İstənilən sual üçün əlaqə saxlayın")</h1>
         </div>
 
         <div class="row g-4 mb-4">
@@ -45,8 +45,8 @@
                 <div class="de-contact-card">
                     <span class="de-contact-card__icon"><i class="fa-solid fa-location-dot"></i></span>
                     <div>
-                        <h5>Ünvan</h5>
-                        <p>@(Model.Contact?.Address ?? "—")</p>
+                        <h5>@L.T("Ünvan")</h5>
+                        <p>@(Model.Contact?.Address is { } addr ? L.T(addr) : "—")</p>
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                 <div class="de-contact-card">
                     <span class="de-contact-card__icon"><i class="fa-solid fa-phone"></i></span>
                     <div>
-                        <h5>Telefon</h5>
+                        <h5>@L.T("Telefon")</h5>
                         @if (!string.IsNullOrEmpty(phone))
                         {
                             <a href="tel:@phone.Replace(" ", "")">@phone</a>
@@ -93,7 +93,7 @@
             <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
                 @if (Model.Map != null)
                 {
-                    <iframe class="de-map" src="@Model.Map.MapUrl" title="Xəritə: @Model.Map.Address"
+                    <iframe class="de-map" src="@Model.Map.MapUrl" title="@L.T("Xəritə: {0}", L.T(Model.Map.Address))"
                             loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                 }
             </div>
@@ -101,10 +101,10 @@
             <!-- Mesaj formu -->
             <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.2s" id="contact-form">
                 <div class="de-form-card">
-                    <h4>Mesaj göndərin</h4>
-                    <p class="lead-sm">Formu doldurun, ən qısa zamanda sizinlə əlaqə saxlayacağıq.</p>
+                    <h4>@L.T("Mesaj göndərin")</h4>
+                    <p class="lead-sm">@L.T("Formu doldurun, ən qısa zamanda sizinlə əlaqə saxlayacağıq.")</p>
 
-                    <form asp-action="SendMessage" asp-fragment="contact-form" method="post" novalidate data-de-loading="Göndərilir…">
+                    <form asp-action="SendMessage" asp-fragment="contact-form" method="post" novalidate data-de-loading="@L.T("Göndərilir…")">
 
                         @if (TempData["SuccessMessage"] != null)
                         {
@@ -117,28 +117,28 @@
 
                         <div class="row g-3">
                             <div class="col-sm-6">
-                                <label asp-for="Message.FullName">Ad Soyad</label>
-                                <input asp-for="Message.FullName" class="form-control" autocomplete="off" placeholder="Adınız" />
+                                <label asp-for="Message.FullName">@L.T("Ad Soyad")</label>
+                                <input asp-for="Message.FullName" class="form-control" autocomplete="off" placeholder="@L.T("Adınız")" />
                                 <span asp-validation-for="Message.FullName" class="text-danger"></span>
                             </div>
                             <div class="col-sm-6">
                                 <label asp-for="Message.Email">Email</label>
-                                <input asp-for="Message.Email" type="email" class="form-control" autocomplete="off" placeholder="ad@numune.az" />
+                                <input asp-for="Message.Email" type="email" class="form-control" autocomplete="off" placeholder="@L.T("ad@numune.az")" />
                                 <span asp-validation-for="Message.Email" class="text-danger"></span>
                             </div>
                             <div class="col-12">
-                                <label asp-for="Message.Subject">Mövzu</label>
-                                <input asp-for="Message.Subject" class="form-control" placeholder="Məs: Mühərrik diaqnostikası" />
+                                <label asp-for="Message.Subject">@L.T("Mövzu")</label>
+                                <input asp-for="Message.Subject" class="form-control" placeholder="@L.T("Məs: Mühərrik diaqnostikası")" />
                                 <span asp-validation-for="Message.Subject" class="text-danger"></span>
                             </div>
                             <div class="col-12">
-                                <label asp-for="Message.Message">Mesaj</label>
-                                <textarea asp-for="Message.Message" class="form-control" rows="4" placeholder="Mesajınızı yazın…"></textarea>
+                                <label asp-for="Message.Message">@L.T("Mesaj")</label>
+                                <textarea asp-for="Message.Message" class="form-control" rows="4" placeholder="@L.T("Mesajınızı yazın…")"></textarea>
                                 <span asp-validation-for="Message.Message" class="text-danger"></span>
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary w-100 py-3">
-                                    <i class="fa-regular fa-paper-plane me-2"></i> Göndər
+                                    <i class="fa-regular fa-paper-plane me-2"></i> @L.T("Göndər")
                                 </button>
                             </div>
                         </div>

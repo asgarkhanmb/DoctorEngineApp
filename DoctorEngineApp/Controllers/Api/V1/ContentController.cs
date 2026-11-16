@@ -1,3 +1,4 @@
+using DoctorEngineApp.Localization;
 using DoctorEngine.Contracts;
 using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
@@ -52,7 +53,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
 
         /// <summary>Ana səhifə üçün hamısı bir sorğuda (tətbiq açılışında bir dəfə yüklənir).</summary>
         [HttpGet("home")]
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, VaryByHeader = "Accept-Language")]   // mətnlər dilə görə fərqlənir
         public async Task<ActionResult<HomeDto>> Home()
         {
             var site = await _site.GetAsync();
@@ -70,27 +71,27 @@ namespace DoctorEngineApp.Controllers.Api.V1
                     string.IsNullOrWhiteSpace(site?.SiteName) ? "DoctorEngine.az" : site!.SiteName,
                     site?.LogoIcon,
                     Upload("site", site?.LogoImage)),
-                sliders.Select(s => new SlideDto(s.Id, s.Title, s.Subtitle, Upload("sliders", s.Image1), Upload("sliders", s.Image2))).ToList(),
-                informs.Select(i => new InformDto(i.Title, i.Description, Upload("inform", i.Icon))).ToList(),
-                about == null ? null : new AboutDto(about.Title, about.Description, Upload("about", about.VideoPath)),
+                sliders.Select(s => new SlideDto(s.Id, L.T(s.Title), L.T(s.Subtitle), Upload("sliders", s.Image1), Upload("sliders", s.Image2))).ToList(),
+                informs.Select(i => new InformDto(L.T(i.Title), L.T(i.Description), Upload("inform", i.Icon))).ToList(),
+                about == null ? null : new AboutDto(L.T(about.Title), L.T(about.Description), Upload("about", about.VideoPath)),
                 await LoadCategoriesAsync(),
                 technicians.Select(ToDto).ToList(),
-                contact == null ? null : new ContactDto(contact.Address, contact.Phone, contact.Email, contact.YouTube,
+                contact == null ? null : new ContactDto(L.T(contact.Address), contact.Phone, contact.Email, contact.YouTube,
                     contact.Facebook, contact.TikTok, contact.WhatsApp, contact.Weekdays, contact.Weekend),
-                phones.Select(p => new ContactPhoneDto(p.Title, p.Subtitle, p.Description, p.PhoneNumber)).ToList(),
-                map == null ? null : new MapDto(map.Address, map.MapUrl),
+                phones.Select(p => new ContactPhoneDto(L.T(p.Title), L.T(p.Subtitle), L.T(p.Description), p.PhoneNumber)).ToList(),
+                map == null ? null : new MapDto(L.T(map.Address), map.MapUrl),
                 whatsapp == null || string.IsNullOrWhiteSpace(whatsapp.PhoneNumber) ? null
-                    : new WhatsAppDto(whatsapp.PhoneNumber, whatsapp.Message,
-                        $"https://wa.me/{whatsapp.PhoneNumber}?text={Uri.EscapeDataString(whatsapp.Message ?? "")}")));
+                    : new WhatsAppDto(whatsapp.PhoneNumber, L.T(whatsapp.Message),
+                        $"https://wa.me/{whatsapp.PhoneNumber}?text={Uri.EscapeDataString(L.T(whatsapp.Message))}")));
         }
 
         /// <summary>Xidmət kateqoriyaları və videoları (Xidmətlər ekranı).</summary>
         [HttpGet("services")]
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, VaryByHeader = "Accept-Language")]   // mətnlər dilə görə fərqlənir
         public async Task<ActionResult<IReadOnlyList<CategoryDto>>> Services() => Ok(await LoadCategoriesAsync());
 
         [HttpGet("technicians")]
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, VaryByHeader = "Accept-Language")]   // mətnlər dilə görə fərqlənir
         public async Task<ActionResult<IReadOnlyList<TechnicianDto>>> Technicians() =>
             Ok((await _technicians.GetAllAsync()).Select(ToDto).ToList());
 
@@ -111,7 +112,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
             // Saytdakı DataAnnotations qaydaları
             var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
             if (!System.ComponentModel.DataAnnotations.Validator.TryValidateObject(vm, new(vm), results, validateAllProperties: true))
-                return BadRequest(new ApiError(results[0].ErrorMessage ?? "Məlumatları düzgün doldurun.", 400));
+                return BadRequest(new ApiError(results[0].ErrorMessage ?? L.T("Məlumatları düzgün doldurun."), 400));
 
             try
             {
@@ -121,7 +122,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
             {
                 return BadRequest(new ApiError(ex.Message, 400));   // məs. "son 1 saat ərzində artıq mesaj göndərilib"
             }
-            return Ok(new MessageResponse("Mesajınız uğurla göndərildi. Tezliklə sizinlə əlaqə saxlanılacaq."));
+            return Ok(new MessageResponse(L.T("Mesajınız uğurla göndərildi. Tezliklə sizinlə əlaqə saxlanılacaq.")));
         }
 
         // ================= KÖMƏKÇİLƏR =================
@@ -152,14 +153,14 @@ namespace DoctorEngineApp.Controllers.Api.V1
 
             return categories.Select(c => new CategoryDto(
                 c.Id,
-                c.Name ?? "",
+                L.T(c.Name),
                 Upload("categories", c.Icon),
-                (c.SubServices ?? new()).Select(s => new VideoDto(s.Id, s.Title, s.Description, Upload("subvideos", s.Video))).ToList(),
+                (c.SubServices ?? new()).Select(s => new VideoDto(s.Id, L.T(s.Title), L.T(s.Description), Upload("subvideos", s.Video))).ToList(),
                 reserveMap.TryGetValue(c.Id, out var sid) ? sid : null)).ToList();
         }
 
         private static TechnicianDto ToDto(Technician t) => new(
-            t.Id, t.FullName ?? "", t.Position, t.Bio, Upload("technicians", t.Image),
+            t.Id, t.FullName ?? "", L.T(t.Position), L.T(t.Bio), Upload("technicians", t.Image),
             t.FacebookUrl, t.InstagramUrl, t.TiktokUrl);
 
         /// <summary>

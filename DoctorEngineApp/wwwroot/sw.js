@@ -8,7 +8,7 @@
 // ---------- "Server işləmir" səhifəsi ----------
 // Səhifə açılarkən server cavab vermirsə (söndürülüb, yenidən başladılır, internet yoxdur)
 // və ya IIS/proxy 502/503/504 qaytarırsa — saytın öz üslubunda offline.html göstərilir.
-const CACHE = "de-offline-v1";
+const CACHE = "de-offline-v2";   // v2: offline.html çoxdilli oldu
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {

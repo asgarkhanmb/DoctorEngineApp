@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             xmlns:c="clr-namespace:DoctorEngine.Contracts;assembly=DoctorEngine.Contracts"
+             x:Class="DoctorEngine.App.Views.AdminReservationsPage"
+             x:DataType="vm:AdminReservationsViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr adm_reservations}">
+
+    <ContentPage.Resources>
+        <Style x:Key="ActionPill" TargetType="Border" BasedOn="{StaticResource Pill}">
+            <Setter Property="Padding" Value="12,7" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{l:Tr adm_reservations}" Subtitle="{l:Tr adm_reservations_sub}" Icon="ic_calendar_w.png" />
+
+        <!-- Filtr -->
+        <ScrollView Grid.Row="1" Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Padding="16,12,16,4">
+            <HorizontalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Filters}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FilterOption">
+                        <Border v:Motion.Appear="True" Style="{StaticResource Pill}" Padding="14,8" StrokeThickness="1"
+                                Stroke="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}"
+                                BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBg}}" v:Motion.Press="True">
+                            <Label Text="{Binding Label}" FontFamily="BarlowSemiBold" FontSize="13" TextColor="{Binding IsSelected, Converter={StaticResource SelectedText}}" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminReservationsViewModel}}, Path=SelectFilterCommand, x:DataType=vm:AdminReservationsViewModel}" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCommand}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="12" Padding="16,8,16,32">
+                    <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                    </Border>
+                    <Label Text="{l:Tr adm_empty}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" Margin="0,24" IsVisible="{Binding IsEmpty}" />
+
+                    <VerticalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Items}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="c:AdminReservationDto">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="16">
+                                    <VerticalStackLayout Spacing="8">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Spacing="0">
+                                                <Label Text="{Binding FullName}" FontFamily="BarlowBold" FontSize="16" LineBreakMode="TailTruncation"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                                <Label Text="{Binding ServiceName}" Style="{StaticResource Muted}" FontSize="13" />
+                                            </VerticalStackLayout>
+                                            <Border Grid.Column="1" VerticalOptions="Start" Style="{StaticResource Pill}" Padding="10,5"
+                                                    BackgroundColor="{Binding Status, Converter={StaticResource StatusColor}, ConverterParameter=bg}">
+                                                <Label Text="{Binding Status, Converter={StaticResource StatusText}}" FontSize="12" FontFamily="BarlowBold"
+                                                       TextColor="{Binding Status, Converter={StaticResource StatusColor}}" />
+                                            </Border>
+                                        </Grid>
+
+                                        <Label FontSize="14" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding DateTime, StringFormat='{0:dd.MM.yyyy · HH:mm}'}" FontFamily="BarlowBold" />
+                                                    <Span Text="   " />
+                                                    <Span Text="{Binding Phone}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Text="{Binding Note}" Style="{StaticResource Muted}" FontSize="13" IsVisible="{Binding Note, Converter={StaticResource HasValue}}" />
+                                        <Label Text="{Binding RejectionReason}" TextColor="#B00F1D" FontSize="13" IsVisible="{Binding RejectionReason, Converter={StaticResource HasValue}}" />
+
+                                        <FlexLayout Wrap="Wrap" JustifyContent="Start" Margin="0,4,0,0">
+                                            <Border Style="{StaticResource ActionPill}" BackgroundColor="#E9F8EF" Margin="0,0,8,8" v:Motion.Press="True">
+                                                <Label Text="{l:Tr adm_res_confirm}" TextColor="#15803D" FontFamily="BarlowBold" FontSize="13" />
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminReservationsViewModel}}, Path=ApproveCommand, x:DataType=vm:AdminReservationsViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                            </Border>
+                                            <Border Style="{StaticResource ActionPill}" BackgroundColor="#FFF6E5" Margin="0,0,8,8" v:Motion.Press="True">
+                                                <Label Text="{l:Tr adm_res_reject}" TextColor="#B45309" FontFamily="BarlowBold" FontSize="13" />
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminReservationsViewModel}}, Path=RejectCommand, x:DataType=vm:AdminReservationsViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                            </Border>
+                                            <Border Style="{StaticResource ActionPill}" BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" Margin="0,0,8,8" v:Motion.Press="True">
+                                                <Label Text="{l:Tr home_call}" TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" FontFamily="BarlowBold" FontSize="13" />
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminReservationsViewModel}}, Path=CallCommand, x:DataType=vm:AdminReservationsViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                            </Border>
+                                            <Border Style="{StaticResource ActionPill}" BackgroundColor="#E7F8EE" Margin="0,0,8,8" v:Motion.Press="True">
+                                                <Label Text="WhatsApp" TextColor="#128C4A" FontFamily="BarlowBold" FontSize="13" />
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminReservationsViewModel}}, Path=WhatsAppCommand, x:DataType=vm:AdminReservationsViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                            </Border>
+                                            <Border Style="{StaticResource ActionPill}" BackgroundColor="#FDECEE" Margin="0,0,8,8" v:Motion.Press="True">
+                                                <Label Text="{l:Tr chat_delete_btn}" TextColor="#B00F1D" FontFamily="BarlowBold" FontSize="13" />
+                                                <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminReservationsViewModel}}, Path=DeleteCommand, x:DataType=vm:AdminReservationsViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                            </Border>
+                                        </FlexLayout>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

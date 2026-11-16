@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using DoctorEngine.App.Localization;
 using DoctorEngine.App.Services;
 
 namespace DoctorEngine.App.ViewModels;
@@ -14,9 +15,24 @@ public partial class BaseViewModel : ObservableObject
     public bool IsNotBusy => !IsBusy;
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
+    protected BaseViewModel()
+    {
+        // Zəif abunə (Lang.Changed WeakEventManager-dir) — keçici ViewModel-lər yaddaşda qalmır
+        Lang.Current.Changed += OnLangChanged;
+    }
+
+    private void OnLangChanged(object? sender, EventArgs e)
+    {
+        ErrorMessage = null;   // köhnə dildəki xəta mətni qalmasın
+        OnLanguageChanged();
+    }
+
+    /// <summary>Dil dəyişəndə: kodda yaradılan mətnləri (salamlama, status və s.) yenidən hesablayın.</summary>
+    protected virtual void OnLanguageChanged() { }
+
     partial void OnErrorMessageChanged(string? value) => OnPropertyChanged(nameof(HasError));
 
-    /// <summary>Əməliyyatı icra edir: yüklənmə göstəricisi + xəta mesajı (Azərbaycan dilində, serverdən).</summary>
+    /// <summary>Əməliyyatı icra edir: yüklənmə göstəricisi + xəta mesajı.</summary>
     protected async Task RunAsync(Func<Task> action, bool showAlert = false)
     {
         if (IsBusy) return;
@@ -29,13 +45,13 @@ public partial class BaseViewModel : ObservableObject
         catch (ApiException ex)
         {
             ErrorMessage = ex.Message;
-            if (showAlert) await Alert("Xəta", ex.Message);
+            if (showAlert) await Alert(Lang.T("common_error"), ex.Message);
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Gözlənilməz xəta baş verdi. Yenidən cəhd edin.";
+            ErrorMessage = Lang.T("common_unexpected");
             System.Diagnostics.Debug.WriteLine(ex);
-            if (showAlert) await Alert("Xəta", ErrorMessage);
+            if (showAlert) await Alert(Lang.T("common_error"), ErrorMessage);
         }
         finally
         {
@@ -44,15 +60,15 @@ public partial class BaseViewModel : ObservableObject
     }
 
     protected static Task Alert(string title, string message) =>
-        Shell.Current?.DisplayAlertAsync(title, message, "Bağla") ?? Task.CompletedTask;
+        Shell.Current?.DisplayAlertAsync(title, message, Lang.T("common_close")) ?? Task.CompletedTask;
 
-    protected static async Task<bool> Confirm(string title, string message, string ok = "Bəli") =>
-        Shell.Current != null && await Shell.Current.DisplayAlertAsync(title, message, ok, "Ləğv et");
+    protected static async Task<bool> Confirm(string title, string message, string? ok = null) =>
+        Shell.Current != null && await Shell.Current.DisplayAlertAsync(title, message, ok ?? Lang.T("common_yes"), Lang.T("common_cancel"));
 
     protected static async Task OpenAsync(string? url)
     {
         if (string.IsNullOrWhiteSpace(url)) return;
         try { await Launcher.Default.OpenAsync(new Uri(url)); }
-        catch { await Alert("Açılmadı", "Bu linki açmaq mümkün olmadı."); }
+        catch { await Alert(Lang.T("common_open_failed_title"), Lang.T("common_open_failed")); }
     }
 }

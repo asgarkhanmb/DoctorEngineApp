@@ -18,6 +18,7 @@ public partial class BookingPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        Motion.Enter(this);   // tab dəyişəndə məzmun yumşaq daxil olur
         if (!_revealed) { _revealed = true; Motion.RevealSections(this); }
         try { await _vm.LoadAsync(); } catch (Exception ex) { Services.CrashLog.Write(ex, "BookingPage"); }
     }

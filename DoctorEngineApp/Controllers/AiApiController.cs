@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Services;
+using DoctorEngineApp.Localization;
+using DoctorEngineApp.Services;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,7 +32,7 @@ namespace DoctorEngineApp.Controllers
         public async Task<IActionResult> Chat([FromBody] ChatRequest request, CancellationToken ct)
         {
             if (!_ai.IsConfigured)
-                return StatusCode(503, new { error = "AI köməkçi hələ ayarlanmayıb. Zəhmət olmasa ustalarımızla əlaqə saxlayın." });
+                return StatusCode(503, new { error = L.T("AI köməkçi hələ ayarlanmayıb. Zəhmət olmasa ustalarımızla əlaqə saxlayın.") });
 
             var history = AiAssistantService.SanitizeHistory(request.Messages, out var validationError);
             if (history == null)
@@ -44,11 +45,11 @@ namespace DoctorEngineApp.Controllers
             switch (limit)
             {
                 case AiLimitResult.DailyLimit:
-                    return StatusCode(429, new { error = $"Bugünkü {quota.Limit} sual limitiniz doldu. Sabah yenidən yazın və ya ustalarımızla əlaqə saxlayın.", remaining = 0 });
+                    return StatusCode(429, new { error = L.T("Bugünkü {0} sual limitiniz doldu. Sabah yenidən yazın və ya ustalarımızla əlaqə saxlayın.", quota.Limit), remaining = 0 });
                 case AiLimitResult.TooFast:
-                    return StatusCode(429, new { error = "Çox tez-tez yazırsınız. Bir dəqiqə gözləyib yenidən cəhd edin.", remaining = quota.Remaining });
+                    return StatusCode(429, new { error = L.T("Çox tez-tez yazırsınız. Bir dəqiqə gözləyib yenidən cəhd edin."), remaining = quota.Remaining });
                 case AiLimitResult.SiteLimit:
-                    return StatusCode(429, new { error = "AI köməkçinin bugünkü ümumi limiti doldu. Sabah yenidən cəhd edin və ya ustalarımızla əlaqə saxlayın.", remaining = 0 });
+                    return StatusCode(429, new { error = L.T("AI köməkçinin bugünkü ümumi limiti doldu. Sabah yenidən cəhd edin və ya ustalarımızla əlaqə saxlayın."), remaining = 0 });
             }
 
             await using var chunks = _ai.StreamAsync(history, ct).GetAsyncEnumerator(ct);
@@ -80,7 +81,7 @@ namespace DoctorEngineApp.Controllers
             {
                 if (!hasFirst)
                 {
-                    await Response.WriteAsync("Bağışlayın, cavab hazırlaya bilmədim. Sualı bir az fərqli yazmağa cəhd edin.", ct);
+                    await Response.WriteAsync(L.T("Bağışlayın, cavab hazırlaya bilmədim. Sualı bir az fərqli yazmağa cəhd edin."), ct);
                     return new EmptyResult();
                 }
 
@@ -98,7 +99,7 @@ namespace DoctorEngineApp.Controllers
             catch (AiException ex)
             {
                 _logger.LogWarning("AI cavabı yarımçıq kəsildi: {Message}", ex.Message);
-                await Response.WriteAsync("\n\n_(Cavab yarımçıq qaldı. Yenidən cəhd edin.)_", CancellationToken.None);
+                await Response.WriteAsync(L.T("\n\n_(Cavab yarımçıq qaldı. Yenidən cəhd edin.)_"), CancellationToken.None);
             }
 
             return new EmptyResult();

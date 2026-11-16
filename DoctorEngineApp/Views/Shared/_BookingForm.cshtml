@@ -33,19 +33,19 @@
 
             <!-- ================= SOL: MƏLUMAT ================= -->
             <aside class="bk-info wow fadeInUp" data-wow-delay="0.1s">
-                <span class="bk-eyebrow">Onlayn rezervasiya</span>
-                <h2>Növbəni indi götürün</h2>
-                <p>Xidməti, günü və boş saatı seçin — rezervasiyanızın statusunu səhifədən çıxmadan canlı izləyin.</p>
+                <span class="bk-eyebrow">@L.T("Onlayn rezervasiya")</span>
+                <h2>@L.T("Növbəni indi götürün")</h2>
+                <p>@L.T("Xidməti, günü və boş saatı seçin — rezervasiyanızın statusunu səhifədən çıxmadan canlı izləyin.")</p>
 
-                <div class="bk-live" title="Saatlar real vaxtda yenilənir">
+                <div class="bk-live" title="@L.T("Saatlar real vaxtda yenilənir")">
                     <span class="bk-live__dot" aria-hidden="true"></span>
-                    <span data-bk-live-text>Canlı: boş saatlar real vaxtda yenilənir</span>
+                    <span data-bk-live-text>@L.T("Canlı: boş saatlar real vaxtda yenilənir")</span>
                 </div>
 
                 <ul class="bk-perks">
-                    <li><i class="fa-regular fa-clock"></i><span><b>İş saatları</b>10:00 – 20:00</span></li>
-                    <li><i class="fa-brands fa-whatsapp"></i><span><b>Təsdiq</b>WhatsApp ilə göndərilir</span></li>
-                    <li><i class="fa-regular fa-calendar"></i><span><b>Öncədən</b>10 günə qədər rezerv</span></li>
+                    <li><i class="fa-regular fa-clock"></i><span><b>@L.T("İş saatları")</b>10:00 – 20:00</span></li>
+                    <li><i class="fa-brands fa-whatsapp"></i><span><b>@L.T("Təsdiq")</b>@L.T("WhatsApp ilə göndərilir")</span></li>
+                    <li><i class="fa-regular fa-calendar"></i><span><b>@L.T("Öncədən")</b>@L.T("10 günə qədər rezerv")</span></li>
                 </ul>
 
                 @if (!string.IsNullOrWhiteSpace(callPhone))
@@ -53,13 +53,13 @@
                     @* Zənglə rezervasiya: sol panelin aşağısı boş qalmasın *@
                     <a class="bk-call" href="tel:@callHref">
                         <span class="bk-call__icon"><i class="fa-solid fa-phone"></i></span>
-                        <span><small>Zənglə də rezerv edə bilərsiniz</small><b>@callPhone</b></span>
+                        <span><small>@L.T("Zənglə də rezerv edə bilərsiniz")</small><b>@callPhone</b></span>
                     </a>
                 }
 
                 <!-- Bu brauzerdən edilən rezervasiyalar (JS doldurur) -->
                 <div class="bk-mine" data-bk-mine hidden>
-                    <h3><i class="fa-regular fa-bookmark"></i> Rezervasiyalarım</h3>
+                    <h3><i class="fa-regular fa-bookmark"></i> @L.T("Rezervasiyalarım")</h3>
                     <ul data-bk-mine-list></ul>
                 </div>
             </aside>
@@ -71,13 +71,13 @@
 
                     <!-- 1. Xidmət -->
                     <fieldset class="bk-step">
-                        <legend><span class="bk-step__num">1</span> Xidmət seçin</legend>
+                        <legend><span class="bk-step__num">1</span> @L.T("Xidmət seçin")</legend>
                         <div class="bk-chips" data-bk-services>
                             @foreach (var s in Model.Services)
                             {
                                 <label class="bk-chip">
                                     <input type="radio" name="@Html.NameFor(m => m.ServiceId)" value="@s.Id" @(s.Id == selectedService ? "checked" : "") required />
-                                    <span><i class="fa-solid fa-screwdriver-wrench"></i> @s.Name</span>
+                                    <span><i class="fa-solid fa-screwdriver-wrench"></i> @L.T(s.Name)</span>
                                 </label>
                             }
                         </div>
@@ -85,17 +85,19 @@
 
                     <!-- 2. Gün -->
                     <fieldset class="bk-step">
-                        <legend><span class="bk-step__num">2</span> Gün seçin</legend>
+                        <legend><span class="bk-step__num">2</span> @L.T("Gün seçin")</legend>
                         <div class="bk-days" data-bk-days>
                             @foreach (var d in days)
                             {
-                                var label = d == now.Date ? "Bu gün" : d == now.Date.AddDays(1) ? "Sabah" : weekDays[(int)d.DayOfWeek];
+                                var label = d == now.Date ? L.T("Bu gün") : d == now.Date.AddDays(1) ? L.T("Sabah")
+                                    : L.Lang == L.Default ? weekDays[(int)d.DayOfWeek] : L.Culture.DateTimeFormat.GetAbbreviatedDayName(d.DayOfWeek);
+                                var monthLabel = L.Lang == L.Default ? months[d.Month - 1] : L.Culture.DateTimeFormat.GetAbbreviatedMonthName(d.Month).TrimEnd('.');
                                 <label class="bk-day">
                                     <input type="radio" name="bkDay" value="@d.ToString("yyyy-MM-dd")" @(d == firstDay ? "checked" : "") />
                                     <span>
                                         <small>@label</small>
                                         <b>@d.Day</b>
-                                        <small>@months[d.Month - 1]</small>
+                                        <small>@monthLabel</small>
                                     </span>
                                 </label>
                             }
@@ -104,40 +106,40 @@
 
                     <!-- 3. Saat -->
                     <fieldset class="bk-step">
-                        <legend><span class="bk-step__num">3</span> Saat seçin</legend>
+                        <legend><span class="bk-step__num">3</span> @L.T("Saat seçin")</legend>
                         <div class="bk-slots" data-bk-slots aria-live="polite">
-                            <p class="bk-slots__hint"><i class="fa-regular fa-hand-pointer"></i> Boş saatları görmək üçün xidmət seçin.</p>
+                            <p class="bk-slots__hint"><i class="fa-regular fa-hand-pointer"></i> @L.T("Boş saatları görmək üçün xidmət seçin.")</p>
                         </div>
                         <div class="bk-legend" aria-hidden="true">
-                            <span><i class="is-free"></i> Boş</span>
-                            <span><i class="is-busy"></i> Tutulub</span>
-                            <span><i class="is-selected"></i> Seçdiyiniz</span>
+                            <span><i class="is-free"></i> @L.T("Boş")</span>
+                            <span><i class="is-busy"></i> @L.T("Tutulub")</span>
+                            <span><i class="is-selected"></i> @L.T("Seçdiyiniz")</span>
                         </div>
                         <div class="bk-notice" data-bk-notice hidden role="alert"></div>
                     </fieldset>
 
                     <!-- 4. Əlaqə -->
                     <fieldset class="bk-step">
-                        <legend><span class="bk-step__num">4</span> Əlaqə məlumatları</legend>
+                        <legend><span class="bk-step__num">4</span> @L.T("Əlaqə məlumatları")</legend>
                         <div class="bk-fields">
                             <div class="bk-field">
-                                <label asp-for="FullName">Ad Soyad</label>
-                                <div class="bk-input"><i class="fa-regular fa-user"></i><input asp-for="FullName" autocomplete="name" required placeholder="Adınız və soyadınız" /></div>
+                                <label asp-for="FullName">@L.T("Ad Soyad")</label>
+                                <div class="bk-input"><i class="fa-regular fa-user"></i><input asp-for="FullName" autocomplete="name" required placeholder="@L.T("Adınız və soyadınız")" /></div>
                             </div>
                             <div class="bk-field">
-                                <label for="phoneInput">Telefon</label>
+                                <label for="phoneInput">@L.T("Telefon")</label>
                                 <div class="bk-input"><i class="fa-solid fa-phone"></i><input asp-for="Phone" id="phoneInput" type="tel" autocomplete="tel" required placeholder="+994 XX XXX XX XX" /></div>
                             </div>
                             <div class="bk-field bk-field--full">
                                 <label class="bk-check" for="sameAsPhone">
                                     <input type="checkbox" id="sameAsPhone" />
-                                    <span>WhatsApp nömrəsi telefonla eyni olsun</span>
+                                    <span>@L.T("WhatsApp nömrəsi telefonla eyni olsun")</span>
                                 </label>
                                 <div class="bk-input"><i class="fa-brands fa-whatsapp"></i><input asp-for="WhatsApp" id="whatsappInput" type="tel" required placeholder="WhatsApp: +994 XX XXX XX XX" /></div>
                             </div>
                             <div class="bk-field bk-field--full">
-                                <label asp-for="Note">Qeyd <small>(ixtiyari)</small></label>
-                                <textarea asp-for="Note" rows="2" placeholder="Məs: avtomobil modeli, ili, mühərrik həcmi"></textarea>
+                                <label asp-for="Note">@L.T("Qeyd") <small>@L.T("(ixtiyari)")</small></label>
+                                <textarea asp-for="Note" rows="2" placeholder="@L.T("Məs: avtomobil modeli, ili, mühərrik həcmi")"></textarea>
                             </div>
                         </div>
                     </fieldset>
@@ -148,10 +150,10 @@
                     <div class="bk-submit">
                         <div class="bk-summary" data-bk-summary>
                             <i class="fa-regular fa-calendar-check"></i>
-                            <span>Xidmət, gün və saat seçin</span>
+                            <span>@L.T("Xidmət, gün və saat seçin")</span>
                         </div>
                         <button type="submit" class="bk-btn bk-btn--primary">
-                            Rezerv et <i class="fa-solid fa-arrow-right"></i>
+                            @L.T("Rezerv et") <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
 
@@ -161,16 +163,16 @@
                 <!-- Uğurlu göndərişdən sonra: canlı status -->
                 <div class="bk-done" data-bk-done hidden>
                     <div class="bk-done__icon"><i class="fa-solid fa-check"></i></div>
-                    <h3>Rezervasiyanız göndərildi!</h3>
+                    <h3>@L.T("Rezervasiyanız göndərildi!")</h3>
                     <p data-bk-done-summary></p>
 
                     <div data-bk-done-tracker></div>
 
                     <div class="bk-done__actions">
-                        <a href="#" class="bk-btn bk-btn--ghost" data-bk-done-link><i class="fa-solid fa-link"></i> İzləmə linki</a>
-                        <button type="button" class="bk-btn bk-btn--primary" data-bk-again><i class="fa-solid fa-plus"></i> Yeni rezervasiya</button>
+                        <a href="#" class="bk-btn bk-btn--ghost" data-bk-done-link><i class="fa-solid fa-link"></i> @L.T("İzləmə linki")</a>
+                        <button type="button" class="bk-btn bk-btn--primary" data-bk-again><i class="fa-solid fa-plus"></i> @L.T("Yeni rezervasiya")</button>
                     </div>
-                    <small class="bk-done__hint">Bu səhifəni bağlasanız da, statusu "Rezervasiyalarım" bölməsindən və ya izləmə linkindən görə bilərsiniz.</small>
+                    <small class="bk-done__hint">@L.T("Bu səhifəni bağlasanız da, statusu \"Rezervasiyalarım\" bölməsindən və ya izləmə linkindən görə bilərsiniz.")</small>
                 </div>
             </div>
 

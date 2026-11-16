@@ -1,3 +1,4 @@
+using DoctorEngineApp.Localization;
 using System.ComponentModel.DataAnnotations;
 using DoctorEngine.Contracts;
 using DoctorEngineApp.Data;
@@ -39,10 +40,11 @@ namespace DoctorEngineApp.Controllers.Api.V1
         {
             var services = await _db.Services.AsNoTracking()
                 .OrderBy(s => s.Id)
-                .Select(s => new BookableServiceDto(s.Id, s.Name))
+                .Select(s => new { s.Id, s.Name })
                 .ToListAsync();
+            var dtos = services.Select(s => new BookableServiceDto(s.Id, L.T(s.Name))).ToList();   // istifadəçinin dilində
 
-            return Ok(new ReservationOptionsDto(services, new ReservationRulesDto(
+            return Ok(new ReservationOptionsDto(dtos, new ReservationRulesDto(
                 ReservationService.OpeningHour,
                 ReservationService.ClosingHour,
                 ReservationService.SlotMinutes,
@@ -76,7 +78,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
             // Saytdakı formanın DataAnnotations qaydaları
             var errors = new List<ValidationResult>();
             if (!Validator.TryValidateObject(vm, new ValidationContext(vm), errors, validateAllProperties: true))
-                return BadRequest(new CreateReservationResponse(false, errors[0].ErrorMessage ?? "Məlumatları düzgün doldurun!", null));
+                return BadRequest(new CreateReservationResponse(false, errors[0].ErrorMessage ?? L.T("Məlumatları düzgün doldurun!"), null));
 
             try
             {
@@ -87,7 +89,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Tətbiqdən rezervasiya yaradılarkən xəta");
-                return StatusCode(500, new CreateReservationResponse(false, "Xəta baş verdi. Yenidən cəhd edin.", null));
+                return StatusCode(500, new CreateReservationResponse(false, L.T("Xəta baş verdi. Yenidən cəhd edin."), null));
             }
         }
 

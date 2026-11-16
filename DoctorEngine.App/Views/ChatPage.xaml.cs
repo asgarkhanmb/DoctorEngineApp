@@ -24,6 +24,7 @@ public partial class ChatPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        Motion.Enter(this);   // tab dəyişəndə məzmun yumşaq daxil olur
         try { await _vm.AppearingAsync(); } catch (Exception ex) { Services.CrashLog.Write(ex, "ChatPage"); }
     }
 }

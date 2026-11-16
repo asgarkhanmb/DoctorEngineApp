@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DoctorEngine.App.Localization;
 using DoctorEngine.App.Services;
 using DoctorEngine.Contracts;
 
@@ -32,9 +33,19 @@ public partial class ProfileViewModel : BaseViewModel
     public bool IsForgotMode => Mode == "forgot";
     public bool HasInfo => !string.IsNullOrEmpty(InfoMessage);
     public UserDto? User => _auth.User;
+    public bool IsAdmin => _auth.User?.IsAdmin == true;
     public string Initial => string.IsNullOrEmpty(User?.FullName) ? "?" : User!.FullName[..1].ToUpperInvariant();
     public string? AvatarUrl => AppConfig.Absolute(User?.AvatarUrl);
-    public string AppVersion => $"Versiya {AppInfo.Current.VersionString}";
+    public string AppVersion => Lang.T("profile_version", AppInfo.Current.VersionString);
+
+    /// <summary>Dil seçimi (AZ / EN / RU / TR) — giriş etməmiş istifadəçiyə də görünür.</summary>
+    public IReadOnlyList<LanguageOption> Languages { get; } = Lang.Supported.Select(l => new LanguageOption(l)).ToList();
+
+    protected override void OnLanguageChanged()
+    {
+        OnPropertyChanged(nameof(AppVersion));
+        foreach (var l in Languages) l.Refresh();
+    }
 
 #if DEBUG
     public bool ShowDevSettings => true;
@@ -56,6 +67,7 @@ public partial class ProfileViewModel : BaseViewModel
         OnPropertyChanged(nameof(IsLoggedIn));
         OnPropertyChanged(nameof(IsGuest));
         OnPropertyChanged(nameof(User));
+        OnPropertyChanged(nameof(IsAdmin));
         OnPropertyChanged(nameof(Initial));
         OnPropertyChanged(nameof(AvatarUrl));
     }
@@ -74,7 +86,7 @@ public partial class ProfileViewModel : BaseViewModel
     private Task Login() => RunAsync(async () =>
     {
         if (string.IsNullOrWhiteSpace(LoginName) || string.IsNullOrEmpty(Password))
-            throw new ApiException("İstifadəçi adı/email və şifrəni daxil edin.", System.Net.HttpStatusCode.BadRequest);
+            throw new ApiException(Lang.T("profile_err_login"), System.Net.HttpStatusCode.BadRequest);
         await _auth.LoginAsync(LoginName, Password);
         Password = "";
         InfoMessage = null;
@@ -84,7 +96,7 @@ public partial class ProfileViewModel : BaseViewModel
     private Task Register() => RunAsync(async () =>
     {
         if (Password != Password2)
-            throw new ApiException("Şifrələr eyni deyil.", System.Net.HttpStatusCode.BadRequest);
+            throw new ApiException(Lang.T("profile_err_pw_mismatch"), System.Net.HttpStatusCode.BadRequest);
         var result = await _auth.RegisterAsync(new RegisterRequest(FullName.Trim(), UserName.Trim(), Email.Trim(), Password));
         InfoMessage = result.Message;
         LoginName = UserName.Trim();
@@ -96,7 +108,7 @@ public partial class ProfileViewModel : BaseViewModel
     private Task Forgot() => RunAsync(async () =>
     {
         if (string.IsNullOrWhiteSpace(Email))
-            throw new ApiException("Email ünvanını daxil edin.", System.Net.HttpStatusCode.BadRequest);
+            throw new ApiException(Lang.T("profile_err_email"), System.Net.HttpStatusCode.BadRequest);
         InfoMessage = (await _auth.ForgotPasswordAsync(Email)).Message;
         Mode = "login";
     });
@@ -104,7 +116,7 @@ public partial class ProfileViewModel : BaseViewModel
     [RelayCommand]
     private async Task Logout()
     {
-        if (!await Confirm("Çıxış", "Hesabdan çıxmaq istəyirsiniz?", "Çıx")) return;
+        if (!await Confirm(Lang.T("profile_logout_title"), Lang.T("profile_logout_confirm"), Lang.T("profile_logout_ok"))) return;
         await _auth.LogoutAsync();
     }
 
@@ -114,6 +126,22 @@ public partial class ProfileViewModel : BaseViewModel
         AppConfig.BaseUrl = ServerUrl;
         ServerUrl = AppConfig.BaseUrl;
         _api.Reset();
-        await Alert("Server", $"Server ünvanı: {AppConfig.BaseUrl}\nDəyişikliyin tam tətbiqi üçün tətbiqi yenidən açın.");
+        await Alert(Lang.T("profile_server_title"), Lang.T("profile_server_saved", AppConfig.BaseUrl));
     }
+}
+
+/// <summary>Dil düyməsi (Profil → Dil).</summary>
+public partial class LanguageOption : ObservableObject
+{
+    public LanguageOption(LanguageInfo info) => Info = info;
+
+    public LanguageInfo Info { get; }
+    public string Code => Info.Code;
+    public string Short => Info.Short;
+    public string NativeName => Info.NativeName;
+    public bool IsSelected => Lang.Current.Code == Info.Code;
+
+    [RelayCommand] private void Select() => Lang.Current.Set(Info.Code);
+
+    public void Refresh() => OnPropertyChanged(nameof(IsSelected));
 }

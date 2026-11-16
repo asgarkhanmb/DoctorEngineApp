@@ -1,4 +1,4 @@
-﻿@model ReservationPageVM
+@model ReservationPageVM
 
 @{
     ViewData["Title"] = "Rezervasiya";
@@ -18,15 +18,15 @@
                 <div class="rs-call__text">
                     @if (!string.IsNullOrWhiteSpace(Model.ContactPhone.Subtitle))
                     {
-                        <span class="rs-call__eyebrow">@Model.ContactPhone.Subtitle</span>
+                        <span class="rs-call__eyebrow">@L.T(Model.ContactPhone.Subtitle)</span>
                     }
-                    <h2>@Model.ContactPhone.Title</h2>
-                    <p>@Model.ContactPhone.Description</p>
+                    <h2>@L.T(Model.ContactPhone.Title)</h2>
+                    <p>@L.T(Model.ContactPhone.Description)</p>
                 </div>
                 <a class="rs-call__btn" href="tel:@tel">
                     <span class="rs-call__icon"><i class="fa fa-phone-alt"></i></span>
                     <span class="rs-call__num">
-                        <small>İndi zəng edin</small>
+                        <small>@L.T("İndi zəng edin")</small>
                         <strong>@Model.ContactPhone.PhoneNumber</strong>
                     </span>
                     <i class="fa-solid fa-arrow-right rs-call__arrow" aria-hidden="true"></i>

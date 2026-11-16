@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             x:Class="DoctorEngine.App.Views.AdminSectionPage"
+             x:DataType="vm:AdminSectionViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{Binding Section.Title}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{Binding Section.Title}" Subtitle="{Binding Section.Subtitle}" Icon="ic_wrench_w.png"
+                      ActionText="{l:Tr adm_add}" ActionCommand="{Binding AddCommand}" ActionVisible="{Binding CanCreate}" />
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding LoadCommand}">
+            <ScrollView>
+                <VerticalStackLayout Spacing="10" Padding="16,16,16,32">
+                    <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                    </Border>
+                    <Border Style="{StaticResource ErrorBox}" BackgroundColor="#FFF6E5" Stroke="#F5D9A8" IsVisible="{Binding CreateBlockedReason, Converter={StaticResource HasValue}}">
+                        <Label Text="{Binding CreateBlockedReason}" TextColor="#92400E" FontSize="13" />
+                    </Border>
+                    <Label Text="{l:Tr adm_empty}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" Margin="0,24" IsVisible="{Binding IsEmpty}" />
+
+                    <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Items}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:AdminListItem">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="10" v:Motion.Press="True">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+                                        <Border WidthRequest="56" HeightRequest="56" StrokeShape="RoundRectangle 14" StrokeThickness="0"
+                                                BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}">
+                                            <Grid>
+                                                <Label Text="{Binding Initial}" FontFamily="BarlowBold" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                                                <Image Source="{Binding ImageUrl}" Aspect="AspectFill" IsVisible="{Binding HasImage}" />
+                                            </Grid>
+                                        </Border>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding Item.Title}" Style="{StaticResource RowTitle}" />
+                                            <Label Text="{Binding Item.Subtitle}" Style="{StaticResource Muted}" FontSize="12" MaxLines="2" LineBreakMode="TailTruncation"
+                                                   IsVisible="{Binding Item.Subtitle, Converter={StaticResource HasValue}}" />
+                                        </VerticalStackLayout>
+                                        <Border Grid.Column="2" Style="{StaticResource Pill}" Padding="8,3" VerticalOptions="Center"
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#33D81324}"
+                                                IsVisible="{Binding Item.Badge, Converter={StaticResource HasValue}}">
+                                            <Label Text="{Binding Item.Badge}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="11" />
+                                        </Border>
+                                        <Image Grid.Column="3" Source="ic_arrow_g.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                                    </Grid>
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AdminSectionViewModel}}, Path=OpenCommand, x:DataType=vm:AdminSectionViewModel}" CommandParameter="{Binding .}" /></Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

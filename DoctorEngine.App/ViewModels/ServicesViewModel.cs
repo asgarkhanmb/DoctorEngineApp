@@ -16,15 +16,17 @@ public partial class ServicesViewModel : BaseViewModel
 
     public ServicesViewModel(ContentService content) => _content = content;
 
+    /// <summary>Dil dəyişəndə kartlar yenidən çəkilir (təsviri olmayan xidmətlərin standart mətni).</summary>
+    protected override void OnLanguageChanged() => Categories.Rebind();
+
     [RelayCommand]
     public async Task LoadAsync(bool force = false)
     {
         await RunAsync(async () =>
         {
             var home = await _content.GetHomeAsync(force);
-            Categories.Clear();
-            foreach (var c in home?.Categories ?? new List<DoctorEngine.Contracts.CategoryDto>())
-                Categories.Add(CategoryItem.From(c));
+            // Clear() yox — Windows-da yeniləmə zamanı çökməsin (bax CollectionSync)
+            Categories.SyncWith((home?.Categories ?? new List<DoctorEngine.Contracts.CategoryDto>()).Select(CategoryItem.From));
         });
         IsRefreshing = false;
     }

@@ -20,11 +20,11 @@ public class VoiceRecorder : IVoiceRecorder
 #if ANDROID
         // Plugin.Maui.Audio AAC yazmanı Android 12 (API 31)+ üzərində dəstəkləyir
         if (!OperatingSystem.IsAndroidVersionAtLeast(31))
-            throw new InvalidOperationException("Səs mesajı Android 12 və daha yeni versiyalarda dəstəklənir.");
+            throw new InvalidOperationException(Localization.Lang.T("voice_android12"));
 #endif
         _recorder ??= _audio.CreateRecorder();
         if (!_recorder.CanRecordAudio)
-            throw new InvalidOperationException("Bu cihazda mikrofon tapılmadı.");
+            throw new InvalidOperationException(Localization.Lang.T("voice_no_mic"));
 
         _path = Path.Combine(FileSystem.CacheDirectory, $"voice_{DateTime.UtcNow:yyyyMMddHHmmss}.m4a");
         await _recorder.StartAsync(_path, new AudioRecorderOptions

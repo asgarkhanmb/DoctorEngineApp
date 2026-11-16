@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using DoctorEngine.App.Localization;
 using DoctorEngine.Contracts;
 
 namespace DoctorEngine.App.Services;
@@ -56,6 +57,24 @@ public class ApiClient
         { Content = body == null ? null : JsonContent.Create(body, options: Json.Options) }, ct);
         await EnsureSuccessAsync(res, ct);
     }
+
+    public Task<T> PutAsync<T>(string path, object? body, CancellationToken ct = default) =>
+        SendAsync<T>(() => new HttpRequestMessage(HttpMethod.Put, path) { Content = body == null ? null : JsonContent.Create(body, options: Json.Options) }, ct);
+
+    public Task<T> DeleteAsync<T>(string path, CancellationToken ct = default) =>
+        SendAsync<T>(() => new HttpRequestMessage(HttpMethod.Delete, path), ct);
+
+    public async Task DeleteAsync(string path, CancellationToken ct = default)
+    {
+        using var res = await SendRawAsync(() => new HttpRequestMessage(HttpMethod.Delete, path), ct);
+        await EnsureSuccessAsync(res, ct);
+    }
+
+    /// <summary>
+    /// Access tokeni dərhal yeniləyir — profil (istifadəçi adı) və ya şifrə dəyişəndən sonra
+    /// tokendəki məlumat (claim-lər, security stamp) yenilənsin.
+    /// </summary>
+    public Task<bool> ForceRefreshAsync() => RefreshAsync(_tokens.AccessToken, default);
 
     /// <summary>Fayl / form göndərmək (çat) — content hər cəhddə yenidən yaradılır.</summary>
     public async Task<T> PostFormAsync<T>(string path, Func<HttpContent> content, CancellationToken ct = default) =>
@@ -133,11 +152,11 @@ public class ApiClient
         }
         catch (HttpRequestException)
         {
-            throw new ApiException("Serverə qoşulmaq mümkün olmadı. İnternet bağlantınızı yoxlayın.", HttpStatusCode.ServiceUnavailable);
+            throw new ApiException(Lang.T("api_no_connection"), HttpStatusCode.ServiceUnavailable);
         }
         catch (TaskCanceledException) when (!ct.IsCancellationRequested)
         {
-            throw new ApiException("Server cavab vermir. Bir azdan yenidən cəhd edin.", HttpStatusCode.RequestTimeout);
+            throw new ApiException(Lang.T("api_timeout"), HttpStatusCode.RequestTimeout);
         }
 
         // Token serverdə etibarsız sayılıbsa (şifrə dəyişib və s.) — bir dəfə yenilə və təkrarla
@@ -154,6 +173,8 @@ public class ApiClient
     private static HttpRequestMessage WithAuth(HttpRequestMessage req, string? token)
     {
         req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        // Seçilmiş dil — server gələcəkdə mətnləri bu dildə qaytara bilsin (AI cavabı sualın dilindədir)
+        req.Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue(Lang.Current.Code));
         if (!string.IsNullOrEmpty(token)) req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return req;
     }
@@ -212,12 +233,12 @@ public class ApiClient
 
     private static string Default(HttpStatusCode code) => code switch
     {
-        HttpStatusCode.Unauthorized => "Sessiyanın vaxtı bitib. Yenidən daxil olun.",
-        HttpStatusCode.Forbidden => "Bu əməliyyata icazəniz yoxdur.",
-        HttpStatusCode.NotFound => "Tapılmadı.",
-        HttpStatusCode.TooManyRequests => "Çox sayda sorğu. Bir az gözləyib yenidən cəhd edin.",
-        >= HttpStatusCode.InternalServerError => "Serverdə xəta baş verdi. Bir azdan yenidən cəhd edin.",
-        _ => "Sorğu yerinə yetirilmədi."
+        HttpStatusCode.Unauthorized => Lang.T("api_unauthorized"),
+        HttpStatusCode.Forbidden => Lang.T("api_forbidden"),
+        HttpStatusCode.NotFound => Lang.T("api_not_found"),
+        HttpStatusCode.TooManyRequests => Lang.T("api_too_many"),
+        >= HttpStatusCode.InternalServerError => Lang.T("api_server_error"),
+        _ => Lang.T("api_failed")
     };
 
     /// <summary>Server xətaları: { error } (ApiError) və ya rezervasiyada { message }.</summary>

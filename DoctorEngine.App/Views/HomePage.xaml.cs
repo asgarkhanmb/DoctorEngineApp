@@ -23,6 +23,7 @@ public partial class HomePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        Motion.Enter(this);   // tab dəyişəndə məzmun yumşaq daxil olur
         _vm.RefreshLive();
         StartSlideTimer();
         try

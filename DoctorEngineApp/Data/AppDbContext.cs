@@ -28,6 +28,15 @@ namespace DoctorEngineApp.Data
         public DbSet<Warranty> Warranties { get; set; }
         public DbSet<WarrantyItem> WarrantyItems { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; } = null!;
+        public DbSet<ContentTranslation> ContentTranslations { get; set; } = null!;   // AI tərcümələri (en/ru/tr)
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<ContentTranslation>()
+                .HasIndex(t => new { t.SourceHash, t.Lang })
+                .IsUnique();
+        }
     }
 }

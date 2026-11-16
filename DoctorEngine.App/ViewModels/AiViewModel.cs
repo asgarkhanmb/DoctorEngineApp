@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DoctorEngine.App.Localization;
 using DoctorEngine.App.Services;
 using DoctorEngine.Contracts;
 
@@ -25,12 +26,10 @@ public partial class AiViewModel : BaseViewModel
     public bool CanAsk => !IsAnswering && !string.IsNullOrWhiteSpace(Question);
     public bool IsEmpty => Messages.Count == 0;
 
-    public IReadOnlyList<string> Suggestions { get; } = new[]
-    {
-        "Mühərrikdən tıqqıltı səsi gəlir, səbəbi nə ola bilər?",
-        "Yağ dəyişməyi nə vaxt etməliyəm?",
-        "Mühərrik çox qızır, nə etməliyəm?"
-    };
+    /// <summary>Hazır suallar — seçilmiş dildə (AI cavabı da sualın dilində verir).</summary>
+    public IReadOnlyList<string> Suggestions => new[] { Lang.T("ai_s1"), Lang.T("ai_s2"), Lang.T("ai_s3") };
+
+    protected override void OnLanguageChanged() => OnPropertyChanged(nameof(Suggestions));
 
     public event Action<AiItem>? ScrollToRequested;
 
@@ -68,7 +67,7 @@ public partial class AiViewModel : BaseViewModel
                 ScrollToRequested?.Invoke(answer);
             }
             if (string.IsNullOrWhiteSpace(answer.Content))
-                answer.Content = "Bağışlayın, cavab hazırlaya bilmədim. Sualı bir az fərqli yazmağa cəhd edin.";
+                answer.Content = Lang.T("ai_no_answer");
         }
         catch (OperationCanceledException)
         {

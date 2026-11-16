@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
              xmlns:v="clr-namespace:DoctorEngine.App.Views"
@@ -7,7 +8,7 @@
              x:DataType="vm:ChatViewModel"
              Shell.NavBarIsVisible="False"
              SafeAreaEdges="All"
-             Title="Çat">
+             Title="{l:Tr tab_chat}">
 
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{AppThemeBinding Light=#EEF2F8, Dark={StaticResource BackgroundDark}}">
 
@@ -22,11 +23,11 @@
                              HorizontalOptions="End" VerticalOptions="End" Margin="0,0,-2,-2" IsVisible="{Binding IsOnline}" />
                 </Grid>
                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                    <Label Text="Canlı usta dəstəyi" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
+                    <Label Text="{l:Tr chat_header}" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
                     <Label TextColor="{StaticResource OnHeaderMuted}" FontSize="13">
                         <Label.Triggers>
                             <DataTrigger TargetType="Label" Binding="{Binding IsGuest}" Value="True">
-                                <Setter Property="Text" Value="Ustalarımız adətən bir neçə dəqiqəyə cavab verir" />
+                                <Setter Property="Text" Value="{l:Tr chat_guest_status}" />
                             </DataTrigger>
                             <DataTrigger TargetType="Label" Binding="{Binding IsLoggedIn}" Value="True">
                                 <Setter Property="Text" Value="{Binding Status}" />
@@ -48,8 +49,8 @@
                         <Image Source="ic_chat_w.png" />
                     </Border>
                 </Grid>
-                <Label Text="Usta ilə birbaşa yazışın" Style="{StaticResource SectionTitle}" FontSize="24" HorizontalTextAlignment="Center" />
-                <Label Text="Probleminizi yazın, şəkil, video və ya səs mesajı göndərin — ustalarımız tezliklə cavab verəcək."
+                <Label Text="{l:Tr chat_guest_title}" Style="{StaticResource SectionTitle}" FontSize="24" HorizontalTextAlignment="Center" />
+                <Label Text="{l:Tr chat_guest_text}"
                        Style="{StaticResource Muted}" FontSize="15" HorizontalTextAlignment="Center" />
 
                 <VerticalStackLayout Spacing="10" Margin="0,6,0,6">
@@ -57,24 +58,24 @@
                         <Border WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="9">
                             <Image Source="ic_attach_r.png" />
                         </Border>
-                        <Label Grid.Column="1" Text="Şəkil və video göndərin" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                        <Label Grid.Column="1" Text="{l:Tr chat_feat_media}" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                         <Border WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="9">
                             <Image Source="ic_mic_r.png" />
                         </Border>
-                        <Label Grid.Column="1" Text="Səs mesajı ilə problemi izah edin" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                        <Label Grid.Column="1" Text="{l:Tr chat_feat_voice}" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                         <Border WidthRequest="36" HeightRequest="36" StrokeShape="RoundRectangle 12" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}" Padding="9">
                             <Image Source="ic_shield_r.png" />
                         </Border>
-                        <Label Grid.Column="1" Text="Yazışmalar yalnız sizə və ustaya görünür" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                        <Label Grid.Column="1" Text="{l:Tr chat_feat_private}" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
                     </Grid>
                 </VerticalStackLayout>
 
                 <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" HeightRequest="54" v:Motion.Press="True">
-                    <Label Text="Daxil ol / Qeydiyyat" TextColor="White" FontFamily="BarlowBold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Label Text="{l:Tr chat_login_register}" TextColor="White" FontFamily="BarlowBold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
                     </Border.GestureRecognizers>
@@ -89,7 +90,7 @@
                 <VerticalStackLayout Padding="0,10,0,4" Spacing="6">
                     <Border Style="{StaticResource Pill}" HorizontalOptions="Center" BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}"
                             IsVisible="{Binding CanLoadMore}" v:Motion.Press="True">
-                        <Label Text="Köhnə mesajları göstər" FontFamily="BarlowSemiBold" FontSize="13" TextColor="{StaticResource Primary}" />
+                        <Label Text="{l:Tr chat_load_older}" FontFamily="BarlowSemiBold" FontSize="13" TextColor="{StaticResource Primary}" />
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding LoadMoreCommand}" />
                         </Border.GestureRecognizers>
@@ -100,14 +101,14 @@
                                 WidthRequest="66" HeightRequest="66" Padding="18" HorizontalOptions="Center">
                             <Image Source="ic_chat_r.png" />
                         </Border>
-                        <Label Text="Söhbətə başlayın" Style="{StaticResource SectionTitle}" FontSize="18" HorizontalTextAlignment="Center" />
-                        <Label Text="Sualınızı yazın — ustalarımız cavab verəcək." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+                        <Label Text="{l:Tr chat_empty_title}" Style="{StaticResource SectionTitle}" FontSize="18" HorizontalTextAlignment="Center" />
+                        <Label Text="{l:Tr chat_empty_text}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </CollectionView.Header>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:ChatItem">
-                    <VerticalStackLayout Padding="12,3" Spacing="4">
+                    <VerticalStackLayout v:Motion.Appear="True" Padding="12,3" Spacing="4">
                         <!-- Tarix ayırıcısı -->
                         <Border IsVisible="{Binding ShowDate}" HorizontalOptions="Center" Style="{StaticResource Pill}" Padding="12,4" Margin="0,10,0,4"
                                 BackgroundColor="{AppThemeBinding Light=#DCE3EE, Dark=#202A44}">
@@ -118,7 +119,7 @@
                         <HorizontalStackLayout IsVisible="{Binding ShowName}" Spacing="6" Margin="6,4,0,0">
                             <Label Text="{Binding UserName}" FontSize="12" Style="{StaticResource Muted}" FontFamily="BarlowBold" />
                             <Border IsVisible="{Binding IsAdmin}" Style="{StaticResource Pill}" BackgroundColor="{StaticResource Primary}" Padding="7,1">
-                                <Label Text="USTA" TextColor="White" FontSize="10" FontFamily="BarlowBold" />
+                                <Label Text="{l:Tr chat_badge_mechanic}" TextColor="White" FontSize="10" FontFamily="BarlowBold" />
                             </Border>
                         </HorizontalStackLayout>
 
@@ -148,7 +149,7 @@
                                         <Border Background="{StaticResource PrimaryGradient}" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="52" HeightRequest="52" Padding="15" HorizontalOptions="Center">
                                             <Image Source="ic_play_w.png" />
                                         </Border>
-                                        <Label Text="Videoya bax" TextColor="White" FontFamily="BarlowSemiBold" FontSize="13" HorizontalOptions="Center" />
+                                        <Label Text="{l:Tr common_watch_video}" TextColor="White" FontFamily="BarlowSemiBold" FontSize="13" HorizontalOptions="Center" />
                                     </VerticalStackLayout>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenMediaCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding VideoUrl}" />
@@ -186,7 +187,7 @@
                                        TextColor="{Binding IsMine, Converter={StaticResource BubbleText}}" />
                                 <!-- Vaxt -->
                                 <HorizontalStackLayout HorizontalOptions="End" Spacing="6">
-                                    <Label Text="redaktə olunub" FontSize="10" Opacity="0.7" IsVisible="{Binding IsEdited}" TextColor="{Binding IsMine, Converter={StaticResource BubbleText}}" />
+                                    <Label Text="{l:Tr chat_edited}" FontSize="10" Opacity="0.7" IsVisible="{Binding IsEdited}" TextColor="{Binding IsMine, Converter={StaticResource BubbleText}}" />
                                     <Label Text="{Binding Time}" FontSize="11" Opacity="0.75" TextColor="{Binding IsMine, Converter={StaticResource BubbleText}}" />
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
@@ -208,8 +209,8 @@
             <VerticalStackLayout Spacing="6">
                 <!-- Redaktə rejimi -->
                 <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding Editing, Converter={StaticResource HasValue}}" Padding="8,0">
-                    <Label Text="Mesaj redaktə olunur" FontSize="13" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" VerticalOptions="Center" />
-                    <Label Grid.Column="1" Text="Ləğv et" FontSize="13" FontFamily="BarlowBold" TextColor="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}">
+                    <Label Text="{l:Tr chat_editing}" FontSize="13" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" VerticalOptions="Center" />
+                    <Label Grid.Column="1" Text="{l:Tr common_cancel}" FontSize="13" FontFamily="BarlowBold" TextColor="{AppThemeBinding Light={StaticResource Muted}, Dark={StaticResource MutedDark}}">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CancelEditCommand}" />
                         </Label.GestureRecognizers>
@@ -226,7 +227,7 @@
                     </Border>
                     <Ellipse x:Name="RecDot" Grid.Column="1" Fill="{StaticResource Primary}" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" />
                     <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
-                        <Label Text="Səs yazılır…" Style="{StaticResource Muted}" FontSize="12" />
+                        <Label Text="{l:Tr chat_recording}" Style="{StaticResource Muted}" FontSize="12" />
                         <Label Text="{Binding RecordTime}" FontSize="18" FontFamily="BarlowBold" />
                     </VerticalStackLayout>
                     <Border Grid.Column="3" WidthRequest="50" HeightRequest="50" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" Padding="14" v:Motion.Press="True">
@@ -248,7 +249,7 @@
                     </Border>
                     <Border Grid.Column="1" StrokeShape="RoundRectangle 23" StrokeThickness="0" Padding="16,2"
                             BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}">
-                        <Editor Text="{Binding Text}" Placeholder="Mesaj yazın…" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
+                        <Editor Text="{Binding Text}" Placeholder="{l:Tr chat_placeholder}" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
                     </Border>
                     <Grid Grid.Column="2" VerticalOptions="End">
                         <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" Padding="13"

@@ -219,7 +219,7 @@
         copy.addEventListener("click", async () => {
             try {
                 await navigator.clipboard.writeText(getText());
-                copy.lastChild.textContent = " Kopyalandı";
+                copy.lastChild.textContent = " " + deT("Kopyalandı");
                 setTimeout(() => (copy.lastChild.textContent = " Kopyala"), 1500);
             } catch { /* clipboard icazəsi yoxdur */ }
         });
@@ -250,7 +250,7 @@
         if (retry) {
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.textContent = "Yenidən cəhd et";
+            btn.textContent = deT("Yenidən cəhd et");
             btn.addEventListener("click", () => { box.remove(); retry(); });
             box.appendChild(btn);
         }
@@ -308,7 +308,7 @@
         bubble.replaceChildren();
         const typing = document.createElement("span");
         typing.className = "ai__typing";
-        typing.setAttribute("aria-label", "Yazılır");
+        typing.setAttribute("aria-label", deT("Yazılır"));
         typing.append(document.createElement("span"), document.createElement("span"), document.createElement("span"));
         bubble.appendChild(typing);
         list.appendChild(wrap);
@@ -330,7 +330,7 @@
             readRemaining(response);
 
             if (!response.ok) {
-                let msg = "Xəta baş verdi. Yenidən cəhd edin.";
+                let msg = deT("Xəta baş verdi. Yenidən cəhd edin.");
                 let data = null;
                 try { data = await response.json(); if (data && data.error) msg = data.error; } catch { }
                 if (data && typeof data.remaining === "number") setRemaining(data.remaining);
@@ -367,10 +367,10 @@
                 console.error(err);
                 if (!text) {
                     wrap.remove();
-                    showError("Bağlantı xətası. İnternetinizi yoxlayıb yenidən cəhd edin.", () => requestAnswer());
+                    showError(deT("Bağlantı xətası. İnternetinizi yoxlayıb yenidən cəhd edin."), () => requestAnswer());
                     return;
                 }
-                text += "\n\n_(Bağlantı kəsildi.)_";
+                text += deT("\n\n_(Bağlantı kəsildi.)_");
             }
         } finally {
             controller = null;
@@ -381,11 +381,11 @@
 
         if (!text.trim()) {
             wrap.remove();
-            if (!stopped) showError("Cavab alınmadı. Yenidən cəhd edin.", () => requestAnswer());
+            if (!stopped) showError(deT("Cavab alınmadı. Yenidən cəhd edin."), () => requestAnswer());
             return;
         }
 
-        if (stopped) text += "\n\n_(dayandırıldı)_";
+        if (stopped) text += deT("\n\n_(dayandırıldı)_");
         renderMarkdown(bubble, text);
         const saved = { role: "assistant", content: text };
         messages.push(saved);

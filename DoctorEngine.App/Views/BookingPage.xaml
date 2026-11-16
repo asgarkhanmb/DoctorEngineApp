@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
              xmlns:v="clr-namespace:DoctorEngine.App.Views"
@@ -8,7 +9,7 @@
              x:DataType="vm:BookingViewModel"
              Shell.NavBarIsVisible="False"
              SafeAreaEdges="Container"
-             Title="Rezervasiya">
+             Title="{l:Tr tab_booking}">
 
     <ContentPage.Resources>
         <!-- Mərhələ nöqtəsi: tamamlananda qırmızı, əks halda şüşə -->
@@ -57,9 +58,9 @@
                 <Border Style="{StaticResource PageHeader}">
                     <VerticalStackLayout Spacing="16">
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="ONLAYN REZERVASİYA" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
-                            <Label Text="Növbəni indi götürün" Style="{StaticResource HeaderTitle}" />
-                            <Label Text="Xidməti, günü və boş saatı seçin — statusu buradan canlı izləyin." Style="{StaticResource HeaderSubtitle}" />
+                            <Label Text="{l:Tr booking_eyebrow}" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
+                            <Label Text="{l:Tr booking_title}" Style="{StaticResource HeaderTitle}" />
+                            <Label Text="{l:Tr booking_subtitle}" Style="{StaticResource HeaderSubtitle}" />
                         </VerticalStackLayout>
 
                         <Grid ColumnDefinitions="*,*,*,*">
@@ -69,28 +70,28 @@
                                     <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step1Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
                                     <Label Text="1" Style="{StaticResource StepNum}" />
                                 </Border>
-                                <Label Text="Xidmət" Style="{StaticResource StepText}" />
+                                <Label Text="{l:Tr step_service}" Style="{StaticResource StepText}" />
                             </VerticalStackLayout>
                             <VerticalStackLayout Grid.Column="1" Spacing="6">
                                 <Border Style="{StaticResource StepDot}">
                                     <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step2Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
                                     <Label Text="2" Style="{StaticResource StepNum}" />
                                 </Border>
-                                <Label Text="Gün" Style="{StaticResource StepText}" />
+                                <Label Text="{l:Tr step_day}" Style="{StaticResource StepText}" />
                             </VerticalStackLayout>
                             <VerticalStackLayout Grid.Column="2" Spacing="6">
                                 <Border Style="{StaticResource StepDot}">
                                     <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step3Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
                                     <Label Text="3" Style="{StaticResource StepNum}" />
                                 </Border>
-                                <Label Text="Saat" Style="{StaticResource StepText}" />
+                                <Label Text="{l:Tr step_time}" Style="{StaticResource StepText}" />
                             </VerticalStackLayout>
                             <VerticalStackLayout Grid.Column="3" Spacing="6">
                                 <Border Style="{StaticResource StepDot}">
                                     <Border.Triggers><DataTrigger TargetType="Border" Binding="{Binding Step4Done}" Value="True"><Setter Property="BackgroundColor" Value="{StaticResource Primary}" /></DataTrigger></Border.Triggers>
                                     <Label Text="4" Style="{StaticResource StepNum}" />
                                 </Border>
-                                <Label Text="Əlaqə" Style="{StaticResource StepText}" />
+                                <Label Text="{l:Tr step_contact}" Style="{StaticResource StepText}" />
                             </VerticalStackLayout>
                         </Grid>
                     </VerticalStackLayout>
@@ -104,13 +105,13 @@
                             <Image Source="ic_check_w.png" />
                         </Border>
                         <VerticalStackLayout Grid.Column="1" Spacing="4">
-                            <Label Text="Rezervasiya göndərildi!" TextColor="White" FontFamily="BarlowBold" FontSize="18" />
+                            <Label Text="{l:Tr booking_sent}" TextColor="White" FontFamily="BarlowBold" FontSize="18" />
                             <Label Text="{Binding SuccessMessage}" TextColor="#F0FFFFFF" FontSize="13" />
                             <Border Style="{StaticResource Pill}" BackgroundColor="#33FFFFFF" Padding="10,4" IsVisible="{Binding SuccessCode, Converter={StaticResource HasValue}}">
                                 <Label TextColor="White" FontSize="12">
                                     <Label.FormattedText>
                                         <FormattedString>
-                                            <Span Text="İzləmə kodu: " />
+                                            <Span Text="{l:Tr booking_tracking}" />
                                             <Span Text="{Binding SuccessCode}" FontFamily="BarlowBold" />
                                         </FormattedString>
                                     </Label.FormattedText>
@@ -129,11 +130,11 @@
                     <VerticalStackLayout Spacing="12">
                         <HorizontalStackLayout Spacing="10">
                             <Border Style="{StaticResource CardNum}"><Label Text="1" Style="{StaticResource StepNum}" /></Border>
-                            <Label Text="Xidmət seçin" Style="{StaticResource CardTitle}" />
+                            <Label Text="{l:Tr booking_choose_service}" Style="{StaticResource CardTitle}" />
                         </HorizontalStackLayout>
                         <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,2">
                             <Picker ItemsSource="{Binding Services}" SelectedItem="{Binding SelectedService}" ItemDisplayBinding="{Binding Name, x:DataType=c:BookableServiceDto}"
-                                    Title="Xidməti seçin…" />
+                                    Title="{l:Tr booking_service_picker}" />
                         </Border>
                     </VerticalStackLayout>
                 </Border>
@@ -143,7 +144,7 @@
                     <VerticalStackLayout Spacing="12">
                         <HorizontalStackLayout Spacing="10">
                             <Border Style="{StaticResource CardNum}"><Label Text="2" Style="{StaticResource StepNum}" /></Border>
-                            <Label Text="Gün seçin" Style="{StaticResource CardTitle}" />
+                            <Label Text="{l:Tr booking_choose_day}" Style="{StaticResource CardTitle}" />
                         </HorizontalStackLayout>
                         <CollectionView ItemsSource="{Binding Days}" HeightRequest="84" SelectionMode="None">
                             <CollectionView.ItemsLayout>
@@ -154,7 +155,7 @@
                             </CollectionView.Footer>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="vm:DayItem">
-                                    <Border WidthRequest="62" HeightRequest="80" Padding="0" StrokeShape="RoundRectangle 18" StrokeThickness="0"
+                                    <Border v:Motion.Appear="True" WidthRequest="62" HeightRequest="80" Padding="0" StrokeShape="RoundRectangle 18" StrokeThickness="0"
                                             BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" v:Motion.Press="True">
                                         <Border.Triggers>
                                             <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
@@ -182,17 +183,17 @@
                     <VerticalStackLayout Spacing="12">
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                             <Border Style="{StaticResource CardNum}"><Label Text="3" Style="{StaticResource StepNum}" /></Border>
-                            <Label Grid.Column="1" Text="Saat seçin" Style="{StaticResource CardTitle}" />
+                            <Label Grid.Column="1" Text="{l:Tr booking_choose_time}" Style="{StaticResource CardTitle}" />
                             <ActivityIndicator Grid.Column="2" IsRunning="{Binding IsLoadingSlots}" IsVisible="{Binding IsLoadingSlots}" HeightRequest="22" WidthRequest="22" />
                         </Grid>
-                        <Label Text="Əvvəlcə xidmət seçin — boş saatlar burada görünəcək." Style="{StaticResource Muted}"
+                        <Label Text="{l:Tr booking_pick_service_first}" Style="{StaticResource Muted}"
                                IsVisible="{Binding Step1Done, Converter={StaticResource InvertedBool}}" />
-                        <Label Text="Bu gün üçün boş saat qalmayıb — başqa gün seçin." Style="{StaticResource Muted}" IsVisible="{Binding NoSlots}" />
+                        <Label Text="{l:Tr booking_no_slots}" Style="{StaticResource Muted}" IsVisible="{Binding NoSlots}" />
                         <FlexLayout BindableLayout.ItemsSource="{Binding Slots}" Wrap="Wrap" JustifyContent="Start">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="vm:SlotItem">
                                     <!-- Aralıq xarici Grid-in Padding-i ilə: FlexLayout uşaq Margin-ini hündürlükdən çıxıb düyməni kəsir -->
-                                    <Grid Padding="0,0,8,8">
+                                    <Grid v:Motion.Appear="True" Padding="0,0,8,8">
                                         <Border Padding="0" WidthRequest="72" HeightRequest="42" StrokeShape="RoundRectangle 14" StrokeThickness="0"
                                                 BackgroundColor="{Binding Background}" v:Motion.Press="True">
                                             <Label Text="{Binding Time}" FontFamily="BarlowBold" FontSize="15" HorizontalOptions="Center" VerticalOptions="Center"
@@ -208,15 +209,15 @@
                         <HorizontalStackLayout Spacing="16" IsVisible="{Binding Step1Done}">
                             <HorizontalStackLayout Spacing="6">
                                 <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="3" Color="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" VerticalOptions="Center" />
-                                <Label Text="Boş" FontSize="12" Style="{StaticResource Muted}" />
+                                <Label Text="{l:Tr slot_free}" FontSize="12" Style="{StaticResource Muted}" />
                             </HorizontalStackLayout>
                             <HorizontalStackLayout Spacing="6">
                                 <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="3" Color="#FDECEE" VerticalOptions="Center" />
-                                <Label Text="Tutulub" FontSize="12" Style="{StaticResource Muted}" />
+                                <Label Text="{l:Tr slot_busy}" FontSize="12" Style="{StaticResource Muted}" />
                             </HorizontalStackLayout>
                             <HorizontalStackLayout Spacing="6">
                                 <BoxView WidthRequest="10" HeightRequest="10" CornerRadius="3" Color="{StaticResource Primary}" VerticalOptions="Center" />
-                                <Label Text="Seçilmiş" FontSize="12" Style="{StaticResource Muted}" />
+                                <Label Text="{l:Tr slot_selected}" FontSize="12" Style="{StaticResource Muted}" />
                             </HorizontalStackLayout>
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
@@ -227,29 +228,29 @@
                     <VerticalStackLayout Spacing="12">
                         <HorizontalStackLayout Spacing="10">
                             <Border Style="{StaticResource CardNum}"><Label Text="4" Style="{StaticResource StepNum}" /></Border>
-                            <Label Text="Əlaqə məlumatları" Style="{StaticResource CardTitle}" />
+                            <Label Text="{l:Tr booking_contact_title}" Style="{StaticResource CardTitle}" />
                         </HorizontalStackLayout>
                         <VerticalStackLayout>
-                            <Label Text="Ad Soyad" Style="{StaticResource FieldLabel}" />
-                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding FullName}" Placeholder="Adınız və soyadınız" /></Border>
+                            <Label Text="{l:Tr field_fullname}" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding FullName}" Placeholder="{l:Tr field_fullname_ph}" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout>
-                            <Label Text="Telefon" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{l:Tr field_phone}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding Phone}" Placeholder="+994 XX XXX XX XX" Keyboard="Telephone" /></Border>
                         </VerticalStackLayout>
                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4">
                             <!-- WidthRequest: Windows-da CheckBox-un standart minimum eni 120px-dir -->
                             <CheckBox IsChecked="{Binding SameAsPhone}" WidthRequest="36" MinimumWidthRequest="0" VerticalOptions="Center" />
-                            <Label Grid.Column="1" Text="WhatsApp nömrəsi telefonla eyni olsun" VerticalOptions="Center" FontSize="14" />
+                            <Label Grid.Column="1" Text="{l:Tr booking_same_wa}" VerticalOptions="Center" FontSize="14" />
                         </Grid>
                         <VerticalStackLayout IsVisible="{Binding SameAsPhone, Converter={StaticResource InvertedBool}}">
                             <Label Text="WhatsApp" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0"><Entry Text="{Binding WhatsApp}" Placeholder="+994 XX XXX XX XX" Keyboard="Telephone" /></Border>
                         </VerticalStackLayout>
                         <VerticalStackLayout>
-                            <Label Text="Qeyd (istəyə görə)" Style="{StaticResource FieldLabel}" />
+                            <Label Text="{l:Tr booking_note}" Style="{StaticResource FieldLabel}" />
                             <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="10,4">
-                                <Editor Text="{Binding Note}" Placeholder="Məs: avtomobil modeli, il, mühərrik həcmi" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="76" />
+                                <Editor Text="{Binding Note}" Placeholder="{l:Tr booking_note_ph}" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="76" />
                             </Border>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
@@ -258,9 +259,9 @@
                 <!-- ================= MƏNİM REZERVASİYALARIM ================= -->
                 <VerticalStackLayout Spacing="10" Margin="16,8,16,0" IsVisible="{Binding HasMyReservations}">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Mənim rezervasiyalarım" Style="{StaticResource SectionTitle}" FontSize="19" VerticalOptions="Center" />
+                        <Label Text="{l:Tr booking_mine}" Style="{StaticResource SectionTitle}" FontSize="19" VerticalOptions="Center" />
                         <Border Grid.Column="1" Style="{StaticResource Pill}" BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#33D81324}" v:Motion.Press="True">
-                            <Label Text="Yenilə" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" />
+                            <Label Text="{l:Tr common_refresh}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" />
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding LoadMineCommand}" />
                             </Border.GestureRecognizers>
@@ -269,7 +270,7 @@
                     <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding MyReservations}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="c:ReservationStatusDto">
-                                <Border Style="{StaticResource SoftCard}" Padding="14">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="14">
                                     <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="2">
                                         <Border Grid.RowSpan="2" WidthRequest="46" HeightRequest="46" StrokeShape="RoundRectangle 14" StrokeThickness="0"
                                                 BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" Padding="12" VerticalOptions="Center">
@@ -308,7 +309,7 @@
             </Border.Shadow>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                 <VerticalStackLayout VerticalOptions="Center" Spacing="0">
-                    <Label Text="Seçiminiz" Style="{StaticResource Muted}" FontSize="12" />
+                    <Label Text="{l:Tr booking_your_choice}" Style="{StaticResource Muted}" FontSize="12" />
                     <Label Text="{Binding Summary}" FontFamily="BarlowBold" FontSize="14" MaxLines="2" LineBreakMode="TailTruncation"
                            TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
                 </VerticalStackLayout>
@@ -321,7 +322,7 @@
                     </Border.Triggers>
                     <Grid>
                         <HorizontalStackLayout Spacing="8" VerticalOptions="Center" IsVisible="{Binding IsNotBusy}">
-                            <Label Text="Təsdiqlə" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
+                            <Label Text="{l:Tr booking_confirm}" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
                             <Image Source="ic_arrow_w.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <ActivityIndicator Color="White" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="24" WidthRequest="24" />

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DoctorEngine.App.Localization;
 using DoctorEngine.App.Services;
 using DoctorEngine.Contracts;
 
@@ -13,7 +14,6 @@ namespace DoctorEngine.App.ViewModels;
 /// </summary>
 public partial class BookingViewModel : BaseViewModel, IQueryAttributable
 {
-    private static readonly string[] DayNames = { "B.", "B.e", "Ç.a", "Ç.", "C.a", "C.", "Ş." };
     private readonly BookingService _booking;
     private ReservationRulesDto? _rules;
     private int? _pendingServiceId;
@@ -38,8 +38,8 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
 
     public bool HasMyReservations => MyReservations.Count > 0;
     public bool NoSlots => !IsLoadingSlots && SelectedService != null && Slots.Count > 0 && Slots.All(s => !s.IsFree);
-    public string Summary => SelectedService == null ? "Xidmət seçin"
-        : SelectedSlot == null ? $"{SelectedService.Name} · saat seçin"
+    public string Summary => SelectedService == null ? Lang.T("booking_choose_service")
+        : SelectedSlot == null ? Lang.T("booking_summary_pick_time", SelectedService.Name)
         : $"{SelectedService.Name} · {SelectedDay?.Long} · {SelectedSlot.Time}";
 
     // ---- Mərhələ göstəricisi (başlıqda 1-2-3-4) ----
@@ -104,14 +104,17 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
         var today = BakuNow().Date;
         var lastSlotToday = today.AddHours(_rules!.ClosingHour).AddMinutes(-_rules.SlotMinutes);
         var start = BakuNow() > lastSlotToday ? 1 : 0;   // bu günün saatları bitibsə — sabahdan
-        var az = new CultureInfo("az-Latn-AZ");
         for (var i = start; i <= _rules.MaxDaysAhead; i++)
-        {
-            var d = today.AddDays(i);
-            var label = i == 0 ? "Bu gün" : i == 1 ? "Sabah" : DayNames[(int)d.DayOfWeek];
-            Days.Add(new DayItem(d, label, d.Day.ToString(), d.ToString("d MMMM", az)));
-        }
+            Days.Add(new DayItem(today.AddDays(i), i));
         SelectedDay = Days.FirstOrDefault();
+    }
+
+    protected override void OnLanguageChanged()
+    {
+        foreach (var d in Days) d.RefreshText();
+        OnPropertyChanged(nameof(Summary));
+        // Status mətni konverterdən gəlir — siyahını yenidən çək
+        MyReservations.Rebind();
     }
 
     partial void OnSelectedServiceChanged(BookableServiceDto? value)
@@ -151,8 +154,8 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
         try
         {
             var slots = await _booking.GetSlotsAsync(SelectedService.Id, SelectedDay.Date);
-            Slots.Clear();
-            foreach (var s in slots) Slots.Add(new SlotItem(s.Time, s.State));
+            // Clear() yox — Windows-da BindableLayout Reset alanda çökə bilir (bax CollectionSync)
+            Slots.SyncWith(slots.Select(s => new SlotItem(s.Time, s.State)));
             SelectedSlot = Slots.FirstOrDefault(s => s.Time == keep && s.IsFree);
         }
         catch (ApiException ex)
@@ -170,12 +173,12 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
     private async Task Submit()
     {
         SuccessMessage = null;
-        if (SelectedService == null) { ErrorMessage = "Xidmət seçin."; return; }
-        if (SelectedDay == null || SelectedSlot == null) { ErrorMessage = "Gün və boş saat seçin."; return; }
-        if (string.IsNullOrWhiteSpace(FullName)) { ErrorMessage = "Ad Soyad tələb olunur."; return; }
-        if (string.IsNullOrWhiteSpace(Phone)) { ErrorMessage = "Telefon tələb olunur."; return; }
+        if (SelectedService == null) { ErrorMessage = Lang.T("booking_err_service"); return; }
+        if (SelectedDay == null || SelectedSlot == null) { ErrorMessage = Lang.T("booking_err_slot"); return; }
+        if (string.IsNullOrWhiteSpace(FullName)) { ErrorMessage = Lang.T("booking_err_name"); return; }
+        if (string.IsNullOrWhiteSpace(Phone)) { ErrorMessage = Lang.T("booking_err_phone"); return; }
         var wa = SameAsPhone ? Phone : WhatsApp;
-        if (string.IsNullOrWhiteSpace(wa)) { ErrorMessage = "WhatsApp nömrəsi tələb olunur."; return; }
+        if (string.IsNullOrWhiteSpace(wa)) { ErrorMessage = Lang.T("booking_err_wa"); return; }
 
         var parts = SelectedSlot.Time.Split(':');
         var when = SelectedDay.Date.AddHours(int.Parse(parts[0])).AddMinutes(int.Parse(parts[1]));
@@ -207,8 +210,7 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
         try
         {
             var mine = await _booking.GetMineAsync();
-            MyReservations.Clear();
-            foreach (var r in mine) MyReservations.Add(r);
+            MyReservations.SyncWith(mine);
         }
         catch (ApiException) { /* status siyahısı vacib deyil — sükutla keç */ }
     }
@@ -223,15 +225,34 @@ public partial class BookingViewModel : BaseViewModel, IQueryAttributable
 
 public partial class DayItem : ObservableObject
 {
+    private readonly int _offset;   // 0 — bu gün, 1 — sabah, ...
+
     public DateTime Date { get; }
-    public string Label { get; }
     public string Number { get; }
-    public string Long { get; }
     [ObservableProperty] private bool isSelected;
 
-    public DayItem(DateTime date, string label, string number, string longText)
+    /// <summary>"Bu gün" / "Sabah" / həftənin günü (qısa) — seçilmiş dildə.</summary>
+    public string Label => _offset switch
     {
-        Date = date; Label = label; Number = number; Long = longText;
+        0 => Lang.T("day_today"),
+        1 => Lang.T("day_tomorrow"),
+        _ => Lang.T("days_short").Split(',')[(int)Date.DayOfWeek]
+    };
+
+    /// <summary>"15 noyabr" / "15 November" / "15 ноября" / "15 Kasım".</summary>
+    public string Long => Date.ToString("d MMMM", Lang.Current.Culture);
+
+    public DayItem(DateTime date, int offset)
+    {
+        Date = date;
+        _offset = offset;
+        Number = date.Day.ToString(CultureInfo.InvariantCulture);
+    }
+
+    public void RefreshText()
+    {
+        OnPropertyChanged(nameof(Label));
+        OnPropertyChanged(nameof(Long));
     }
 }
 

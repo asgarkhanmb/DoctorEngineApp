@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Data;
+﻿using DoctorEngineApp.Localization;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.ViewModels.ContactMessage;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ public class ContactMessageService : IContactMessageService
                 x.CreatedDate >= oneHourAgo);
 
             if (alreadySent)
-                throw new Exception("Bu email ilə son 1 saat ərzində artıq mesaj göndərilib.");
+                throw new Exception(L.T("Bu email ilə son 1 saat ərzində artıq mesaj göndərilib."));
 
             var entity = new ContactMessage
             {
@@ -64,7 +65,7 @@ public class ContactMessageService : IContactMessageService
         var message = await _context.ContactMessages.FindAsync(id);
 
         if (message == null)
-            throw new Exception("Mesaj tapılmadı — artıq silinmiş ola bilər.");
+            throw new Exception(L.T("Mesaj tapılmadı — artıq silinmiş ola bilər."));
 
         _context.ContactMessages.Remove(message);
         await _context.SaveChangesAsync();

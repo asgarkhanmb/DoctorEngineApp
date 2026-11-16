@@ -53,7 +53,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#D81324" />
+		<!-- Tətbiq ikonu: saytın loqosu (Admin → Sayt ayarları → loqo şəkli), ağ fonda.
+		     ForegroundScale: Android-in dairəvi / yuvarlaq maskası loqonun kənarlarını kəsməsin. -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" ForegroundScale="0.62" Color="#FFFFFF" />
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#D81324" BaseSize="128,128" />
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />

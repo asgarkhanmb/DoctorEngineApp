@@ -247,6 +247,22 @@
         <Setter Property="Padding" Value="12,10" />
     </Style>
 
+    <!-- Kart başlığı (Profil redaktəsi, Admin panel; Rezervasiya səhifəsinin öz nüsxəsi də var) -->
+    <Style x:Key="CardTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowBold" />
+        <Setter Property="FontSize" Value="17" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
+    <!-- Menyu sətrinin mətni (Admin panel) -->
+    <Style x:Key="RowTitle" TargetType="Label">
+        <Setter Property="FontFamily" Value="BarlowSemiBold" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="LineBreakMode" Value="TailTruncation" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+    </Style>
+
     <Style x:Key="SuccessBox" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{StaticResource SuccessSoft}" />
         <Setter Property="Stroke" Value="#BFE8CF" />

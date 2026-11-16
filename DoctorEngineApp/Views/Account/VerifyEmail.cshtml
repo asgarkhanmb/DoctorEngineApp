@@ -1,29 +1,29 @@
-﻿@{
+@{
     Layout = "_AuthLayout";
     ViewData["Title"] = "Emaili təsdiqləyin";
 }
 
 <div class="auth-head">
     <div class="auth-head__icon"><i class="fa-regular fa-envelope-open"></i></div>
-    <h1>Emailinizi yoxlayın</h1>
-    <p>Qeydiyyat uğurla tamamlandı! Email ünvanınıza təsdiq linki göndərdik.</p>
+    <h1>@L.T("Emailinizi yoxlayın")</h1>
+    <p>@L.T("Qeydiyyat uğurla tamamlandı! Email ünvanınıza təsdiq linki göndərdik.")</p>
 </div>
 
 <div class="auth-form">
     <div class="auth-alert auth-alert--ok" role="status">
         <i class="fa-solid fa-circle-check"></i>
-        <span>Məktubdakı <strong>“Təsdiqlə”</strong> linkinə klik edin, sonra hesabınıza daxil ola bilərsiniz.</span>
+        <span>@L.Html("Məktubdakı {0} linkinə klik edin, sonra hesabınıza daxil ola bilərsiniz.", $"<strong>“{System.Net.WebUtility.HtmlEncode(L.T("Təsdiqlə"))}”</strong>")</span>
     </div>
 
     <small class="auth-hint">
         <i class="fa-regular fa-lightbulb"></i>
-        Məktubu görmürsünüz? “Spam” və ya “Promotions” qovluğunu yoxlayın.
+        @L.T("Məktubu görmürsünüz? “Spam” və ya “Promotions” qovluğunu yoxlayın.")
     </small>
 
     <a asp-controller="Account" asp-action="Login" class="auth-btn">
-        Daxil ol <i class="fa-solid fa-arrow-right"></i>
+        @L.T("Daxil ol") <i class="fa-solid fa-arrow-right"></i>
     </a>
     <a asp-controller="Home" asp-action="Index" class="auth-btn auth-btn--ghost">
-        Ana səhifəyə qayıt
+        @L.T("Ana səhifəyə qayıt")
     </a>
 </div>

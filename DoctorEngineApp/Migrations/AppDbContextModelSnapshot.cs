@@ -306,6 +306,43 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("ContactPhones");
                 });
 
+            modelBuilder.Entity("DoctorEngineApp.Models.ContentTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Lang")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SourceHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceHash", "Lang")
+                        .IsUnique();
+
+                    b.ToTable("ContentTranslations");
+                });
+
             modelBuilder.Entity("DoctorEngineApp.Models.Inform", b =>
                 {
                     b.Property<int>("Id")
@@ -384,6 +421,11 @@ namespace DoctorEngineApp.Migrations
                         .IsRequired()
                         .HasMaxLength(800)
                         .HasColumnType("nvarchar(800)");
+
+                    b.Property<string>("Lang")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("P256dh")
                         .IsRequired()

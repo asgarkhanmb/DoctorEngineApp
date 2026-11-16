@@ -6,7 +6,7 @@
     var isNotFound = Model.Code == 404;
 }
 <!DOCTYPE html>
-<html lang="az">
+<html lang="@DoctorEngineApp.Localization.L.Lang">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,31 +41,31 @@
             <div class="err-actions">
                 @if (Model.LoginUrl != null)
                 {
-                    <a href="@Model.LoginUrl" class="err-btn err-btn--primary"><i class="fa-solid fa-right-to-bracket"></i> Daxil ol</a>
+                    <a href="@Model.LoginUrl" class="err-btn err-btn--primary"><i class="fa-solid fa-right-to-bracket"></i> @L.T("Daxil ol")</a>
                 }
                 @if (Model.CanRetry)
                 {
-                    <button type="button" class="err-btn err-btn--primary" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Yenidən cəhd et</button>
+                    <button type="button" class="err-btn err-btn--primary" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> @L.T("Yenidən cəhd et")</button>
                 }
-                <a href="/" class="err-btn @(Model.CanRetry || Model.LoginUrl != null ? "err-btn--light" : "err-btn--primary")"><i class="fa-solid fa-house"></i> Ana səhifə</a>
-                <button type="button" class="err-btn err-btn--light" data-back hidden><i class="fa-solid fa-arrow-left"></i> Geri qayıt</button>
+                <a href="/" class="err-btn @(Model.CanRetry || Model.LoginUrl != null ? "err-btn--light" : "err-btn--primary")"><i class="fa-solid fa-house"></i> @L.T("Ana səhifə")</a>
+                <button type="button" class="err-btn err-btn--light" data-back hidden><i class="fa-solid fa-arrow-left"></i> @L.T("Geri qayıt")</button>
             </div>
 
             @if (isNotFound)
             {
-                <nav class="err-links" aria-label="Faydalı keçidlər">
-                    <span>Bəlkə bunlar lazımdır:</span>
-                    <a href="/Service"><i class="fa-solid fa-screwdriver-wrench"></i> Xidmətlər</a>
-                    <a href="/Reservation"><i class="fa-regular fa-calendar-check"></i> Rezervasiya</a>
-                    <a href="/Contact"><i class="fa-regular fa-comments"></i> Əlaqə</a>
+                <nav class="err-links" aria-label="@L.T("Faydalı keçidlər")">
+                    <span>@L.T("Bəlkə bunlar lazımdır:")</span>
+                    <a href="/Service"><i class="fa-solid fa-screwdriver-wrench"></i> @L.T("Xidmətlər")</a>
+                    <a href="/Reservation"><i class="fa-regular fa-calendar-check"></i> @L.T("Rezervasiya")</a>
+                    <a href="/Contact"><i class="fa-regular fa-comments"></i> @L.T("Əlaqə")</a>
                 </nav>
             }
 
             @if (Model.Code >= 500 && !string.IsNullOrEmpty(Model.RequestId))
             {
                 <p class="err-ref">
-                    Problem davam edərsə, bizə bu kodu bildirin:
-                    <button type="button" class="err-ref__code" data-copy="@Model.RequestId" title="Kopyala">
+                    @L.T("Problem davam edərsə, bizə bu kodu bildirin:")
+                    <button type="button" class="err-ref__code" data-copy="@Model.RequestId" title="@L.T("Kopyala")">
                         <code>@Model.RequestId</code> <i class="fa-regular fa-copy" aria-hidden="true"></i>
                     </button>
                 </p>

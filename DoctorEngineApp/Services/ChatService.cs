@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Data;
+using DoctorEngineApp.Localization;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
@@ -56,10 +57,10 @@ namespace DoctorEngineApp.Services
             var text = Normalize(vm.Message);
 
             if (text == null && vm.File == null)
-                return ChatResult.Invalid("Mesaj və ya fayl əlavə edin.");
+                return ChatResult.Invalid(L.T("Mesaj və ya fayl əlavə edin."));
 
             if (text != null && text.Length > MaxMessageLength)
-                return ChatResult.Invalid($"Mesaj maksimum {MaxMessageLength} simvol ola bilər.");
+                return ChatResult.Invalid(L.T("Mesaj maksimum {0} simvol ola bilər.", MaxMessageLength));
 
             string? url = null, type = null;
             if (vm.File != null)
@@ -106,11 +107,11 @@ namespace DoctorEngineApp.Services
 
             var text = Normalize(vm.Message);
             if (text != null && text.Length > MaxMessageLength)
-                return ChatResult.Invalid($"Mesaj maksimum {MaxMessageLength} simvol ola bilər.");
+                return ChatResult.Invalid(L.T("Mesaj maksimum {0} simvol ola bilər.", MaxMessageLength));
 
             var keepsAttachment = msg.AttachmentUrl != null && !vm.RemoveAttachment && vm.File == null;
             if (text == null && vm.File == null && !keepsAttachment)
-                return ChatResult.Invalid("Mesaj boş qala bilməz. Mətn yazın və ya fayl əlavə edin.");
+                return ChatResult.Invalid(L.T("Mesaj boş qala bilməz. Mətn yazın və ya fayl əlavə edin."));
 
             string? oldFile = null;
 
@@ -211,7 +212,7 @@ namespace DoctorEngineApp.Services
         {
             var kind = AllowedUploadAttribute.DetectKind(file);
             if (kind == null)
-                return (null, null, "Yalnız şəkil (jpg, png, webp), video (mp4, webm, mov) və ya səs mesajı göndərilə bilər.");
+                return (null, null, L.T("Yalnız şəkil (jpg, png, webp), video (mp4, webm, mov) və ya səs mesajı göndərilə bilər."));
 
             var max = kind switch
             {

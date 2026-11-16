@@ -1,4 +1,4 @@
-﻿@* =====================================================
+@* =====================================================
    CANLI ÇAT VİDJETİ
    İstifadə: <partial name="_ChatWidget" />
    Tam ekran: <partial name="_ChatWidget" view-data='new ViewDataDictionary(ViewData) { ["ChatFullPage"] = true }' />
@@ -38,7 +38,7 @@
     };
 }
 
-<section class="dc-chat @(fullPage ? "dc-chat--full" : "") @(drawer ? "dc-chat--drawer" : "")" id="dcChat" aria-label="Canlı çat">
+<section class="dc-chat @(fullPage ? "dc-chat--full" : "") @(drawer ? "dc-chat--drawer" : "")" id="dcChat" aria-label="@L.T("Canlı çat")">
 
     <!-- BAŞLIQ -->
     <header class="dc-chat__header">
@@ -47,30 +47,30 @@
         </div>
 
         <div class="dc-chat__heading">
-            <h3>Canlı Usta Dəstəyi</h3>
+            <h3>@L.T("Canlı Usta Dəstəyi")</h3>
             <span class="dc-chat__status" data-state="@(isAuthenticated ? "connecting" : "offline")">
                 <span class="dc-chat__dot"></span>
-                <span class="dc-chat__status-text">@(isAuthenticated ? "Qoşulur…" : "Giriş tələb olunur")</span>
+                <span class="dc-chat__status-text">@(isAuthenticated ? L.T("Qoşulur…") : L.T("Giriş tələb olunur"))</span>
             </span>
         </div>
 
         @if (isAuthenticated)
         {
-            <button type="button" class="dc-chat__icon-btn" data-dc-sound title="Bildiriş səsini söndür" aria-label="Bildiriş səsini söndür" aria-pressed="false">
+            <button type="button" class="dc-chat__icon-btn" data-dc-sound title="@L.T("Bildiriş səsini söndür")" aria-label="@L.T("Bildiriş səsini söndür")" aria-pressed="false">
                 <i class="fa-solid fa-bell"></i>
             </button>
         }
 
         @if (!fullPage && isAuthenticated)
         {
-            <a class="dc-chat__icon-btn" asp-controller="Chat" asp-action="Index" title="Tam ekranda aç">
+            <a class="dc-chat__icon-btn" asp-controller="Chat" asp-action="Index" title="@L.T("Tam ekranda aç")">
                 <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
             </a>
         }
 
         @if (drawer)
         {
-            <button type="button" class="dc-chat__icon-btn" data-dc-close title="Bağla" aria-label="Çatı bağla">
+            <button type="button" class="dc-chat__icon-btn" data-dc-close title="@L.T("Bağla")" aria-label="@L.T("Çatı bağla")">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         }
@@ -81,9 +81,9 @@
         <!-- Bildiriş icazəsi: sayt bağlı / arxa planda olanda da səs və bildiriş -->
         <div class="dc-chat__push" hidden>
             <i class="fa-solid fa-bell" aria-hidden="true"></i>
-            <span>Sayt bağlı olanda da yeni mesajdan xəbər tutun.</span>
-            <button type="button" class="dc-chat__push-on">Bildirişləri aç</button>
-            <button type="button" class="dc-chat__push-x" aria-label="Bağla" title="Bağla">
+            <span>@L.T("Sayt bağlı olanda da yeni mesajdan xəbər tutun.")</span>
+            <button type="button" class="dc-chat__push-on">@L.T("Bildirişləri aç")</button>
+            <button type="button" class="dc-chat__push-x" aria-label="@L.T("Bağla")" title="@L.T("Bağla")">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
         </div>
@@ -99,10 +99,10 @@
                     <div class="dc-msg__content">
                         <div class="dc-msg__name">
                             <span>DoctorEngine</span>
-                            <span class="dc-badge"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>Usta</span>
+                            <span class="dc-badge"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>@L.T("Usta")</span>
                         </div>
                         <div class="dc-msg__bubble">
-                            <div class="dc-msg__text">@* pre-wrap: mətn bir sətirdə olmalıdır, yoxsa girinti ekranda görünür *@Salam! 👋 Canlı Usta Dəstəyinə xoş gəlmisiniz.<br />Sualınızı ustalarımıza yaza bilərsiniz. Yazışmaları görmək və mesaj göndərmək üçün hesabınıza daxil olun.</div>
+                            <div class="dc-msg__text">@* pre-wrap: mətn bir sətirdə olmalıdır, yoxsa girinti ekranda görünür **@@L.T("Salam! 👋 Canlı Usta Dəstəyinə xoş gəlmisiniz.")<br />@L.T("Sualınızı ustalarımıza yaza bilərsiniz. Yazışmaları görmək və mesaj göndərmək üçün hesabınıza daxil olun.")</div>
                         </div>
                     </div>
                 </div>
@@ -116,7 +116,7 @@
 
         <div class="dc-chat__more-wrap">
             <button type="button" class="dc-chat__more" hidden>
-                <i class="fa-solid fa-clock-rotate-left"></i> Köhnə mesajları göstər
+                <i class="fa-solid fa-clock-rotate-left"></i> @L.T("Köhnə mesajları göstər")
             </button>
         </div>
 
@@ -124,17 +124,17 @@
 
         <div class="dc-chat__loading">
             <span class="dc-chat__spinner"></span>
-            Mesajlar yüklənir…
+            @L.T("Mesajlar yüklənir…")
         </div>
 
         <div class="dc-chat__empty" hidden>
             <i class="fa-regular fa-comments"></i>
-            <p>Hələ mesaj yoxdur.<br />Sualınızı yazın — ustalarımız cavab verəcək.</p>
+            <p>@L.T("Hələ mesaj yoxdur.")<br />@L.T("Sualınızı yazın — ustalarımız cavab verəcək.")</p>
         </div>
     </div>
 
     <button type="button" class="dc-chat__jump" hidden>
-        <i class="fa-solid fa-arrow-down"></i> Yeni mesaj
+        <i class="fa-solid fa-arrow-down"></i> @L.T("Yeni mesaj")
     </button>
     }
 
@@ -151,7 +151,7 @@
                     <span class="dc-chat__preview-name"></span>
                     <span class="dc-chat__preview-size"></span>
                 </div>
-                <button type="button" class="dc-chat__icon-btn dc-chat__preview-remove" title="Faylı çıxar">
+                <button type="button" class="dc-chat__icon-btn dc-chat__preview-remove" title="@L.T("Faylı çıxar")">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -161,7 +161,7 @@
             </div>
 
             <div class="dc-chat__row">
-                <label class="dc-chat__attach" title="Şəkil və ya video əlavə et">
+                <label class="dc-chat__attach" title="@L.T("Şəkil və ya video əlavə et")">
                     <i class="fa-solid fa-paperclip"></i>
                     <input type="file" class="dc-chat__file"
                            accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov,.m4v" />
@@ -169,43 +169,43 @@
 
                 <textarea class="dc-chat__input" rows="1"
                           maxlength="@ChatService.MaxMessageLength"
-                         placeholder="Mesaj yazın…"
-                          aria-label="Mesaj"></textarea>
+                         placeholder="@L.T("Mesaj yazın…")"
+                          aria-label="@L.T("Mesaj")"></textarea>
 
-                <button type="submit" class="dc-chat__send" title="Göndər" disabled>
+                <button type="submit" class="dc-chat__send" title="@L.T("Göndər")" disabled>
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
 
-                <button type="button" class="dc-chat__send dc-chat__mic" title="Səs mesajı yaz" aria-label="Səs mesajı yaz" hidden>
+                <button type="button" class="dc-chat__send dc-chat__mic" title="@L.T("Səs mesajı yaz")" aria-label="@L.T("Səs mesajı yaz")" hidden>
                     <i class="fa-solid fa-microphone"></i>
                 </button>
             </div>
 
             <!-- SƏS YAZMA ZOLAĞI -->
             <div class="dc-rec" hidden>
-                <button type="button" class="dc-rec__cancel" title="Ləğv et" aria-label="Səs yazmanı ləğv et">
+                <button type="button" class="dc-rec__cancel" title="@L.T("Ləğv et")" aria-label="@L.T("Səs yazmanı ləğv et")">
                     <i class="fa-solid fa-trash"></i>
                 </button>
                 <span class="dc-rec__dot" aria-hidden="true"></span>
                 <span class="dc-rec__time" aria-live="off">0:00</span>
                 <canvas class="dc-rec__wave" aria-hidden="true"></canvas>
-                <button type="button" class="dc-rec__pause" title="Fasilə" aria-label="Fasilə">
+                <button type="button" class="dc-rec__pause" title="@L.T("Fasilə")" aria-label="@L.T("Fasilə")">
                     <i class="fa-solid fa-pause"></i>
                 </button>
-                <button type="button" class="dc-chat__send dc-rec__send" title="Göndər" aria-label="Səs mesajını göndər">
+                <button type="button" class="dc-chat__send dc-rec__send" title="@L.T("Göndər")" aria-label="@L.T("Səs mesajını göndər")">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>
 
             <div class="dc-chat__hint">
-                <span><kbd>Enter</kbd> göndər · <kbd>Shift</kbd>+<kbd>Enter</kbd> yeni sətir</span>
-                <span>Şəkil ≤ @(ChatService.MaxImageBytes / 1024 / 1024) MB · Video ≤ @(ChatService.MaxVideoBytes / 1024 / 1024) MB</span>
+                <span>@L.Html("{0} göndər · {1} yeni sətir", "<kbd>Enter</kbd>", "<kbd>Shift</kbd>+<kbd>Enter</kbd>")</span>
+                <span>@L.T("Şəkil") ≤ @(ChatService.MaxImageBytes / 1024 / 1024) MB · @L.T("Video") ≤ @(ChatService.MaxVideoBytes / 1024 / 1024) MB</span>
             </div>
         </form>
 
         <div class="dc-chat__dropzone" hidden>
             <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Şəkil və ya videonu buraya buraxın</span>
+            <span>@L.T("Şəkil və ya videonu buraya buraxın")</span>
         </div>
     }
     else
@@ -213,16 +213,17 @@
         <div class="dc-chat__guest">
             <i class="fa-solid fa-lock"></i>
             <span>
-                Mesaj yazmaq üçün <a href="@loginUrl">daxil olun</a>
-                və ya <a href="@registerUrl">qeydiyyatdan keçin</a>.
+                @L.Html("Mesaj yazmaq üçün {0} və ya {1}.",
+                    $"<a href=\"{System.Net.WebUtility.HtmlEncode(loginUrl)}\">{System.Net.WebUtility.HtmlEncode(L.T("daxil olun"))}</a>",
+                    $"<a href=\"{System.Net.WebUtility.HtmlEncode(registerUrl)}\">{System.Net.WebUtility.HtmlEncode(L.T("qeydiyyatdan keçin"))}</a>")
             </span>
         </div>
     }
 </section>
 
 <!-- ŞƏKLİ BÖYÜK GÖSTƏRMƏ -->
-<div class="dc-lightbox" hidden role="dialog" aria-modal="true" aria-label="Şəkil">
-    <button type="button" class="dc-lightbox__close" title="Bağla"><i class="fa-solid fa-xmark"></i></button>
+<div class="dc-lightbox" hidden role="dialog" aria-modal="true" aria-label="@L.T("Şəkil")">
+    <button type="button" class="dc-lightbox__close" title="@L.T("Bağla")"><i class="fa-solid fa-xmark"></i></button>
     <img alt="" />
 </div>
 

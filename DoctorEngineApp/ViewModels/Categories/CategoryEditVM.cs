@@ -18,6 +18,9 @@ namespace DoctorEngineApp.ViewModels.Categories
         [AllowedUpload(UploadKind.Image)]
         public IFormFile? IconFile { get; set; }
 
+        /// <summary>Hazır ikonun açarı (bax: CategoryIconPresets). Boşdursa ikon dəyişmir.</summary>
+        public string? PresetIcon { get; set; }
+
         // ===== Kateqoriyanın videosu (hər kateqoriyada bir video) =====
 
         /// <summary>Mövcud video qeydi (SubService). Yoxdursa null.</summary>

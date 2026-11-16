@@ -17,16 +17,16 @@
 {
     <div class="sv-empty">
         <i class="fa-solid fa-screwdriver-wrench"></i>
-        <p>Xidmətlər tezliklə əlavə olunacaq.</p>
+        <p>@L.T("Xidmətlər tezliklə əlavə olunacaq.")</p>
     </div>
 }
 else
 {
     @if (Model.ShowFilter)
     {
-        <div class="sv-filter" role="toolbar" aria-label="Kateqoriyaya görə süz">
+        <div class="sv-filter" role="toolbar" aria-label="@L.T("Kateqoriyaya görə süz")">
             <button type="button" class="sv-chip is-active" data-filter="all" aria-pressed="true">
-                Hamısı <span class="sv-chip__count">@items.Count</span>
+                @L.T("Hamısı") <span class="sv-chip__count">@items.Count</span>
             </button>
             @foreach (var (cat, sub) in items)
             {
@@ -35,10 +35,10 @@ else
                     {
                         <img src="@Url.Content($"~/uploads/categories/{cat.Icon}")" alt="" width="20" height="20" />
                     }
-                    @cat.Name
+                    @L.T(cat.Name)
                     @if (sub == null)
                     {
-                        <span class="sv-chip__count">tezliklə</span>
+                        <span class="sv-chip__count">@L.T("tezliklə")</span>
                     }
                 </button>
             }
@@ -58,46 +58,46 @@ else
             <article class="sv-card @(sub == null ? "sv-card--soon" : "")" data-cat="cat-@cat.Id">
                 @if (videoUrl != null)
                 {
-                    <button type="button" class="sv-card__media" data-video="@videoUrl" data-title="@sub!.Title" aria-label="Videoya bax: @sub.Title">
+                    <button type="button" class="sv-card__media" data-video="@videoUrl" data-title="@L.T(sub!.Title)" aria-label="@L.T("Videoya bax: {0}", L.T(sub.Title))">
                         <video src="@(videoUrl)#t=0.5" preload="metadata" muted loop playsinline tabindex="-1" aria-hidden="true"></video>
                         <span class="sv-card__play" aria-hidden="true"><i class="fa-solid fa-play"></i></span>
-                        <span class="sv-badge" aria-hidden="true"><i class="fa-solid fa-video"></i> <span data-duration>Video</span></span>
+                        <span class="sv-badge" aria-hidden="true"><i class="fa-solid fa-video"></i> <span data-duration>@L.T("Video")</span></span>
                     </button>
                 }
                 else
                 {
                     <div class="sv-card__soon-media">
                         @if (catIcon != null) { <img src="@catIcon" alt="" /> } else { <i class="fa-solid fa-screwdriver-wrench"></i> }
-                        <span class="sv-badge"><i class="fa-regular fa-clock"></i> Video tezliklə</span>
+                        <span class="sv-badge"><i class="fa-regular fa-clock"></i> @L.T("Video tezliklə")</span>
                     </div>
                 }
 
                 <div class="sv-card__body">
                     <span class="sv-card__cat">
                         @if (catIcon != null) { <img src="@catIcon" alt="" width="18" height="18" /> }
-                        @cat.Name
+                        @L.T(cat.Name)
                     </span>
 
                     @if (sub != null)
                     {
-                        <h3>@sub.Title</h3>
-                        <p>@sub.Description</p>
+                        <h3>@L.T(sub.Title)</h3>
+                        <p>@L.T(sub.Description)</p>
                     }
                     else
                     {
-                        <h3>@cat.Name</h3>
-                        <p>Bu xidmət üzrə ətraflı məlumat tezliklə əlavə olunacaq. Sualınız varsa, usta ilə yazışın və ya elə indi rezervasiya edin.</p>
+                        <h3>@L.T(cat.Name)</h3>
+                        <p>@L.T("Bu xidmət üzrə ətraflı məlumat tezliklə əlavə olunacaq. Sualınız varsa, usta ilə yazışın və ya elə indi rezervasiya edin.")</p>
                     }
 
                     <div class="sv-card__actions">
-                        <a href="@reserveUrl" class="sv-btn sv-btn--primary">Rezervasiya et <i class="fa-solid fa-arrow-right"></i></a>
+                        <a href="@reserveUrl" class="sv-btn sv-btn--primary">@L.T("Rezervasiya et") <i class="fa-solid fa-arrow-right"></i></a>
                         @if (sub != null)
                         {
-                            <a asp-controller="Assistant" asp-action="Index" class="sv-btn sv-btn--ghost"><i class="fa-solid fa-wand-magic-sparkles"></i> Sual ver</a>
+                            <a asp-controller="Assistant" asp-action="Index" class="sv-btn sv-btn--ghost"><i class="fa-solid fa-wand-magic-sparkles"></i> @L.T("Sual ver")</a>
                         }
                         else
                         {
-                            <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--ghost"><i class="fa-regular fa-comments"></i> Ustaya yaz</a>
+                            <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--ghost"><i class="fa-regular fa-comments"></i> @L.T("Ustaya yaz")</a>
                         }
                     </div>
                 </div>
@@ -111,7 +111,7 @@ else
             <div class="modal-content">
                 <div class="sv-modal__head">
                     <h2 class="sv-modal__title" id="svVideoTitle"></h2>
-                    <button type="button" class="sv-modal__close" data-bs-dismiss="modal" aria-label="Bağla"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" class="sv-modal__close" data-bs-dismiss="modal" aria-label="@L.T("Bağla")"><i class="fa-solid fa-xmark"></i></button>
                 </div>
                 <video class="sv-modal__video" controls playsinline></video>
             </div>

@@ -28,6 +28,13 @@
     <PackageReference Include="WebPush" Version="1.0.12" />
   </ItemGroup>
 
+  <!-- Əllə tərcümə olunmuş UI/JS mətnləri (az → en/ru/tr) -->
+  <ItemGroup>
+    <!-- WithCulture=false: "ui.en.json"-dakı ".en" mədəniyyət kimi oxunmasın (yoxsa satellite assembly-yə düşür) -->
+    <EmbeddedResource Include="Localization\*.json" WithCulture="false" />
+    <Content Remove="Localization\*.json" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\DoctorEngine.Contracts\DoctorEngine.Contracts.csproj" />
   </ItemGroup>

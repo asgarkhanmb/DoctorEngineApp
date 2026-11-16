@@ -196,6 +196,13 @@ builder.Services.Configure<AiOptions>(builder.Configuration.GetSection(AiOptions
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient<AiAssistantService>(client => client.Timeout = TimeSpan.FromSeconds(90));
 
+// ÇOXDİLLİLİK (az/en/ru/tr): bazadan gələn mətnlər AI ilə arxa planda tərcümə olunur (Localization/ContentTranslationWorker)
+builder.Services.AddSingleton<DoctorEngineApp.Localization.TranslationStore>();
+builder.Services.AddHostedService<DoctorEngineApp.Localization.ContentTranslationWorker>();
+builder.Services.AddHttpClient("ai-translate", client => client.Timeout = TimeSpan.FromSeconds(120));
+// Validasiya mesajları və [Display] adları da L.T ilə tərcümə olunur
+builder.Services.AddSingleton<Microsoft.Extensions.Localization.IStringLocalizerFactory, DoctorEngineApp.Localization.LStringLocalizerFactory>();
+
 builder.Services.AddSignalR();
 
 // Upload limit
@@ -222,9 +229,12 @@ builder.Services.AddControllersWithViews(opt =>
     opt.Filters.Add<SmartAntiforgeryFilter>();
     opt.Filters.Add<DoctorEngineApp.Helpers.AdminFlashFilter>();   // admin əməliyyatlarından sonra bildiriş
     opt.Filters.Add<DoctorEngineApp.Helpers.AdminExceptionFilter>(); // admin xətaları → qırmızı bildiriş, xəta səhifəsi yox
-});
+})
+    .AddDataAnnotationsLocalization();   // [Required(ErrorMessage=...)] → LStringLocalizer → L.T
 
 var app = builder.Build();
+
+DoctorEngineApp.Localization.L.Store = app.Services.GetRequiredService<DoctorEngineApp.Localization.TranslationStore>();
 
 // ROTATIVA
 RotativaConfiguration.Setup(
@@ -269,6 +279,13 @@ app.UseStaticFiles(new StaticFileOptions
         if (ctx.Context.Request.Path.StartsWithSegments("/uploads/chat"))
             ctx.Context.Response.Headers["Content-Security-Policy"] = "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'unsafe-inline'";
     }
+});
+
+// Sayt dili (az/en/ru/tr): "de_lang" kukisindən — yalnız UI dili, tarix/rəqəm formatı dəyişmir
+app.Use(async (ctx, next) =>
+{
+    DoctorEngineApp.Localization.L.Apply(ctx);
+    await next();
 });
 
 app.UseRouting();

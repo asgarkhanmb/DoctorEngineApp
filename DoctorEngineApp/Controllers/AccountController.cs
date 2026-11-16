@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Data;
+using DoctorEngineApp.Localization;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Helpers.Enums;
 using DoctorEngineApp.Models;
@@ -80,12 +81,12 @@ namespace DoctorEngineApp.Controllers
                                  Request.Scheme);
 
             // İstifadəçi daxil etdiyi məlumat HTML-ə encode olunaraq yazılır
-            string html = $"<h3>Xoş Gəlmisiniz {HtmlEncoder.Default.Encode(user.FullName)}</h3>" +
-                          $"<p>Emailinizi təsdiqləyin:</p>" +
-                          $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Təsdiqlə</a>";
+            string html = $"<h3>{L.T("Xoş Gəlmisiniz {0}", HtmlEncoder.Default.Encode(user.FullName))}</h3>" +
+                          $"<p>{L.T("Emailinizi təsdiqləyin:")}</p>" +
+                          $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">{L.T("Təsdiqlə")}</a>";
 
-            if (!await TrySendEmailAsync(user.Email, "Email təsdiqi", html))
-                TempData["ToastError"] = "Hesab yaradıldı, amma təsdiq məktubu göndərilmədi. Bir azdan «Şifrəni unutmusunuz» ilə yenidən cəhd edin və ya bizimlə əlaqə saxlayın.";
+            if (!await TrySendEmailAsync(user.Email, L.T("Email təsdiqi"), html))
+                TempData["ToastError"] = L.T("Hesab yaradıldı, amma təsdiq məktubu göndərilmədi. Bir azdan «Şifrəni unutmusunuz» ilə yenidən cəhd edin və ya bizimlə əlaqə saxlayın.");
 
             return RedirectToAction(nameof(VerifyEmail));
         }
@@ -127,7 +128,7 @@ namespace DoctorEngineApp.Controllers
                        ?? await _userManager.FindByNameAsync(model.EmailOrUsername);
 
             // Eyni ümumi mesaj: hansı hesabın mövcud olduğunu bildirmirik
-            const string invalidLogin = "İstifadəçi adı/email və ya şifrə yanlışdır";
+            var invalidLogin = L.T("İstifadəçi adı/email və ya şifrə yanlışdır");
 
             if (user == null)
             {
@@ -143,7 +144,7 @@ namespace DoctorEngineApp.Controllers
 
             if (result.IsLockedOut)
             {
-                ModelState.AddModelError("", "Çox sayda uğursuz cəhd. Hesab müvəqqəti bloklanıb, bir neçə dəqiqə sonra yenidən cəhd edin.");
+                ModelState.AddModelError("", L.T("Çox sayda uğursuz cəhd. Hesab müvəqqəti bloklanıb, bir neçə dəqiqə sonra yenidən cəhd edin."));
                 return View(model);
             }
 
@@ -151,7 +152,7 @@ namespace DoctorEngineApp.Controllers
             // (yalnız şifrə düzgün olduqda bura çatır)
             if (result.IsNotAllowed)
             {
-                ModelState.AddModelError("", "Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.");
+                ModelState.AddModelError("", L.T("Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın."));
                 return View(model);
             }
 
@@ -197,19 +198,19 @@ namespace DoctorEngineApp.Controllers
                                      new { email = user.Email, token },
                                      Request.Scheme);
 
-                string html = $"<h3>Şifrəni yenilə</h3>" +
-                              $"<p>Yeni şifrə təyin etmək üçün aşağıdakı linkə klik edin:</p>" +
-                              $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Şifrəni dəyiş</a>";
+                string html = $"<h3>{L.T("Şifrəni yenilə")}</h3>" +
+                              $"<p>{L.T("Yeni şifrə təyin etmək üçün aşağıdakı linkə klik edin:")}</p>" +
+                              $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">{L.T("Şifrəni dəyiş")}</a>";
 
-                if (!await TrySendEmailAsync(user.Email, "Şifrənin yenilənməsi", html))
+                if (!await TrySendEmailAsync(user.Email, L.T("Şifrənin yenilənməsi"), html))
                 {
-                    ModelState.AddModelError(string.Empty, "Məktub göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin.");
+                    ModelState.AddModelError(string.Empty, L.T("Məktub göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin."));
                     return View(model);
                 }
             }
 
             // Mesaj göstərmək üçün TempData
-            TempData["SuccessMessage"] = "Şifrə yeniləmə linki emailinizə göndərildi.";
+            TempData["SuccessMessage"] = L.T("Şifrə yeniləmə linki emailinizə göndərildi.");
 
             return RedirectToAction(nameof(Login));
         }
@@ -334,7 +335,7 @@ namespace DoctorEngineApp.Controllers
             // Cookie-dəki istifadəçi adı yenilənsin
             await _signInManager.RefreshSignInAsync(user);
 
-            TempData["ProfileSuccess"] = "Profil məlumatlarınız yeniləndi.";
+            TempData["ProfileSuccess"] = L.T("Profil məlumatlarınız yeniləndi.");
             return RedirectToAction(nameof(Profile));
         }
 
@@ -355,20 +356,20 @@ namespace DoctorEngineApp.Controllers
 
             if (!await _userManager.CheckPasswordAsync(user, model.CurrentPassword))
             {
-                ModelState.AddModelError("Email.CurrentPassword", "Şifrə yanlışdır");
+                ModelState.AddModelError("Email.CurrentPassword", L.T("Şifrə yanlışdır"));
                 return ProfileView(user, email: model);
             }
 
             if (string.Equals(user.Email, newEmail, StringComparison.OrdinalIgnoreCase))
             {
-                ModelState.AddModelError("Email.NewEmail", "Bu, hazırkı email ünvanınızdır");
+                ModelState.AddModelError("Email.NewEmail", L.T("Bu, hazırkı email ünvanınızdır"));
                 return ProfileView(user, email: model);
             }
 
             var existing = await _userManager.FindByEmailAsync(newEmail);
             if (existing != null && existing.Id != user.Id)
             {
-                ModelState.AddModelError("Email.NewEmail", "Bu email artıq başqa hesabda istifadə olunur");
+                ModelState.AddModelError("Email.NewEmail", L.T("Bu email artıq başqa hesabda istifadə olunur"));
                 return ProfileView(user, email: model);
             }
 
@@ -379,18 +380,18 @@ namespace DoctorEngineApp.Controllers
                                  new { userId = user.Id, email = newEmail, token },
                                  Request.Scheme);
 
-            string html = $"<h3>Salam {HtmlEncoder.Default.Encode(user.FullName ?? user.UserName ?? string.Empty)}</h3>" +
-                          $"<p>Hesabınızın email ünvanını <strong>{HtmlEncoder.Default.Encode(newEmail)}</strong> olaraq dəyişmək üçün aşağıdakı linkə klik edin:</p>" +
-                          $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Yeni emaili təsdiqlə</a>" +
-                          $"<p>Bu sorğunu siz göndərməmisinizsə, bu məktubu nəzərə almayın.</p>";
+            string html = $"<h3>{L.T("Salam {0}", HtmlEncoder.Default.Encode(user.FullName ?? user.UserName ?? string.Empty))}</h3>" +
+                          $"<p>{L.T("Hesabınızın email ünvanını {0} olaraq dəyişmək üçün aşağıdakı linkə klik edin:", $"<strong>{HtmlEncoder.Default.Encode(newEmail)}</strong>")}</p>" +
+                          $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">{L.T("Yeni emaili təsdiqlə")}</a>" +
+                          $"<p>{L.T("Bu sorğunu siz göndərməmisinizsə, bu məktubu nəzərə almayın.")}</p>";
 
-            if (!await TrySendEmailAsync(newEmail, "Email dəyişikliyinin təsdiqi", html))
+            if (!await TrySendEmailAsync(newEmail, L.T("Email dəyişikliyinin təsdiqi"), html))
             {
-                TempData["ProfileError"] = "Təsdiq məktubu göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin.";
+                TempData["ProfileError"] = L.T("Təsdiq məktubu göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin.");
                 return RedirectToAction(nameof(Profile), null, null, "email");
             }
 
-            TempData["ProfileSuccess"] = $"Təsdiq linki {newEmail} ünvanına göndərildi. Email linkə klik etdikdən sonra dəyişəcək.";
+            TempData["ProfileSuccess"] = L.T("Təsdiq linki {0} ünvanına göndərildi. Email linkə klik etdikdən sonra dəyişəcək.", newEmail);
             return RedirectToAction(nameof(Profile), null, null, "email");
         }
 
@@ -412,17 +413,17 @@ namespace DoctorEngineApp.Controllers
             if (!result.Succeeded)
             {
                 // Daxil olmayıbsa, Profile login-ə yönləndirir; mesaj girişdən sonra profildə görünür
-                TempData["ProfileError"] = "Təsdiq linki etibarsızdır və ya vaxtı keçib. Yenidən cəhd edin.";
+                TempData["ProfileError"] = L.T("Təsdiq linki etibarsızdır və ya vaxtı keçib. Yenidən cəhd edin.");
                 return RedirectToAction(nameof(Profile), null, null, "email");
             }
 
             // Köhnə emailə xəbərdarlıq (hesab oğurlanmasının tez aşkarlanması üçün)
             if (!string.IsNullOrEmpty(oldEmail))
             {
-                string notice = "<h3>Email ünvanınız dəyişdirildi</h3>" +
-                                $"<p>Hesabınızın email ünvanı <strong>{HtmlEncoder.Default.Encode(email)}</strong> olaraq dəyişdirildi.</p>" +
-                                "<p>Bu dəyişikliyi siz etməmisinizsə, dərhal bizimlə əlaqə saxlayın.</p>";
-                try { await _emailService.SendAsync(oldEmail, "Email ünvanınız dəyişdirildi", notice); }
+                string notice = $"<h3>{L.T("Email ünvanınız dəyişdirildi")}</h3>" +
+                                $"<p>{L.T("Hesabınızın email ünvanı {0} olaraq dəyişdirildi.", $"<strong>{HtmlEncoder.Default.Encode(email)}</strong>")}</p>" +
+                                $"<p>{L.T("Bu dəyişikliyi siz etməmisinizsə, dərhal bizimlə əlaqə saxlayın.")}</p>";
+                try { await _emailService.SendAsync(oldEmail, L.T("Email ünvanınız dəyişdirildi"), notice); }
                 catch { /* bildiriş göndərilməsə də dəyişiklik qüvvədədir */ }
             }
 
@@ -430,11 +431,11 @@ namespace DoctorEngineApp.Controllers
             if (_signInManager.IsSignedIn(User) && _userManager.GetUserId(User) == user.Id)
             {
                 await _signInManager.RefreshSignInAsync(user);
-                TempData["ProfileSuccess"] = "Email ünvanınız uğurla dəyişdirildi.";
+                TempData["ProfileSuccess"] = L.T("Email ünvanınız uğurla dəyişdirildi.");
                 return RedirectToAction(nameof(Profile), null, null, "email");
             }
 
-            TempData["SuccessMessage"] = "Email ünvanınız dəyişdirildi. Yeni email ilə daxil ola bilərsiniz.";
+            TempData["SuccessMessage"] = L.T("Email ünvanınız dəyişdirildi. Yeni email ilə daxil ola bilərsiniz.");
             return RedirectToAction(nameof(Login));
         }
 
@@ -465,7 +466,7 @@ namespace DoctorEngineApp.Controllers
             // Şifrə dəyişəndə security stamp yenilənir — bu sessiya aktiv qalsın
             await _signInManager.RefreshSignInAsync(user);
 
-            TempData["ProfileSuccess"] = "Şifrəniz uğurla dəyişdirildi.";
+            TempData["ProfileSuccess"] = L.T("Şifrəniz uğurla dəyişdirildi.");
             return RedirectToAction(nameof(Profile), null, null, "password");
         }
 
@@ -481,7 +482,7 @@ namespace DoctorEngineApp.Controllers
 
             if (photo == null || photo.Length == 0)
             {
-                TempData["ProfileError"] = "Şəkil seçin.";
+                TempData["ProfileError"] = L.T("Şəkil seçin.");
                 return RedirectToAction(nameof(Profile));
             }
 
@@ -506,14 +507,14 @@ namespace DoctorEngineApp.Controllers
             if (!result.Succeeded)
             {
                 DeleteAvatarFile(fileName);
-                TempData["ProfileError"] = "Şəkil yadda saxlanılmadı. Yenidən cəhd edin.";
+                TempData["ProfileError"] = L.T("Şəkil yadda saxlanılmadı. Yenidən cəhd edin.");
                 return RedirectToAction(nameof(Profile));
             }
 
             DeleteAvatarFile(oldImage);
             await _signInManager.RefreshSignInAsync(user);   // header-dəki avatar yenilənsin
 
-            TempData["ProfileSuccess"] = "Profil şəkliniz yeniləndi.";
+            TempData["ProfileSuccess"] = L.T("Profil şəkliniz yeniləndi.");
             return RedirectToAction(nameof(Profile));
         }
 
@@ -534,7 +535,7 @@ namespace DoctorEngineApp.Controllers
                 await _userManager.UpdateAsync(user);
                 DeleteAvatarFile(oldImage);
                 await _signInManager.RefreshSignInAsync(user);
-                TempData["ProfileSuccess"] = "Profil şəkli silindi.";
+                TempData["ProfileSuccess"] = L.T("Profil şəkli silindi.");
             }
 
             return RedirectToAction(nameof(Profile));

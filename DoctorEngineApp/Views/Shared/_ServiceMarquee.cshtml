@@ -10,7 +10,7 @@
     var repeated = new List<CategoryVM>();
     while (repeated.Count < 8) repeated.AddRange(items);
 
-    <section class="de-marquee" aria-label="Xidmətlərimiz">
+    <section class="de-marquee" aria-label="@L.T("Xidmətlərimiz")">
         <div class="de-marquee__track">
             @for (int copy = 0; copy < 2; copy++)
             {
@@ -27,7 +27,7 @@
                                 {
                                     <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>
                                 }
-                                <span>@c.Name</span>
+                                <span>@L.T(c.Name)</span>
                             </a>
                         </li>
                         <li class="de-marquee__sep" aria-hidden="true"><i class="fa-solid fa-gear"></i></li>

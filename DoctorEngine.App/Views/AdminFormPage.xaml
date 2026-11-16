@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             xmlns:c="clr-namespace:DoctorEngine.Contracts;assembly=DoctorEngine.Contracts"
+             x:Class="DoctorEngine.App.Views.AdminFormPage"
+             x:DataType="vm:AdminFormViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{Binding Section.Title}">
+
+    <ContentPage.Resources>
+        <!-- ===== Sahə şablonları (tip serverdən gəlir) ===== -->
+
+        <DataTemplate x:Key="TextTemplate" x:DataType="vm:TextFieldVm">
+            <VerticalStackLayout v:Motion.Appear="True" Spacing="6">
+                <Label Text="{Binding Label}" Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                    <Entry Text="{Binding Text}" Keyboard="{Binding Keyboard}" MaxLength="{Binding MaxLength}" IsReadOnly="{Binding IsReadOnly}" />
+                </Border>
+                <Label Text="{Binding Hint}" Style="{StaticResource Muted}" FontSize="12" IsVisible="{Binding HasHint}" />
+            </VerticalStackLayout>
+        </DataTemplate>
+
+        <DataTemplate x:Key="MultilineTemplate" x:DataType="vm:TextFieldVm">
+            <VerticalStackLayout v:Motion.Appear="True" Spacing="6">
+                <Label Text="{Binding Label}" Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="10,4">
+                    <Editor Text="{Binding Text}" AutoSize="TextChanges" MinimumHeightRequest="90" MaxLength="{Binding MaxLength}" IsReadOnly="{Binding IsReadOnly}" />
+                </Border>
+                <Label Text="{Binding Hint}" Style="{StaticResource Muted}" FontSize="12" IsVisible="{Binding HasHint}" />
+            </VerticalStackLayout>
+        </DataTemplate>
+
+        <DataTemplate x:Key="BoolTemplate" x:DataType="vm:BoolFieldVm">
+            <Grid v:Motion.Appear="True" ColumnDefinitions="Auto,*" ColumnSpacing="4">
+                <!-- WidthRequest: Windows-da CheckBox-un standart minimum eni 120px-dir -->
+                <CheckBox IsChecked="{Binding Value}" IsEnabled="{Binding IsEditable}" WidthRequest="36" MinimumWidthRequest="0" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="{Binding Label}" VerticalOptions="Center" FontSize="15" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SelectTemplate" x:DataType="vm:SelectFieldVm">
+            <VerticalStackLayout v:Motion.Appear="True" Spacing="6">
+                <Label Text="{Binding Label}" Style="{StaticResource FieldLabel}" />
+                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 14" Padding="14,0">
+                    <Picker ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" Title="{Binding Placeholder}"
+                            ItemDisplayBinding="{Binding Label, x:DataType=c:AdminOptionDto}" IsEnabled="{Binding IsEditable}" />
+                </Border>
+                <Label Text="{Binding Hint}" Style="{StaticResource Muted}" FontSize="12" IsVisible="{Binding HasHint}" />
+            </VerticalStackLayout>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FileTemplate" x:DataType="vm:FileFieldVm">
+            <VerticalStackLayout v:Motion.Appear="True" Spacing="8">
+                <Label Text="{Binding Label}" Style="{StaticResource FieldLabel}" />
+                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" HeightRequest="160" IsVisible="{Binding HasPreview}"
+                        BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}">
+                    <Image Source="{Binding PreviewSource}" Aspect="AspectFit" />
+                </Border>
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                    <Label Text="{Binding FileText}" Style="{StaticResource Muted}" FontSize="13" VerticalOptions="Center" LineBreakMode="MiddleTruncation">
+                        <Label.GestureRecognizers><TapGestureRecognizer Command="{Binding OpenCurrentCommand}" /></Label.GestureRecognizers>
+                    </Label>
+                    <Border Grid.Column="1" Style="{StaticResource Pill}" Padding="10,6" BackgroundColor="#FDECEE" IsVisible="{Binding HasPicked}" v:Motion.Press="True">
+                        <Label Text="✕" TextColor="#B00F1D" FontFamily="BarlowBold" FontSize="13" />
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ClearPickedCommand}" /></Border.GestureRecognizers>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource Pill}" Padding="12,6" IsVisible="{Binding IsEditable}" v:Motion.Press="True"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#33D81324}">
+                        <Label Text="{Binding PickText}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" />
+                        <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding PickCommand}" /></Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+                <Label Text="{Binding Hint}" Style="{StaticResource Muted}" FontSize="12" IsVisible="{Binding HasHint}" />
+            </VerticalStackLayout>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ItemsTemplate" x:DataType="vm:ItemsFieldVm">
+            <VerticalStackLayout v:Motion.Appear="True" Spacing="8">
+                <Label Text="{Binding Label}" Style="{StaticResource FieldLabel}" />
+                <Grid ColumnDefinitions="*,80,36" ColumnSpacing="8">
+                    <Label Text="{Binding PartLabel}" Style="{StaticResource Muted}" FontSize="12" />
+                    <Label Grid.Column="1" Text="{Binding MonthsLabel}" Style="{StaticResource Muted}" FontSize="12" />
+                </Grid>
+                <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Rows}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ItemRowVm">
+                            <Grid v:Motion.Appear="True" ColumnDefinitions="*,80,36" ColumnSpacing="8">
+                                <Border Style="{StaticResource Field}" StrokeShape="RoundRectangle 12" Padding="10,0">
+                                    <Entry Text="{Binding PartName}" MaxLength="100" IsReadOnly="{Binding IsEditable, Converter={StaticResource InvertedBool}}" />
+                                </Border>
+                                <Border Grid.Column="1" Style="{StaticResource Field}" StrokeShape="RoundRectangle 12" Padding="10,0">
+                                    <Entry Text="{Binding Months}" Keyboard="Numeric" MaxLength="3" IsReadOnly="{Binding IsEditable, Converter={StaticResource InvertedBool}}" />
+                                </Border>
+                                <Border Grid.Column="2" Style="{StaticResource Pill}" Padding="0" WidthRequest="36" HeightRequest="36" BackgroundColor="#FDECEE"
+                                        VerticalOptions="Center" IsVisible="{Binding IsEditable}" v:Motion.Press="True">
+                                    <Label Text="✕" TextColor="#B00F1D" FontFamily="BarlowBold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding RemoveCommand}" /></Border.GestureRecognizers>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+                <Border Style="{StaticResource Pill}" Padding="12,6" IsVisible="{Binding IsEditable}" v:Motion.Press="True"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#33D81324}">
+                    <Label Text="{Binding AddText}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" />
+                    <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding AddRowCommand}" /></Border.GestureRecognizers>
+                </Border>
+                <Label Text="{Binding Hint}" Style="{StaticResource Muted}" FontSize="12" IsVisible="{Binding HasHint}" />
+            </VerticalStackLayout>
+        </DataTemplate>
+
+        <v:AdminFieldTemplateSelector x:Key="FieldSelector"
+                                      Text="{StaticResource TextTemplate}"
+                                      Multiline="{StaticResource MultilineTemplate}"
+                                      Bool="{StaticResource BoolTemplate}"
+                                      Select="{StaticResource SelectTemplate}"
+                                      File="{StaticResource FileTemplate}"
+                                      Items="{StaticResource ItemsTemplate}" />
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{Binding Section.Title}" Subtitle="{Binding Heading}" Icon="ic_wrench_w.png" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16" Padding="16,16,16,32">
+                <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                    <Label Text="{Binding ErrorMessage}" TextColor="#7F1D1D" FontSize="13" />
+                </Border>
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="{StaticResource Primary}" HorizontalOptions="Center" />
+
+                <Border Style="{StaticResource SoftCard}" Padding="18" IsVisible="{Binding IsLoaded}">
+                    <VerticalStackLayout Spacing="16" BindableLayout.ItemsSource="{Binding Fields}"
+                                         BindableLayout.ItemTemplateSelector="{StaticResource FieldSelector}" />
+                </Border>
+
+                <Button Text="{l:Tr common_save}" Command="{Binding SaveCommand}" IsVisible="{Binding CanSave}" IsEnabled="{Binding IsNotBusy}" />
+                <Button Text="{l:Tr adm_delete}" Command="{Binding DeleteCommand}" IsVisible="{Binding CanDelete}" IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="Transparent" TextColor="{StaticResource Primary}" BorderColor="{StaticResource Primary}" BorderWidth="1" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

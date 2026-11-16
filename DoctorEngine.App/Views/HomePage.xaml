@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
              xmlns:v="clr-namespace:DoctorEngine.App.Views"
@@ -7,7 +8,7 @@
              x:DataType="vm:HomeViewModel"
              Shell.NavBarIsVisible="False"
              SafeAreaEdges="Container"
-             Title="Ana səhifə">
+             Title="{l:Tr tab_home}">
 
     <!-- Səhifə fonu göydür (status bar zonası başlıqla eyni rəngdə görünür); məzmunun öz açıq fonu var -->
     <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
@@ -71,7 +72,7 @@
                                                     <BoxView Background="{StaticResource ImageOverlay}" />
                                                     <VerticalStackLayout VerticalOptions="End" Padding="18,16" Spacing="6">
                                                         <Border Style="{StaticResource Pill}" BackgroundColor="{StaticResource Primary}" Padding="10,4">
-                                                            <Label Text="AVTO XİDMƏTLƏR" TextColor="White" FontSize="10" FontFamily="BarlowBold" CharacterSpacing="1.2" />
+                                                            <Label Text="{l:Tr home_auto_services}" TextColor="White" FontSize="10" FontFamily="BarlowBold" CharacterSpacing="1.2" />
                                                         </Border>
                                                         <Label Text="{Binding Title}" TextColor="White" FontSize="22" FontFamily="BarlowBold" MaxLines="2" LineBreakMode="TailTruncation" />
                                                         <Label Text="{Binding Subtitle}" TextColor="#E6FFFFFF" FontSize="13" MaxLines="2" LineBreakMode="TailTruncation" />
@@ -94,7 +95,7 @@
                                 <Border Style="{StaticResource TileIcon}" Background="{StaticResource PrimaryGradient}">
                                     <Image Source="ic_calendar_w.png" />
                                 </Border>
-                                <Label Text="Rezervasiya" Style="{StaticResource TileLabel}" />
+                                <Label Text="{l:Tr tab_booking}" Style="{StaticResource TileLabel}" />
                                 <VerticalStackLayout.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding BookCommand}" />
                                 </VerticalStackLayout.GestureRecognizers>
@@ -103,7 +104,7 @@
                                 <Border Style="{StaticResource TileIcon}" Background="{StaticResource NavyTile}">
                                     <Image Source="ic_chat_w.png" />
                                 </Border>
-                                <Label Text="Usta ilə çat" Style="{StaticResource TileLabel}" />
+                                <Label Text="{l:Tr home_tile_chat}" Style="{StaticResource TileLabel}" />
                                 <VerticalStackLayout.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenChatCommand}" />
                                 </VerticalStackLayout.GestureRecognizers>
@@ -112,7 +113,7 @@
                                 <Border Style="{StaticResource TileIcon}" Background="{StaticResource VioletTile}">
                                     <Image Source="ic_spark_w.png" />
                                 </Border>
-                                <Label Text="AI köməkçi" Style="{StaticResource TileLabel}" />
+                                <Label Text="{l:Tr ai_title}" Style="{StaticResource TileLabel}" />
                                 <VerticalStackLayout.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding OpenAiCommand}" />
                                 </VerticalStackLayout.GestureRecognizers>
@@ -132,7 +133,7 @@
                     <!-- Bildirişlər -->
                     <Border Style="{StaticResource Pill}" BackgroundColor="#FFF4E5" Margin="16,14,16,0" Padding="14,8" HorizontalOptions="Fill"
                             IsVisible="{Binding IsOffline}">
-                        <Label Text="Oflayn rejim — son yüklənmiş məlumat göstərilir. Yeniləmək üçün aşağı çəkin." FontSize="13" TextColor="#9A3412" />
+                        <Label Text="{l:Tr home_offline}" FontSize="13" TextColor="#9A3412" />
                     </Border>
                     <Border Style="{StaticResource ErrorBox}" Margin="16,14,16,0" IsVisible="{Binding HasError}">
                         <Label Text="{Binding ErrorMessage}" FontSize="13" TextColor="#7F1D1D" />
@@ -147,13 +148,13 @@
                     <!-- ================= XİDMƏTLƏR ================= -->
                     <Grid ClassId="reveal" Padding="20,28,16,12" ColumnDefinitions="*,Auto" IsVisible="{Binding HasSlides}">
                         <VerticalStackLayout Spacing="0">
-                            <Label Text="XİDMƏTLƏRİMİZ" Style="{StaticResource Eyebrow}" />
-                            <Label Text="Ən son xidmətlər" Style="{StaticResource SectionTitle}" />
+                            <Label Text="{l:Tr home_services_eyebrow}" Style="{StaticResource Eyebrow}" />
+                            <Label Text="{l:Tr home_latest_services}" Style="{StaticResource SectionTitle}" />
                         </VerticalStackLayout>
                         <Border Grid.Column="1" Style="{StaticResource Pill}" BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#33D81324}"
                                 VerticalOptions="End" v:Motion.Press="True">
                             <HorizontalStackLayout Spacing="4">
-                                <Label Text="Hamısı" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" VerticalOptions="Center" />
+                                <Label Text="{l:Tr common_all}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="13" VerticalOptions="Center" />
                                 <Image Source="ic_arrow_r.png" WidthRequest="14" HeightRequest="14" VerticalOptions="Center" />
                             </HorizontalStackLayout>
                             <Border.GestureRecognizers>
@@ -174,7 +175,7 @@
                         </CollectionView.Footer>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="vm:CategoryItem">
-                                <Grid Padding="0,4,0,18"><Border Style="{StaticResource SoftCard}" Padding="0" WidthRequest="236" v:Motion.Press="True">
+                                <Grid v:Motion.Appear="True" Padding="0,4,0,18"><Border Style="{StaticResource SoftCard}" Padding="0" WidthRequest="236" v:Motion.Press="True">
                                     <Grid RowDefinitions="132,*">
                                         <!-- Rəngli üst hissə + ikon -->
                                         <Grid Background="{StaticResource NavyTile}" IsClippedToBounds="True">
@@ -187,7 +188,7 @@
                                                     HorizontalOptions="End" VerticalOptions="End" Margin="0,0,14,14" IsVisible="{Binding HasVideo}">
                                                 <HorizontalStackLayout Spacing="5">
                                                     <Image Source="ic_play_w.png" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" />
-                                                    <Label Text="Video" TextColor="White" FontFamily="BarlowBold" FontSize="12" VerticalOptions="Center" />
+                                                    <Label Text="{l:Tr common_video}" TextColor="White" FontFamily="BarlowBold" FontSize="12" VerticalOptions="Center" />
                                                 </HorizontalStackLayout>
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=PlayVideoCommand, x:DataType=vm:HomeViewModel}"
@@ -198,9 +199,9 @@
                                         <Grid Grid.Row="1" Padding="16,14,16,16" RowDefinitions="Auto,*,Auto" RowSpacing="4">
                                             <Label Text="{Binding Name}" FontFamily="BarlowBold" FontSize="17" MaxLines="1" LineBreakMode="TailTruncation"
                                                    TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
-                                            <Label Grid.Row="1" Text="{Binding Description, TargetNullValue='Peşəkar diaqnostika və təmir'}" Style="{StaticResource Muted}" MaxLines="2" LineBreakMode="TailTruncation" />
+                                            <Label Grid.Row="1" Text="{Binding ShortDescription}" Style="{StaticResource Muted}" MaxLines="2" LineBreakMode="TailTruncation" />
                                             <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                                                <Label Text="Rezervasiya et" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="14" VerticalOptions="Center" />
+                                                <Label Text="{l:Tr common_book}" TextColor="{StaticResource Primary}" FontFamily="BarlowBold" FontSize="14" VerticalOptions="Center" />
                                                 <Border Grid.Column="1" WidthRequest="34" HeightRequest="34" StrokeShape="RoundRectangle 12" StrokeThickness="0"
                                                         Background="{StaticResource PrimaryGradient}" Padding="8">
                                                     <Image Source="ic_arrow_w.png" />
@@ -219,13 +220,13 @@
 
                     <!-- ================= NİYƏ BİZ ================= -->
                     <VerticalStackLayout ClassId="reveal" Padding="20,10,16,12" Spacing="0" IsVisible="{Binding HasSlides}">
-                        <Label Text="NİYƏ DOCTORENGINE" Style="{StaticResource Eyebrow}" />
-                        <Label Text="Mühərrikiniz etibarlı əllərdə" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{l:Tr home_why_eyebrow}" Style="{StaticResource Eyebrow}" />
+                        <Label Text="{l:Tr home_why_title}" Style="{StaticResource SectionTitle}" />
                     </VerticalStackLayout>
                     <VerticalStackLayout ClassId="reveal" Padding="16,0" Spacing="12" BindableLayout.ItemsSource="{Binding Informs}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="vm:InformItem">
-                                <Border Style="{StaticResource SoftCard}" Padding="14">
+                                <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="14">
                                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
                                         <Border WidthRequest="54" HeightRequest="54" StrokeShape="RoundRectangle 16" StrokeThickness="0"
                                                 BackgroundColor="{AppThemeBinding Light={StaticResource PrimarySoft}, Dark=#2BD81324}" Padding="11">
@@ -243,8 +244,8 @@
 
                     <!-- ================= USTALAR ================= -->
                     <VerticalStackLayout ClassId="reveal" Padding="20,28,16,12" Spacing="0" IsVisible="{Binding HasSlides}">
-                        <Label Text="KOMANDAMIZ" Style="{StaticResource Eyebrow}" />
-                        <Label Text="Mütəxəssislərimiz" Style="{StaticResource SectionTitle}" />
+                        <Label Text="{l:Tr home_team_eyebrow}" Style="{StaticResource Eyebrow}" />
+                        <Label Text="{l:Tr home_team_title}" Style="{StaticResource SectionTitle}" />
                     </VerticalStackLayout>
                     <CollectionView ClassId="reveal" ItemsSource="{Binding Technicians}" HeightRequest="300" SelectionMode="None">
                         <CollectionView.ItemsLayout>
@@ -258,7 +259,7 @@
                         </CollectionView.Footer>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="vm:TechnicianItem">
-                                <Grid Padding="0,4,0,18"><Border StrokeShape="RoundRectangle 24" StrokeThickness="0" Padding="0" WidthRequest="220">
+                                <Grid v:Motion.Appear="True" Padding="0,4,0,18"><Border StrokeShape="RoundRectangle 24" StrokeThickness="0" Padding="0" WidthRequest="220">
                                     <Border.Shadow>
                                         <Shadow Brush="#0B2154" Offset="0,8" Radius="20" Opacity="0.18" />
                                     </Border.Shadow>
@@ -281,7 +282,7 @@
                     <!-- ================= ƏLAQƏ ================= -->
                     <Border ClassId="reveal" Style="{StaticResource SoftCard}" Margin="16,4,16,0" Padding="18">
                         <VerticalStackLayout Spacing="14">
-                            <Label Text="Bizimlə əlaqə" Style="{StaticResource SectionTitle}" FontSize="19" />
+                            <Label Text="{l:Tr home_contact_title}" Style="{StaticResource SectionTitle}" FontSize="19" />
 
                             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" v:Motion.Press="True">
                                 <Border WidthRequest="42" HeightRequest="42" StrokeShape="RoundRectangle 13" StrokeThickness="0"
@@ -289,7 +290,7 @@
                                     <Image Source="ic_pin_r.png" />
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                                    <Label Text="Ünvan" Style="{StaticResource Muted}" FontSize="12" />
+                                    <Label Text="{l:Tr home_address}" Style="{StaticResource Muted}" FontSize="12" />
                                     <Label Text="{Binding Contact.Address}" FontFamily="BarlowSemiBold" FontSize="14" />
                                 </VerticalStackLayout>
                                 <Grid.GestureRecognizers>
@@ -303,11 +304,11 @@
                                     <Image Source="ic_clock_r.png" />
                                 </Border>
                                 <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                                    <Label Text="İş saatları" Style="{StaticResource Muted}" FontSize="12" />
+                                    <Label Text="{l:Tr home_hours}" Style="{StaticResource Muted}" FontSize="12" />
                                     <Label FontSize="14">
                                         <Label.FormattedText>
                                             <FormattedString>
-                                                <Span Text="B.e–Cümə  " />
+                                                <Span Text="{l:Tr home_weekdays}" />
                                                 <Span Text="{Binding Contact.Weekdays}" FontFamily="BarlowBold" />
                                             </FormattedString>
                                         </Label.FormattedText>
@@ -315,7 +316,7 @@
                                     <Label FontSize="14">
                                         <Label.FormattedText>
                                             <FormattedString>
-                                                <Span Text="Şənbə–Bazar  " />
+                                                <Span Text="{l:Tr home_weekend}" />
                                                 <Span Text="{Binding Contact.Weekend}" FontFamily="BarlowBold" />
                                             </FormattedString>
                                         </Label.FormattedText>
@@ -327,7 +328,7 @@
                                 <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" HeightRequest="52" v:Motion.Press="True">
                                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
                                         <Image Source="ic_phone_w.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                                        <Label Text="Zəng et" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
+                                        <Label Text="{l:Tr home_call}" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
                                     </HorizontalStackLayout>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding CallCommand}" />
@@ -346,7 +347,7 @@
                         </VerticalStackLayout>
                     </Border>
 
-                    <Label Text="DoctorEngine · Mühərrik təmiri mərkəzi" Style="{StaticResource Muted}" FontSize="12"
+                    <Label Text="{l:Tr home_footer}" Style="{StaticResource Muted}" FontSize="12"
                            HorizontalTextAlignment="Center" Margin="0,22,0,0" />
                 </VerticalStackLayout>
             </ScrollView>

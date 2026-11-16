@@ -58,7 +58,7 @@
 
         const close = el("button", "de-toast__close");
         close.type = "button";
-        close.setAttribute("aria-label", "Bağla");
+        close.setAttribute("aria-label", deT("Bağla"));
         close.appendChild(icon("fa-solid fa-xmark"));
         node.appendChild(close);
 
@@ -88,10 +88,10 @@
     // ---------- Təsdiq pəncərəsi ----------
     function confirmDialog(opts = {}) {
         const o = Object.assign({
-            title: "Əminsiniz?",
+            title: deT("Əminsiniz?"),
             text: "",
-            okText: "Bəli",
-            cancelText: "Ləğv et",
+            okText: deT("Bəli"),
+            cancelText: deT("Ləğv et"),
             danger: false,
             icon: null
         }, typeof opts === "string" ? { title: opts } : opts);
@@ -167,8 +167,8 @@
     else flushServerToasts();
 
     // ---------- İnternet bağlantısı ----------
-    window.addEventListener("offline", () => toast("İnternet bağlantısı kəsildi. Bərpa olunanda səhifə yenidən işləyəcək.", "warning", { duration: 6000 }));
-    window.addEventListener("online", () => toast("İnternet bağlantısı bərpa olundu.", "success", { duration: 3000 }));
+    window.addEventListener("offline", () => toast(deT("İnternet bağlantısı kəsildi. Bərpa olunanda səhifə yenidən işləyəcək."), "warning", { duration: 6000 }));
+    window.addEventListener("online", () => toast(deT("İnternet bağlantısı bərpa olundu."), "success", { duration: 3000 }));
 
     // ---------- Service worker: push + server işləməyəndə "offline" səhifəsi ----------
     if ("serviceWorker" in navigator && window.isSecureContext) {

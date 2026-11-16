@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
              xmlns:v="clr-namespace:DoctorEngine.App.Views"
@@ -7,7 +8,7 @@
              x:DataType="vm:ServicesViewModel"
              Shell.NavBarIsVisible="False"
              SafeAreaEdges="Container"
-             Title="Xidmətlər">
+             Title="{l:Tr tab_services}">
 
     <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
         <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
@@ -17,9 +18,9 @@
                         <Border Style="{StaticResource PageHeader}">
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <VerticalStackLayout Spacing="4">
-                                    <Label Text="XİDMƏTLƏRİMİZ" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
-                                    <Label Text="Xidmətlər" Style="{StaticResource HeaderTitle}" />
-                                    <Label Text="Videolara baxın və uyğun xidməti bir toxunuşla rezervasiya edin." Style="{StaticResource HeaderSubtitle}" />
+                                    <Label Text="{l:Tr home_services_eyebrow}" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
+                                    <Label Text="{l:Tr tab_services}" Style="{StaticResource HeaderTitle}" />
+                                    <Label Text="{l:Tr services_subtitle}" Style="{StaticResource HeaderSubtitle}" />
                                 </VerticalStackLayout>
                                 <Border Grid.Column="1" Style="{StaticResource GlassIconButton}" WidthRequest="56" HeightRequest="56" Padding="14" VerticalOptions="Center">
                                     <Image Source="ic_wrench_w.png" />
@@ -36,14 +37,14 @@
                 <CollectionView.EmptyView>
                     <VerticalStackLayout Padding="32" Spacing="8" HorizontalOptions="Center">
                         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
-                        <Label Text="Xidmətlər tezliklə əlavə olunacaq." Style="{StaticResource Muted}" HorizontalTextAlignment="Center" IsVisible="{Binding IsNotBusy}" />
+                        <Label Text="{l:Tr services_empty}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" IsVisible="{Binding IsNotBusy}" />
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:CategoryItem">
                         <!-- Kənar boşluq xarici Grid-in Padding-i ilə: Windows CollectionView şablonun kök Margin-ini nəzərə almır -->
-                        <Grid Padding="16,10">
+                        <Grid v:Motion.Appear="True" Padding="16,10">
                         <Border Style="{StaticResource SoftCard}" Padding="0">
                             <VerticalStackLayout Spacing="0">
                                 <!-- Rəngli üst hissə -->
@@ -60,10 +61,10 @@
                                                 <Label TextColor="White" FontSize="11" FontFamily="BarlowSemiBold">
                                                     <Label.Triggers>
                                                         <DataTrigger TargetType="Label" Binding="{Binding HasVideo}" Value="True">
-                                                            <Setter Property="Text" Value="▶  Video izah var" />
+                                                            <Setter Property="Text" Value="{l:Tr services_has_video}" />
                                                         </DataTrigger>
                                                         <DataTrigger TargetType="Label" Binding="{Binding HasVideo}" Value="False">
-                                                            <Setter Property="Text" Value="Video tezliklə" />
+                                                            <Setter Property="Text" Value="{l:Tr services_video_soon}" />
                                                         </DataTrigger>
                                                     </Label.Triggers>
                                                 </Label>
@@ -73,14 +74,14 @@
                                 </Grid>
 
                                 <VerticalStackLayout Padding="16,14,16,16" Spacing="12">
-                                    <Label Text="{Binding Description, TargetNullValue='Peşəkar diaqnostika və etibarlı təmir — ustalarımız mühərrikinizə ən doğru həlli tapacaq.'}"
+                                    <Label Text="{Binding LongDescription}"
                                            Style="{StaticResource Muted}" />
 
                                     <!-- Videolar -->
                                     <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Videos}">
                                         <BindableLayout.ItemTemplate>
                                             <DataTemplate x:DataType="vm:VideoItem">
-                                                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="10"
+                                                <Border v:Motion.Appear="True" StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="10"
                                                         BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}" v:Motion.Press="True">
                                                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                                         <Border WidthRequest="42" HeightRequest="42" StrokeShape="RoundRectangle 14" StrokeThickness="0"
@@ -88,9 +89,9 @@
                                                             <Image Source="ic_play_w.png" />
                                                         </Border>
                                                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                                                            <Label Text="{Binding Title, TargetNullValue='Videoya bax'}" FontFamily="BarlowBold" FontSize="14" LineBreakMode="TailTruncation"
+                                                            <Label Text="{Binding DisplayTitle}" FontFamily="BarlowBold" FontSize="14" LineBreakMode="TailTruncation"
                                                                    TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
-                                                            <Label Text="Videoya baxmaq üçün toxunun" Style="{StaticResource Muted}" FontSize="12" />
+                                                            <Label Text="{l:Tr services_tap_video}" Style="{StaticResource Muted}" FontSize="12" />
                                                         </VerticalStackLayout>
                                                         <Image Grid.Column="2" Source="ic_arrow_g.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
                                                     </Grid>
@@ -107,7 +108,7 @@
                                     <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Background="{StaticResource PrimaryGradient}" HeightRequest="52" v:Motion.Press="True">
                                         <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
                                             <Image Source="ic_calendar_w.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
-                                            <Label Text="Rezervasiya et" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
+                                            <Label Text="{l:Tr common_book}" TextColor="White" FontFamily="BarlowBold" FontSize="15" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ServicesViewModel}}, Path=BookCommand, x:DataType=vm:ServicesViewModel}"

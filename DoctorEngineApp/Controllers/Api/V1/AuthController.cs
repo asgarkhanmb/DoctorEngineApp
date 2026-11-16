@@ -1,3 +1,4 @@
+using DoctorEngineApp.Localization;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -27,7 +28,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
     [IgnoreAntiforgeryToken]   // yalnız JSON qəbul edir; cookie istifadə olunmur → CSRF riski yoxdur
     public partial class AuthController : ControllerBase
     {
-        private const string InvalidLogin = "İstifadəçi adı/email və ya şifrə yanlışdır";
+        private static string InvalidLogin => L.T("İstifadəçi adı/email və ya şifrə yanlışdır");
 
         private readonly UserManager<AppUser> _users;
         private readonly SignInManager<AppUser> _signIn;
@@ -56,9 +57,9 @@ namespace DoctorEngineApp.Controllers.Api.V1
         [EnableRateLimiting("auth")]
         public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
         {
-            if (!_jwt.IsConfigured) return Error(503, "Tətbiq girişi serverdə hələ ayarlanmayıb.");
+            if (!_jwt.IsConfigured) return Error(503, L.T("Tətbiq girişi serverdə hələ ayarlanmayıb."));
             if (string.IsNullOrWhiteSpace(request.EmailOrUsername) || string.IsNullOrEmpty(request.Password))
-                return Error(400, "İstifadəçi adı/email və şifrəni daxil edin.");
+                return Error(400, L.T("İstifadəçi adı/email və şifrəni daxil edin."));
 
             var login = request.EmailOrUsername.Trim();
             var user = await _users.FindByEmailAsync(login) ?? await _users.FindByNameAsync(login);
@@ -67,9 +68,9 @@ namespace DoctorEngineApp.Controllers.Api.V1
             // Saytla eyni: şifrə + lockout + email təsdiqi (cookie yaradılmır)
             var result = await _signIn.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
             if (result.IsLockedOut)
-                return Error(423, "Çox sayda uğursuz cəhd. Hesab müvəqqəti bloklanıb, bir neçə dəqiqə sonra yenidən cəhd edin.");
+                return Error(423, L.T("Çox sayda uğursuz cəhd. Hesab müvəqqəti bloklanıb, bir neçə dəqiqə sonra yenidən cəhd edin."));
             if (result.IsNotAllowed)
-                return Error(403, "Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın.");
+                return Error(403, L.T("Email təsdiqlənməyib. Zəhmət olmasa emailinizi yoxlayın."));
             if (!result.Succeeded)
                 return Error(401, InvalidLogin);
 
@@ -89,15 +90,15 @@ namespace DoctorEngineApp.Controllers.Api.V1
             var userName = request.UserName?.Trim() ?? "";
             var email = request.Email?.Trim() ?? "";
 
-            if (fullName.Length == 0) errors["fullName"] = new[] { "Ad və soyadı daxil edin" };
-            else if (fullName.Length > 100) errors["fullName"] = new[] { "Ad Soyad maksimum 100 simvol ola bilər" };
+            if (fullName.Length == 0) errors["fullName"] = new[] { L.T("Ad və soyadı daxil edin") };
+            else if (fullName.Length > 100) errors["fullName"] = new[] { L.T("Ad Soyad maksimum 100 simvol ola bilər") };
 
-            if (userName.Length < 3 || userName.Length > 30) errors["userName"] = new[] { "İstifadəçi adı 3–30 simvol olmalıdır" };
-            else if (!UserNameRegex().IsMatch(userName)) errors["userName"] = new[] { "Yalnız latın hərfləri, rəqəm və . _ - istifadə edin" };
+            if (userName.Length < 3 || userName.Length > 30) errors["userName"] = new[] { L.T("İstifadəçi adı 3–30 simvol olmalıdır") };
+            else if (!UserNameRegex().IsMatch(userName)) errors["userName"] = new[] { L.T("Yalnız latın hərfləri, rəqəm və . _ - istifadə edin") };
 
-            if (!new EmailAddressAttribute().IsValid(email) || email.Length == 0) errors["email"] = new[] { "Email düzgün formatda deyil" };
+            if (!new EmailAddressAttribute().IsValid(email) || email.Length == 0) errors["email"] = new[] { L.T("Email düzgün formatda deyil") };
 
-            if ((request.Password?.Length ?? 0) < 6) errors["password"] = new[] { "Şifrə minimum 6 simvol olmalıdır" };
+            if ((request.Password?.Length ?? 0) < 6) errors["password"] = new[] { L.T("Şifrə minimum 6 simvol olmalıdır") };
 
             if (errors.Count > 0)
                 return BadRequest(new ApiError(errors.Values.First()[0], 400, errors));
@@ -107,7 +108,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
             if (!result.Succeeded)
             {
                 var identityErrors = result.Errors.Select(e => e.Description).ToArray();
-                return BadRequest(new ApiError(identityErrors.FirstOrDefault() ?? "Qeydiyyat alınmadı.", 400,
+                return BadRequest(new ApiError(identityErrors.FirstOrDefault() ?? L.T("Qeydiyyat alınmadı."), 400,
                     new Dictionary<string, string[]> { [""] = identityErrors }));
             }
 
@@ -118,14 +119,14 @@ namespace DoctorEngineApp.Controllers.Api.V1
             // Təsdiq linki saytın səhifəsinə aparır (tətbiqdə sonra daxil olunur)
             var token = await _users.GenerateEmailConfirmationTokenAsync(user);
             var url = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, token }, Request.Scheme);
-            var html = $"<h3>Xoş Gəlmisiniz {HtmlEncoder.Default.Encode(user.FullName)}</h3>" +
-                       "<p>Emailinizi təsdiqləyin:</p>" +
-                       $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Təsdiqlə</a>";
+            var html = $"<h3>{L.T("Xoş Gəlmisiniz {0}", HtmlEncoder.Default.Encode(user.FullName))}</h3>" +
+                       $"<p>{L.T("Emailinizi təsdiqləyin:")}</p>" +
+                       $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">{L.T("Təsdiqlə")}</a>";
 
-            var sent = await TrySendAsync(email, "Email təsdiqi", html);
+            var sent = await TrySendAsync(email, L.T("Email təsdiqi"), html);
             return Ok(new MessageResponse(sent
-                ? "Hesab yaradıldı. Emailinizə göndərilən linklə hesabınızı təsdiqləyin, sonra daxil olun."
-                : "Hesab yaradıldı, amma təsdiq məktubu göndərilmədi. Bir azdan «Şifrəni unutmusunuz» ilə yenidən cəhd edin."));
+                ? L.T("Hesab yaradıldı. Emailinizə göndərilən linklə hesabınızı təsdiqləyin, sonra daxil olun.")
+                : L.T("Hesab yaradıldı, amma təsdiq məktubu göndərilmədi. Bir azdan «Şifrəni unutmusunuz» ilə yenidən cəhd edin.")));
         }
 
         // ================= TOKEN YENİLƏMƏ / ÇIXIŞ =================
@@ -134,10 +135,10 @@ namespace DoctorEngineApp.Controllers.Api.V1
         [AllowAnonymous]   // limitsiz: refresh token 256-bit təsadüfidir (təxmin oluna bilməz), tətbiq onu avtomatik çağırır
         public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshRequest request)
         {
-            if (!_jwt.IsConfigured) return Error(503, "Tətbiq girişi serverdə hələ ayarlanmayıb.");
+            if (!_jwt.IsConfigured) return Error(503, L.T("Tətbiq girişi serverdə hələ ayarlanmayıb."));
             var response = await _tokens.RefreshAsync(request.RefreshToken, request.DeviceName);
             return response == null
-                ? Error(401, "Sessiyanın vaxtı bitib. Yenidən daxil olun.")
+                ? Error(401, L.T("Sessiyanın vaxtı bitib. Yenidən daxil olun."))
                 : Ok(response);
         }
 
@@ -156,7 +157,7 @@ namespace DoctorEngineApp.Controllers.Api.V1
         public async Task<ActionResult<UserDto>> Me()
         {
             var user = await _users.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "");
-            if (user == null) return Error(401, "İstifadəçi tapılmadı.");
+            if (user == null) return Error(401, L.T("İstifadəçi tapılmadı."));
             return Ok(TokenService.ToDto(user, await _users.GetRolesAsync(user)));
         }
 
@@ -168,19 +169,19 @@ namespace DoctorEngineApp.Controllers.Api.V1
         public async Task<ActionResult<MessageResponse>> ForgotPassword([FromBody] ForgotPasswordRequest request)
         {
             // Cavab həmişə eynidir: hansı emailin qeydiyyatda olduğunu bildirmirik
-            const string generic = "Əgər bu email qeydiyyatdadırsa, şifrə yeniləmə linki göndərildi.";
+            var generic = L.T("Əgər bu email qeydiyyatdadırsa, şifrə yeniləmə linki göndərildi.");
             var user = string.IsNullOrWhiteSpace(request.Email) ? null : await _users.FindByEmailAsync(request.Email.Trim());
             if (user == null || !await _users.IsEmailConfirmedAsync(user))
                 return Ok(new MessageResponse(generic));
 
             var token = await _users.GeneratePasswordResetTokenAsync(user);
             var url = Url.Action("ResetPassword", "Account", new { email = user.Email, token }, Request.Scheme);
-            var html = "<h3>Şifrəni yenilə</h3>" +
-                       "<p>Yeni şifrə təyin etmək üçün aşağıdakı linkə klik edin:</p>" +
-                       $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">Şifrəni dəyiş</a>";
+            var html = $"<h3>{L.T("Şifrəni yenilə")}</h3>" +
+                       $"<p>{L.T("Yeni şifrə təyin etmək üçün aşağıdakı linkə klik edin:")}</p>" +
+                       $"<a href=\"{HtmlEncoder.Default.Encode(url ?? string.Empty)}\">{L.T("Şifrəni dəyiş")}</a>";
 
-            if (!await TrySendAsync(user.Email!, "Şifrənin yenilənməsi", html))
-                return Error(503, "Məktub göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin.");
+            if (!await TrySendAsync(user.Email!, L.T("Şifrənin yenilənməsi"), html))
+                return Error(503, L.T("Məktub göndərilmədi — email xidməti müvəqqəti işləmir. Bir azdan yenidən cəhd edin."));
             return Ok(new MessageResponse(generic));
         }
 

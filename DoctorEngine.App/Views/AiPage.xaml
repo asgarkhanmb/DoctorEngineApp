@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
              xmlns:v="clr-namespace:DoctorEngine.App.Views"
@@ -8,7 +9,7 @@
              Shell.NavBarIsVisible="False"
              Shell.TabBarIsVisible="False"
              SafeAreaEdges="All"
-             Title="AI köməkçi">
+             Title="{l:Tr ai_title}">
 
     <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{AppThemeBinding Light=#F3F1FB, Dark={StaticResource BackgroundDark}}">
 
@@ -23,11 +24,11 @@
                     <Image Source="ic_spark_w.png" />
                 </Border>
                 <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
-                    <Label Text="AI köməkçi" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
-                    <Label Text="İlkin məsləhət · 24/7" TextColor="{StaticResource OnHeaderMuted}" FontSize="12" />
+                    <Label Text="{l:Tr ai_title}" TextColor="White" FontFamily="BarlowBold" FontSize="19" />
+                    <Label Text="{l:Tr ai_subtitle}" TextColor="{StaticResource OnHeaderMuted}" FontSize="12" />
                 </VerticalStackLayout>
                 <Border Grid.Column="3" Style="{StaticResource Pill}" BackgroundColor="{StaticResource Glass}" VerticalOptions="Center" v:Motion.Press="True">
-                    <Label Text="Təmizlə" TextColor="White" FontFamily="BarlowSemiBold" FontSize="13" />
+                    <Label Text="{l:Tr ai_clear}" TextColor="White" FontFamily="BarlowSemiBold" FontSize="13" />
                     <Border.GestureRecognizers><TapGestureRecognizer Command="{Binding ClearCommand}" /></Border.GestureRecognizers>
                 </Border>
             </Grid>
@@ -40,7 +41,7 @@
             </CollectionView.Header>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:AiItem">
-                    <Grid Padding="12,5">
+                    <Grid v:Motion.Appear="True" Padding="12,5">
                         <!-- İstifadəçi -->
                         <Border IsVisible="{Binding IsUser}" HorizontalOptions="End" MaximumWidthRequest="320" Background="{StaticResource PrimaryGradient}"
                                 StrokeShape="RoundRectangle 20" StrokeThickness="0" Padding="14,10">
@@ -78,13 +79,13 @@
                         <Image Source="ic_spark_w.png" />
                     </Border>
                 </Grid>
-                <Label Text="Nə ilə kömək edə bilərəm?" Style="{StaticResource SectionTitle}" FontSize="23" HorizontalTextAlignment="Center" />
-                <Label Text="Mühərrik problemi barədə sual verin — AI ilkin məsləhət verir. Dəqiq diaqnostika üçün ustaya müraciət edin."
+                <Label Text="{l:Tr ai_empty_title}" Style="{StaticResource SectionTitle}" FontSize="23" HorizontalTextAlignment="Center" />
+                <Label Text="{l:Tr ai_empty_text}"
                        Style="{StaticResource Muted}" FontSize="15" HorizontalTextAlignment="Center" />
                 <VerticalStackLayout Spacing="10" Margin="0,8,0,0" BindableLayout.ItemsSource="{Binding Suggestions}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
-                            <Border Style="{StaticResource SoftCard}" Padding="14,12" StrokeShape="RoundRectangle 18" v:Motion.Press="True">
+                            <Border v:Motion.Appear="True" Style="{StaticResource SoftCard}" Padding="14,12" StrokeShape="RoundRectangle 18" v:Motion.Press="True">
                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                                     <Image Source="ic_spark_n.png" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
                                     <Label Grid.Column="1" Text="{Binding .}" FontSize="14" FontFamily="BarlowSemiBold" VerticalOptions="Center"
@@ -109,7 +110,7 @@
             </Border.Shadow>
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                 <Border StrokeShape="RoundRectangle 23" StrokeThickness="0" Padding="16,2" BackgroundColor="{AppThemeBinding Light=#F1F4FA, Dark=#202A44}">
-                    <Editor Text="{Binding Question}" Placeholder="Sualınızı yazın…" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
+                    <Editor Text="{Binding Question}" Placeholder="{l:Tr ai_placeholder}" AutoSize="TextChanges" MaxLength="1000" MinimumHeightRequest="44" MaximumHeightRequest="120" />
                 </Border>
                 <Grid Grid.Column="1" VerticalOptions="End">
                     <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource VioletTile}" Padding="13"

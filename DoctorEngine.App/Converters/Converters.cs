@@ -19,14 +19,14 @@ public class HasValueConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();
 }
 
-/// <summary>Rezervasiya statusu → Azərbaycan dilində mətn.</summary>
+/// <summary>Rezervasiya statusu → seçilmiş dildə mətn.</summary>
 public class StatusTextConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => (value as string) switch
     {
-        "Pending" => "Gözləyir",
-        "Confirmed" => "Təsdiqləndi",
-        "Rejected" => "Rədd edildi",
+        "Pending" => Localization.Lang.T("status_pending"),
+        "Confirmed" => Localization.Lang.T("status_confirmed"),
+        "Rejected" => Localization.Lang.T("status_rejected"),
         _ => value?.ToString() ?? ""
     };
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotSupportedException();

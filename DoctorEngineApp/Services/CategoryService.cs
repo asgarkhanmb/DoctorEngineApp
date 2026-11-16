@@ -1,5 +1,6 @@
 ﻿using DoctorEngineApp.ViewModels.Services;
 using DoctorEngineApp.Data;
+using DoctorEngineApp.Helpers;
 using DoctorEngineApp.Models;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels.Categories;
@@ -101,7 +102,7 @@ namespace DoctorEngineApp.Services
             var entity = new ServiceCategory
             {
                 Name = vm.Name.Trim(),
-                Icon = vm.IconFile != null ? await SaveFileAsync(vm.IconFile, IconFolder) : ""
+                Icon = await SaveIconAsync(vm.IconFile, vm.PresetIcon) ?? ""
             };
 
             if (vm.VideoFile != null)
@@ -129,10 +130,11 @@ namespace DoctorEngineApp.Services
 
             // --- Ad və ikon ---
             entity.Name = vm.Name.Trim();
-            if (vm.IconFile != null)
+            var newIcon = await SaveIconAsync(vm.IconFile, vm.PresetIcon);
+            if (newIcon != null)
             {
                 if (!string.IsNullOrEmpty(entity.Icon)) oldFiles.Add(Path.Combine(IconFolder, entity.Icon));
-                entity.Icon = await SaveFileAsync(vm.IconFile, IconFolder);
+                entity.Icon = newIcon;
             }
 
             // --- Video (əsas = ən köhnə qeyd) ---
@@ -187,6 +189,29 @@ namespace DoctorEngineApp.Services
         }
 
         // ================= FAYLLAR =================
+
+        /// <summary>
+        /// Yüklənmiş fayl varsa onu, yoxsa seçilmiş hazır ikonu uploads/categories-ə saxlayır.
+        /// Hazır ikon kopyalanır ki, kateqoriya silinəndə/dəyişəndə orijinal toxunulmaz qalsın.
+        /// Heç biri yoxdursa null qaytarır.
+        /// </summary>
+        private async Task<string?> SaveIconAsync(IFormFile? file, string? preset)
+        {
+            if (file != null) return await SaveFileAsync(file, IconFolder);
+            if (!CategoryIconPresets.IsValid(preset)) return null;
+
+            var source = Path.Combine(_env.WebRootPath, CategoryIconPresets.WebFolder, preset + ".png");
+            if (!File.Exists(source))
+            {
+                _logger.LogWarning("Hazır ikon faylı tapılmadı: {Path}", source);
+                return null;
+            }
+
+            Directory.CreateDirectory(IconFolder);
+            var name = Guid.NewGuid() + ".png";
+            File.Copy(source, Path.Combine(IconFolder, name));
+            return name;
+        }
 
         private static async Task<string> SaveFileAsync(IFormFile file, string folder)
         {

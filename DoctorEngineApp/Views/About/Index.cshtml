@@ -25,9 +25,9 @@
         <section class="ab-why">
             <div class="container">
                 <div class="sv-head wow fadeInUp" data-wow-delay="0.1s">
-                    <span class="sv-eyebrow">Niyə biz?</span>
-                    <h2>Üstünlüklərimiz</h2>
-                    <p>Avtomobilinizi etibar edə biləcəyiniz səbəblər.</p>
+                    <span class="sv-eyebrow">@L.T("Niyə biz?")</span>
+                    <h2>@L.T("Üstünlüklərimiz")</h2>
+                    <p>@L.T("Avtomobilinizi etibar edə biləcəyiniz səbəblər.")</p>
                 </div>
 
                 <div class="ab-why__grid">
@@ -35,7 +35,7 @@
                     {
                         var inf = informs[i];
                         // Təsvir admin paneldə vergüllə yazılır: "Peşəkar baxım,Etibarlı nəticə" → siyahı
-                        var points = (inf.Description ?? "")
+                        var points = L.T(inf.Description)
                             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
                         <article class="ab-why__card wow fadeInUp" data-wow-delay="@($"{i * 0.1 + 0.1:0.0}s")">
@@ -46,7 +46,7 @@
                                 }
                                 <span class="ab-why__num" aria-hidden="true">0@(i + 1)</span>
                             </div>
-                            <h3>@inf.Title</h3>
+                            <h3>@L.T(inf.Title)</h3>
                             @if (points.Length > 1)
                             {
                                 <ul>
@@ -58,7 +58,7 @@
                             }
                             else
                             {
-                                <p>@inf.Description</p>
+                                <p>@L.T(inf.Description)</p>
                             }
                         </article>
                     }
@@ -74,16 +74,16 @@
     <section class="container sv-cta-wrap ab-cta-wrap">
         <div class="sv-cta wow fadeInUp" data-wow-delay="0.1s">
             <div>
-                <h2>Mühərrikinizlə bağlı sualınız var?</h2>
-                <p>Bizə zəng edin, usta ilə yazışın və ya elə indi rezervasiya edin — vaxtınıza qənaət edin.</p>
+                <h2>@L.T("Mühərrikinizlə bağlı sualınız var?")</h2>
+                <p>@L.T("Bizə zəng edin, usta ilə yazışın və ya elə indi rezervasiya edin — vaxtınıza qənaət edin.")</p>
             </div>
             <div class="sv-cta__actions">
-                <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--primary sv-btn--lg">Rezervasiya et <i class="fa-solid fa-arrow-right"></i></a>
+                <a asp-controller="Reservation" asp-action="Index" class="sv-btn sv-btn--primary sv-btn--lg">@L.T("Rezervasiya et") <i class="fa-solid fa-arrow-right"></i></a>
                 @if (telHref != null)
                 {
-                    <a href="@telHref" class="sv-btn sv-btn--light sv-btn--lg"><i class="fa-solid fa-phone"></i> Zəng et</a>
+                    <a href="@telHref" class="sv-btn sv-btn--light sv-btn--lg"><i class="fa-solid fa-phone"></i> @L.T("Zəng et")</a>
                 }
-                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--light sv-btn--lg"><i class="fa-regular fa-comments"></i> Usta ilə çat</a>
+                <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="sv-btn sv-btn--light sv-btn--lg"><i class="fa-regular fa-comments"></i> @L.T("Usta ilə çat")</a>
             </div>
         </div>
     </section>

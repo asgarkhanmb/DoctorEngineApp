@@ -86,12 +86,12 @@
     /** Fayl uyğundursa null, deyilsə xəta mətni qaytarır. */
     function validateFile(file) {
         const kind = fileKind(file);
-        if (!kind) return "Yalnız şəkil (jpg, png, webp) və ya video (mp4, webm, mov) göndərilə bilər.";
+        if (!kind) return deT("Yalnız şəkil (jpg, png, webp) və ya video (mp4, webm, mov) göndərilə bilər.");
         const max = kind === "image" ? cfg.maxImageBytes : cfg.maxVideoBytes;
         if (file.size > max) {
-            return (kind === "image" ? "Şəkil" : "Video") + " maksimum " + Math.round(max / 1024 / 1024) + " MB ola bilər.";
+            return deT("{0} maksimum {1} MB ola bilər.", kind === "image" ? deT("Şəkil") : deT("Video"), Math.round(max / 1024 / 1024));
         }
-        if (file.size === 0) return "Fayl boşdur.";
+        if (file.size === 0) return deT("Fayl boşdur.");
         return null;
     }
 
@@ -112,8 +112,8 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const diff = Math.round((today - date) / 86400000);
-        if (diff === 0) return "Bu gün";
-        if (diff === 1) return "Dünən";
+        if (diff === 0) return deT("Bu gün");
+        if (diff === 1) return deT("Dünən");
         const months = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avqust", "sentyabr", "oktyabr", "noyabr", "dekabr"];
         return d + " " + months[m - 1] + (y !== today.getFullYear() ? " " + y : "");
     }
@@ -174,10 +174,10 @@
             const first = Object.values(data.errors).flat()[0];
             if (first) return first;
         }
-        if (status === 413) return "Fayl çox böyükdür.";
-        if (status === 404) return "Mesaj tapılmadı (silinmiş ola bilər).";
-        if (status === 400) return "Sorğu qəbul olunmadı. Səhifəni yeniləyib yenidən cəhd edin.";
-        return "Xəta baş verdi. Yenidən cəhd edin.";
+        if (status === 413) return deT("Fayl çox böyükdür.");
+        if (status === 404) return deT("Mesaj tapılmadı (silinmiş ola bilər).");
+        if (status === 400) return deT("Sorğu qəbul olunmadı. Səhifəni yeniləyib yenidən cəhd edin.");
+        return deT("Xəta baş verdi. Yenidən cəhd edin.");
     }
 
     /**
@@ -205,7 +205,7 @@
                 const ok = xhr.status >= 200 && xhr.status < 300;
                 resolve({ ok, data: xhr.response, error: ok ? null : errorFromResponse(xhr.status, xhr.response) });
             };
-            xhr.onerror = () => resolve({ ok: false, error: "Şəbəkə xətası. İnternet bağlantınızı yoxlayın." });
+            xhr.onerror = () => resolve({ ok: false, error: deT("Şəbəkə xətası. İnternet bağlantınızı yoxlayın.") });
             xhr.send(formData || null);
         });
     }
@@ -222,7 +222,7 @@
         if (dto.attachmentType === "image") {
             const img = document.createElement("img");
             img.src = dto.attachmentUrl;
-            img.alt = "Şəkil";
+            img.alt = deT("Şəkil");
             img.loading = "lazy";
             img.addEventListener("click", () => openLightbox(dto.attachmentUrl));
             img.addEventListener("load", keepBottomOnMediaLoad, { once: true });
@@ -358,14 +358,14 @@
 
         const playBtn = el("button", "dc-voice__play");
         playBtn.type = "button";
-        playBtn.setAttribute("aria-label", "Səs mesajını oynat");
+        playBtn.setAttribute("aria-label", deT("Səs mesajını oynat"));
         const playIcon = icon("fa-solid fa-play");
         playBtn.appendChild(playIcon);
 
         const main = el("div", "dc-voice__main");
         const track = el("div", "dc-voice__track");
         track.setAttribute("role", "slider");
-        track.setAttribute("aria-label", "Səs mesajı");
+        track.setAttribute("aria-label", deT("Səs mesajı"));
         track.tabIndex = 0;
         const bars = seededPeaks(dto.id).map((h) => {
             const b = el("span", "dc-voice__bar");
@@ -378,7 +378,7 @@
         const timeEl = el("span", "dc-voice__time", "0:00");
         const speedBtn = el("button", "dc-voice__speed", "1×");
         speedBtn.type = "button";
-        speedBtn.title = "Oxutma sürəti";
+        speedBtn.title = deT("Oxutma sürəti");
         info.append(timeEl, speedBtn);
         main.append(track, info);
 
@@ -438,12 +438,12 @@
             if (currentVoice && currentVoice !== audio) currentVoice.pause();
             currentVoice = audio;
             playIcon.className = "fa-solid fa-pause";
-            playBtn.setAttribute("aria-label", "Fasilə");
+            playBtn.setAttribute("aria-label", deT("Fasilə"));
             wrap.classList.add("is-playing");
         });
         audio.addEventListener("pause", () => {
             playIcon.className = "fa-solid fa-play";
-            playBtn.setAttribute("aria-label", "Səs mesajını oynat");
+            playBtn.setAttribute("aria-label", deT("Səs mesajını oynat"));
             wrap.classList.remove("is-playing");
         });
         audio.addEventListener("ended", () => {
@@ -452,7 +452,7 @@
         });
         audio.addEventListener("error", () => {
             wrap.classList.add("is-error");
-            timeEl.textContent = "Fayl açılmadı";
+            timeEl.textContent = deT("Fayl açılmadı");
         });
 
         playBtn.addEventListener("click", async () => {
@@ -539,7 +539,7 @@
         if (dto.isAdmin) {
             const badge = el("span", "dc-badge");
             badge.appendChild(icon("fa-solid fa-screwdriver-wrench"));
-            badge.appendChild(document.createTextNode("Usta"));
+            badge.appendChild(document.createTextNode(deT("Usta")));
             name.appendChild(badge);
         }
         content.appendChild(name);
@@ -566,7 +566,7 @@
         }
 
         const meta = el("div", "dc-msg__meta");
-        if (dto.isEdited) meta.appendChild(el("span", null, "redaktə olunub"));
+        if (dto.isEdited) meta.appendChild(el("span", null, deT("redaktə olunub")));
         const time = el("time", null, dto.time);
         time.dateTime = dto.date + "T" + dto.time;
         meta.appendChild(time);
@@ -584,8 +584,8 @@
             if (canEdit) {
                 const editBtn = el("button", "dc-msg__action");
                 editBtn.type = "button";
-                editBtn.title = "Redaktə et";
-                editBtn.setAttribute("aria-label", "Redaktə et");
+                editBtn.title = deT("Redaktə et");
+                editBtn.setAttribute("aria-label", deT("Redaktə et"));
                 editBtn.appendChild(icon("fa-solid fa-pen"));
                 editBtn.addEventListener("click", () => startEdit(dto.id));
                 actions.appendChild(editBtn);
@@ -593,8 +593,8 @@
             if (canDelete) {
                 const delBtn = el("button", "dc-msg__action is-danger");
                 delBtn.type = "button";
-                delBtn.title = "Sil";
-                delBtn.setAttribute("aria-label", "Sil");
+                delBtn.title = deT("Sil");
+                delBtn.setAttribute("aria-label", deT("Sil"));
                 delBtn.appendChild(icon("fa-solid fa-trash"));
                 delBtn.addEventListener("click", () => deleteMessage(dto.id));
                 actions.appendChild(delBtn);
@@ -682,7 +682,7 @@
         } catch (e) {
             console.error(e);
             emptyEl.hidden = false;
-            emptyEl.querySelector("p").textContent = "Mesajları yükləmək mümkün olmadı. Səhifəni yeniləyin.";
+            emptyEl.querySelector("p").textContent = deT("Mesajları yükləmək mümkün olmadı. Səhifəni yeniləyin.");
         } finally {
             loadingEl.hidden = true;
         }
@@ -703,7 +703,7 @@
             body.scrollTop = body.scrollHeight - prevHeight;
             body.style.scrollBehavior = "";
         } catch (e) {
-            showError("Köhnə mesajlar yüklənmədi.");
+            showError(deT("Köhnə mesajlar yüklənmədi."));
         } finally {
             moreBtn.disabled = false;
         }
@@ -817,7 +817,7 @@
     function renderSoundBtn() {
         if (!soundBtn) return;
         soundBtn.querySelector("i").className = soundMuted ? "fa-solid fa-bell-slash" : "fa-solid fa-bell";
-        const label = soundMuted ? "Bildiriş səsini aç" : "Bildiriş səsini söndür";
+        const label = soundMuted ? deT("Bildiriş səsini aç") : deT("Bildiriş səsini söndür");
         soundBtn.title = label;
         soundBtn.setAttribute("aria-label", label);
         soundBtn.setAttribute("aria-pressed", String(soundMuted));
@@ -858,7 +858,7 @@
             if (perm !== "granted") {
                 pushActive = false;
                 if (perm === "denied" && askPermission) {
-                    showError("Bildirişlər brauzerdə bloklanıb. Ünvan sətrindəki kilid işarəsindən icazə verin.");
+                    showError(deT("Bildirişlər brauzerdə bloklanıb. Ünvan sətrindəki kilid işarəsindən icazə verin."));
                 }
                 return false;
             }
@@ -990,9 +990,9 @@
             setUnread(unread + 1, {
                 userName: dto.userName,
                 isAdmin: !!dto.isAdmin,
-                text: dto.message || (dto.attachmentType === "audio" ? "🎤 Səs mesajı"
-                    : dto.attachmentType === "video" ? "🎬 Video"
-                    : dto.attachmentType === "image" ? "📷 Şəkil" : "")
+                text: dto.message || (dto.attachmentType === "audio" ? deT("🎤 Səs mesajı")
+                    : dto.attachmentType === "video" ? "🎬 " + deT("Video")
+                    : dto.attachmentType === "image" ? deT("📷 Şəkil") : "")
             });
         }
     });
@@ -1005,23 +1005,23 @@
 
     connection.on("DeleteMessage", (id) => removeMessage(id));
 
-    connection.onreconnecting(() => setStatus("connecting", "Yenidən qoşulur…"));
+    connection.onreconnecting(() => setStatus("connecting", deT("Yenidən qoşulur…")));
     connection.onreconnected(() => {
-        setStatus("online", "Onlayn");
+        setStatus("online", deT("Onlayn"));
         if (loaded) resync();
         refreshUnread();
     });
     connection.onclose(() => {
-        setStatus("offline", "Bağlantı kəsildi");
+        setStatus("offline", deT("Bağlantı kəsildi"));
         setTimeout(startConnection, 5000);
     });
 
     async function startConnection() {
         try {
             await connection.start();
-            setStatus("online", "Onlayn");
+            setStatus("online", deT("Onlayn"));
         } catch (e) {
-            setStatus("offline", "Bağlantı yoxdur");
+            setStatus("offline", deT("Bağlantı yoxdur"));
             setTimeout(startConnection, 5000);
         }
     }
@@ -1147,8 +1147,8 @@
         } catch (e) {
             if (rec === me) { rec = null; recBar.hidden = true; recBar.classList.remove("is-starting"); rowEl.hidden = false; updateSendState(); }
             showError(e && e.name === "NotAllowedError"
-                ? "Mikrofona icazə verilmədi. Brauzerin ünvan sətrindəki kilid işarəsindən icazə verin."
-                : "Mikrofon tapılmadı və ya istifadə olunur.");
+                ? deT("Mikrofona icazə verilmədi. Brauzerin ünvan sətrindəki kilid işarəsindən icazə verin.")
+                : deT("Mikrofon tapılmadı və ya istifadə olunur."));
             return;
         }
 
@@ -1168,7 +1168,7 @@
         } catch (e) {
             stream.getTracks().forEach((t) => t.stop());
             rec = null; recBar.hidden = true; recBar.classList.remove("is-starting"); rowEl.hidden = false; updateSendState();
-            showError("Brauzeriniz səs yazmanı dəstəkləmir.");
+            showError(deT("Brauzeriniz səs yazmanı dəstəkləmir."));
             return;
         }
 
@@ -1252,11 +1252,11 @@
         cleanupRecording();
 
         if (ms < 1000 || blob.size === 0) {
-            showError("Səs mesajı çox qısadır.");
+            showError(deT("Səs mesajı çox qısadır."));
             return;
         }
         if (blob.size > cfg.maxAudioBytes) {
-            showError("Səs mesajı maksimum " + Math.round(cfg.maxAudioBytes / 1024 / 1024) + " MB ola bilər.");
+            showError(deT("{0} maksimum {1} MB ola bilər.", deT("Səs mesajı"), Math.round(cfg.maxAudioBytes / 1024 / 1024)));
             return;
         }
 
@@ -1336,7 +1336,7 @@
 
         previewEl.querySelector(".dc-chat__preview-name").textContent = file.name;
         previewEl.querySelector(".dc-chat__preview-size").textContent =
-            (fileKind(file) === "image" ? "Şəkil" : "Video") + " · " + formatSize(file.size);
+            (fileKind(file) === "image" ? deT("Şəkil") : deT("Video")) + " · " + formatSize(file.size);
         previewEl.hidden = false;
         updateSendState();
         input.focus();
@@ -1358,7 +1358,7 @@
         if (!text && !pendingFile) return;
 
         if (text.length > cfg.maxLength) {
-            showError("Mesaj maksimum " + cfg.maxLength + " simvol ola bilər.");
+            showError(deT("Mesaj maksimum {0} simvol ola bilər.", cfg.maxLength));
             return;
         }
 
@@ -1484,7 +1484,7 @@
         const textarea = document.createElement("textarea");
         textarea.maxLength = cfg.maxLength;
         textarea.value = dto.message || "";
-        textarea.placeholder = "Mesaj…";
+        textarea.placeholder = deT("Mesaj…");
         editor.appendChild(textarea);
 
         // Fayl sətri
@@ -1522,27 +1522,27 @@
                     v.muted = true;
                     thumb.appendChild(v);
                 }
-                label.textContent = "Yeni: " + newFile.name + " (" + formatSize(newFile.size) + ")";
+                label.textContent = deT("Yeni:") + " " + newFile.name + " (" + formatSize(newFile.size) + ")";
                 fileRow.hidden = false;
                 fileRow.classList.remove("is-removed");
-                changeText.textContent = "Başqa fayl";
+                changeText.textContent = deT("Başqa fayl");
                 removeBtn.hidden = false;
-                removeBtn.replaceChildren(icon("fa-solid fa-rotate-left"), document.createTextNode(" Ləğv et"));
+                removeBtn.replaceChildren(icon("fa-solid fa-rotate-left"), document.createTextNode(" " + deT("Ləğv et")));
             } else if (hasExisting) {
                 if (dto.attachmentType === "image") thumb.style.backgroundImage = 'url("' + dto.attachmentUrl + '")';
                 else thumb.appendChild(icon(dto.attachmentType === "audio" ? "fa-solid fa-microphone" : "fa-solid fa-film"));
-                const kindName = dto.attachmentType === "image" ? "Şəkil" : dto.attachmentType === "audio" ? "Səs mesajı" : "Video";
-                label.textContent = kindName + (removeAttachment ? " silinəcək" : "");
+                const kindName = dto.attachmentType === "image" ? deT("Şəkil") : dto.attachmentType === "audio" ? deT("Səs mesajı") : deT("Video");
+                label.textContent = removeAttachment ? deT("{0} silinəcək", kindName) : kindName;
                 fileRow.hidden = false;
                 fileRow.classList.toggle("is-removed", removeAttachment);
-                changeText.textContent = "Dəyiş";
+                changeText.textContent = deT("Dəyiş");
                 removeBtn.hidden = false;
                 removeBtn.replaceChildren(
                     icon(removeAttachment ? "fa-solid fa-rotate-left" : "fa-solid fa-trash"),
-                    document.createTextNode(removeAttachment ? " Geri qaytar" : " Faylı sil"));
+                    document.createTextNode(" " + (removeAttachment ? deT("Geri qaytar") : deT("Faylı sil"))));
             } else {
                 fileRow.hidden = true;
-                changeText.textContent = "Şəkil/video əlavə et";
+                changeText.textContent = deT("Şəkil/video əlavə et");
                 removeBtn.hidden = true;
             }
         }
@@ -1582,11 +1582,11 @@
         buttons.appendChild(fileBtns);
         buttons.appendChild(el("span", "spacer"));
 
-        const cancelBtn = el("button", "dc-btn", "Ləğv et");
+        const cancelBtn = el("button", "dc-btn", deT("Ləğv et"));
         cancelBtn.type = "button";
         const saveBtn = el("button", "dc-btn dc-btn--primary");
         saveBtn.type = "button";
-        saveBtn.append(icon("fa-solid fa-check"), document.createTextNode(" Yadda saxla"));
+        saveBtn.append(icon("fa-solid fa-check"), document.createTextNode(" " + deT("Yadda saxla")));
         buttons.append(cancelBtn, saveBtn);
 
         editor.appendChild(buttons);
@@ -1596,7 +1596,7 @@
             const text = textarea.value.trim();
             const willHaveFile = !!newFile || (!!dto.attachmentUrl && !removeAttachment);
             if (!text && !willHaveFile) {
-                errorBox.textContent = "Mesaj boş qala bilməz. Mətn yazın və ya fayl əlavə edin.";
+                errorBox.textContent = deT("Mesaj boş qala bilməz. Mətn yazın və ya fayl əlavə edin.");
                 errorBox.hidden = false;
                 return;
             }
@@ -1612,9 +1612,9 @@
 
             saveBtn.disabled = true;
             cancelBtn.disabled = true;
-            saveBtn.lastChild.textContent = newFile ? " Yüklənir… 0%" : " Saxlanılır…";
+            saveBtn.lastChild.textContent = " " + (newFile ? deT("Yüklənir… {0}%", 0) : deT("Saxlanılır…"));
 
-            const res = await post("/api/chat/edit", fd, newFile ? (p) => (saveBtn.lastChild.textContent = " Yüklənir… " + Math.round(p * 100) + "%") : null);
+            const res = await post("/api/chat/edit", fd, newFile ? (p) => (saveBtn.lastChild.textContent = " " + deT("Yüklənir… {0}%", Math.round(p * 100))) : null);
 
             if (res.ok && res.data) {
                 if (newFileUrl) URL.revokeObjectURL(newFileUrl);
@@ -1624,7 +1624,7 @@
             } else {
                 saveBtn.disabled = false;
                 cancelBtn.disabled = false;
-                saveBtn.lastChild.textContent = " Yadda saxla";
+                saveBtn.lastChild.textContent = " " + deT("Yadda saxla");
                 errorBox.textContent = res.error;
                 errorBox.hidden = false;
             }
@@ -1677,14 +1677,14 @@
         const ownMessage = dto.userName === cfg.currentUser;
         const ok = window.deUI
             ? await window.deUI.confirm({
-                title: "Mesaj silinsin?",
+                title: deT("Mesaj silinsin?"),
                 text: ownMessage
-                    ? "Mesaj hamı üçün silinəcək. Bu əməliyyat geri qaytarıla bilməz."
-                    : dto.userName + " istifadəçisinin mesajı admin olaraq silinəcək.",
-                okText: "Sil",
+                    ? deT("Mesaj hamı üçün silinəcək. Bu əməliyyat geri qaytarıla bilməz.")
+                    : deT("{0} istifadəçisinin mesajı admin olaraq silinəcək.", dto.userName),
+                okText: deT("Sil"),
                 danger: true
             })
-            : window.confirm("Bu mesaj silinsin?");
+            : window.confirm(deT("Bu mesaj silinsin?"));
         if (!ok) return;
 
         const node = list.querySelector('.dc-msg[data-id="' + id + '"]');

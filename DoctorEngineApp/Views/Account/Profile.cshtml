@@ -40,25 +40,25 @@
                 </div>
             </div>
 
-            <nav class="ds-nav" role="tablist" aria-label="Ayarlar bölmələri">
+            <nav class="ds-nav" role="tablist" aria-label="@L.T("Ayarlar bölmələri")">
                 <button type="button" class="ds-nav__item" role="tab" id="tab-profile" data-tab="profile" aria-controls="panel-profile" aria-selected="true">
                     <i class="fa-regular fa-user"></i>
-                    <span><b>Profil</b><small>Şəkil, ad, istifadəçi adı</small></span>
+                    <span><b>@L.T("Profil")</b><small>@L.T("Şəkil, ad, istifadəçi adı")</small></span>
                 </button>
                 <button type="button" class="ds-nav__item" role="tab" id="tab-email" data-tab="email" aria-controls="panel-email" aria-selected="false">
                     <i class="fa-regular fa-envelope"></i>
-                    <span><b>Email</b><small>Email ünvanının dəyişdirilməsi</small></span>
+                    <span><b>Email</b><small>@L.T("Email ünvanının dəyişdirilməsi")</small></span>
                 </button>
                 <button type="button" class="ds-nav__item" role="tab" id="tab-password" data-tab="password" aria-controls="panel-password" aria-selected="false">
                     <i class="fa-solid fa-shield-halved"></i>
-                    <span><b>Təhlükəsizlik</b><small>Şifrənin dəyişdirilməsi</small></span>
+                    <span><b>@L.T("Təhlükəsizlik")</b><small>@L.T("Şifrənin dəyişdirilməsi")</small></span>
                 </button>
             </nav>
 
             <form asp-action="Logout" asp-controller="Account" method="post" class="ds-logout">
                 <button type="submit" class="ds-nav__item is-danger">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    <span><b>Çıxış</b></span>
+                    <span><b>@L.T("Çıxış")</b></span>
                 </button>
             </form>
         </aside>
@@ -82,21 +82,21 @@
             <!-- ---------- PROFİL ---------- -->
             <section class="ds-panel" id="panel-profile" role="tabpanel" aria-labelledby="tab-profile">
                 <header class="ds-panel__head">
-                    <h2>Profil</h2>
-                    <p>Bu məlumatlar çatda və hesabınızda göstərilir.</p>
+                    <h2>@L.T("Profil")</h2>
+                    <p>@L.T("Bu məlumatlar çatda və hesabınızda göstərilir.")</p>
                 </header>
 
                 <!-- Şəkil -->
                 <div class="ds-row">
                     <div class="ds-row__label">
-                        <h3>Profil şəkli</h3>
-                        <p>JPG, PNG və ya WEBP, maksimum 5 MB.</p>
+                        <h3>@L.T("Profil şəkli")</h3>
+                        <p>@L.T("JPG, PNG və ya WEBP, maksimum 5 MB.")</p>
                     </div>
                     <div class="ds-row__control">
                         <div class="ds-photo">
                             @if (hasImage)
                             {
-                                <img class="ds-avatar ds-avatar--lg" src="~/uploads/avatars/@Model.ProfileImage" alt="Profil şəkli" />
+                                <img class="ds-avatar ds-avatar--lg" src="~/uploads/avatars/@Model.ProfileImage" alt="@L.T("Profil şəkli")" />
                             }
                             else
                             {
@@ -106,7 +106,7 @@
                             <div class="ds-photo__actions">
                                 <form asp-action="UploadAvatar" asp-controller="Account" method="post" enctype="multipart/form-data" id="avatarForm">
                                     <label class="ds-btn ds-btn--primary" for="avatarInput">
-                                        <i class="fa-solid fa-camera"></i> @(hasImage ? "Şəkli dəyiş" : "Şəkil yüklə")
+                                        <i class="fa-solid fa-camera"></i> @(hasImage ? L.T("Şəkli dəyiş") : L.T("Şəkil yüklə"))
                                     </label>
                                     <input type="file" name="photo" id="avatarInput" accept=".jpg,.jpeg,.png,.webp" class="visually-hidden" />
                                 </form>
@@ -114,7 +114,7 @@
                                 {
                                     <form asp-action="RemoveAvatar" asp-controller="Account" method="post">
                                         <button type="submit" class="ds-btn ds-btn--ghost">
-                                            <i class="fa-regular fa-trash-can"></i> Sil
+                                            <i class="fa-regular fa-trash-can"></i> @L.T("Sil")
                                         </button>
                                     </form>
                                 }
@@ -128,7 +128,7 @@
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Info.FullName"></label></h3>
-                            <p>Tam adınız.</p>
+                            <p>@L.T("Tam adınız.")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input">
@@ -142,7 +142,7 @@
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Info.UserName"></label></h3>
-                            <p>Latın hərfləri, rəqəm və . _ - (3–30 simvol).</p>
+                            <p>@L.T("Latın hərfləri, rəqəm və . _ - (3–30 simvol).")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input">
@@ -155,7 +155,7 @@
 
                     <footer class="ds-panel__foot">
                         <button type="submit" class="ds-btn ds-btn--primary">
-                            <i class="fa-solid fa-floppy-disk"></i> Yadda saxla
+                            <i class="fa-solid fa-floppy-disk"></i> @L.T("Yadda saxla")
                         </button>
                     </footer>
                 </form>
@@ -164,20 +164,20 @@
             <!-- ---------- EMAIL ---------- -->
             <section class="ds-panel" id="panel-email" role="tabpanel" aria-labelledby="tab-email" hidden>
                 <header class="ds-panel__head">
-                    <h2>Email ünvanı</h2>
-                    <p>Yeni ünvana təsdiq linki göndəriləcək. Email yalnız linkə klik etdikdən sonra dəyişəcək.</p>
+                    <h2>@L.T("Email ünvanı")</h2>
+                    <p>@L.T("Yeni ünvana təsdiq linki göndəriləcək. Email yalnız linkə klik etdikdən sonra dəyişəcək.")</p>
                 </header>
 
                 <div class="ds-row">
                     <div class="ds-row__label">
-                        <h3>Hazırkı email</h3>
-                        <p>Giriş və bildirişlər üçün.</p>
+                        <h3>@L.T("Hazırkı email")</h3>
+                        <p>@L.T("Giriş və bildirişlər üçün.")</p>
                     </div>
                     <div class="ds-row__control">
                         <div class="ds-current">
                             <i class="fa-regular fa-envelope"></i>
                             <span>@Model.CurrentEmail</span>
-                            <em class="ds-badge"><i class="fa-solid fa-check"></i> Təsdiqlənib</em>
+                            <em class="ds-badge"><i class="fa-solid fa-check"></i> @L.T("Təsdiqlənib")</em>
                         </div>
                     </div>
                 </div>
@@ -186,12 +186,12 @@
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Email.NewEmail"></label></h3>
-                            <p>Təsdiq linki bu ünvana gələcək.</p>
+                            <p>@L.T("Təsdiq linki bu ünvana gələcək.")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input">
                                 <i class="fa-regular fa-envelope"></i>
-                                <input asp-for="Email.NewEmail" type="email" autocomplete="email" placeholder="yeni@email.com" />
+                                <input asp-for="Email.NewEmail" type="email" autocomplete="email" placeholder="@L.T("yeni@email.com")" />
                             </div>
                             <span asp-validation-for="Email.NewEmail" class="ds-error"></span>
                         </div>
@@ -200,13 +200,13 @@
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Email.CurrentPassword"></label></h3>
-                            <p>Təhlükəsizlik üçün şifrənizi təsdiqləyin.</p>
+                            <p>@L.T("Təhlükəsizlik üçün şifrənizi təsdiqləyin.")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input ds-input--password">
                                 <i class="fa-solid fa-lock"></i>
                                 <input asp-for="Email.CurrentPassword" autocomplete="current-password" />
-                                <button type="button" class="ds-eye" aria-label="Şifrəni göstər"><i class="fa-regular fa-eye"></i></button>
+                                <button type="button" class="ds-eye" aria-label="@L.T("Şifrəni göstər")"><i class="fa-regular fa-eye"></i></button>
                             </div>
                             <span asp-validation-for="Email.CurrentPassword" class="ds-error"></span>
                         </div>
@@ -214,7 +214,7 @@
 
                     <footer class="ds-panel__foot">
                         <button type="submit" class="ds-btn ds-btn--primary">
-                            <i class="fa-regular fa-paper-plane"></i> Təsdiq linki göndər
+                            <i class="fa-regular fa-paper-plane"></i> @L.T("Təsdiq linki göndər")
                         </button>
                     </footer>
                 </form>
@@ -223,21 +223,21 @@
             <!-- ---------- ŞİFRƏ ---------- -->
             <section class="ds-panel" id="panel-password" role="tabpanel" aria-labelledby="tab-password" hidden>
                 <header class="ds-panel__head">
-                    <h2>Təhlükəsizlik</h2>
-                    <p>Güclü şifrə: böyük və kiçik hərf, rəqəm və xüsusi simvol.</p>
+                    <h2>@L.T("Təhlükəsizlik")</h2>
+                    <p>@L.T("Güclü şifrə: böyük və kiçik hərf, rəqəm və xüsusi simvol.")</p>
                 </header>
 
                 <form asp-action="ChangePassword" asp-controller="Account" method="post" novalidate>
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Password.CurrentPassword"></label></h3>
-                            <p>İndi istifadə etdiyiniz şifrə.</p>
+                            <p>@L.T("İndi istifadə etdiyiniz şifrə.")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input ds-input--password">
                                 <i class="fa-solid fa-lock"></i>
                                 <input asp-for="Password.CurrentPassword" autocomplete="current-password" />
-                                <button type="button" class="ds-eye" aria-label="Şifrəni göstər"><i class="fa-regular fa-eye"></i></button>
+                                <button type="button" class="ds-eye" aria-label="@L.T("Şifrəni göstər")"><i class="fa-regular fa-eye"></i></button>
                             </div>
                             <span asp-validation-for="Password.CurrentPassword" class="ds-error"></span>
                         </div>
@@ -246,17 +246,17 @@
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Password.NewPassword"></label></h3>
-                            <p>Minimum 6 simvol.</p>
+                            <p>@L.T("Minimum 6 simvol.")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input ds-input--password">
                                 <i class="fa-solid fa-key"></i>
                                 <input asp-for="Password.NewPassword" autocomplete="new-password" />
-                                <button type="button" class="ds-eye" aria-label="Şifrəni göstər"><i class="fa-regular fa-eye"></i></button>
+                                <button type="button" class="ds-eye" aria-label="@L.T("Şifrəni göstər")"><i class="fa-regular fa-eye"></i></button>
                             </div>
                             <span asp-validation-for="Password.NewPassword" class="ds-error"></span>
-                            <ul class="ds-rules" id="pwRules" aria-label="Şifrə tələbləri">
-                                <li data-rule="length">6+ simvol</li>
+                            <ul class="ds-rules" id="pwRules" aria-label="@L.T("Şifrə tələbləri")">
+                                <li data-rule="length">@L.T("6+ simvol")</li>
                                 <li data-rule="upper">A–Z</li>
                                 <li data-rule="lower">a–z</li>
                                 <li data-rule="digit">0–9</li>
@@ -268,13 +268,13 @@
                     <div class="ds-row">
                         <div class="ds-row__label">
                             <h3><label asp-for="Password.ConfirmPassword"></label></h3>
-                            <p>Yeni şifrəni təkrar yazın.</p>
+                            <p>@L.T("Yeni şifrəni təkrar yazın.")</p>
                         </div>
                         <div class="ds-row__control">
                             <div class="ds-input ds-input--password">
                                 <i class="fa-solid fa-key"></i>
                                 <input asp-for="Password.ConfirmPassword" autocomplete="new-password" />
-                                <button type="button" class="ds-eye" aria-label="Şifrəni göstər"><i class="fa-regular fa-eye"></i></button>
+                                <button type="button" class="ds-eye" aria-label="@L.T("Şifrəni göstər")"><i class="fa-regular fa-eye"></i></button>
                             </div>
                             <span asp-validation-for="Password.ConfirmPassword" class="ds-error"></span>
                         </div>
@@ -282,7 +282,7 @@
 
                     <footer class="ds-panel__foot">
                         <button type="submit" class="ds-btn ds-btn--primary">
-                            <i class="fa-solid fa-check"></i> Şifrəni yenilə
+                            <i class="fa-solid fa-check"></i> @L.T("Şifrəni yenilə")
                         </button>
                     </footer>
                 </form>
@@ -326,7 +326,7 @@
                     var hidden = input.type === 'password';
                     input.type = hidden ? 'text' : 'password';
                     btn.querySelector('i').className = hidden ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
-                    btn.setAttribute('aria-label', hidden ? 'Şifrəni gizlət' : 'Şifrəni göstər');
+                    btn.setAttribute('aria-label', hidden ? deT('Şifrəni gizlət') : deT('Şifrəni göstər'));
                 });
             });
 
@@ -355,7 +355,7 @@
                     var file = input.files && input.files[0];
                     if (!file) return;
                     if (file.size > 5 * 1024 * 1024) {
-                        if (window.deUI) window.deUI.toast('Şəkil ölçüsü maksimum 5 MB ola bilər.', 'error');
+                        if (window.deUI) window.deUI.toast(deT('Şəkil ölçüsü maksimum 5 MB ola bilər.'), 'error');
                         input.value = '';
                         return;
                     }

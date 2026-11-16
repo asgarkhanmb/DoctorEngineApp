@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DoctorEngine.App.Localization;
 using DoctorEngine.App.Services;
 using DoctorEngine.Contracts;
 
@@ -27,7 +28,8 @@ public partial class ChatViewModel : BaseViewModel
     [NotifyPropertyChangedFor(nameof(CanSend))]
     private string? text;
 
-    [ObservableProperty] private string status = "Qoşulur…";
+    private string _state = "connecting";
+    [ObservableProperty] private string status = Lang.T("chat_connecting");
     [ObservableProperty] private bool isOnline;
     [ObservableProperty] private bool isSending;
     [ObservableProperty] private bool isRecording;
@@ -56,7 +58,8 @@ public partial class ChatViewModel : BaseViewModel
         _chat.StateChanged += s =>
         {
             IsOnline = s == "online";
-            Status = s switch { "online" => "Onlayn", "connecting" => "Qoşulur…", _ => "Bağlantı yoxdur" };
+            _state = s;
+            UpdateStatus();
         };
         _auth.Changed += async (_, _) =>
         {
@@ -65,6 +68,19 @@ public partial class ChatViewModel : BaseViewModel
             if (!_auth.IsLoggedIn) { Messages.Clear(); await _chat.DisconnectAsync(); _connected = false; }
         };
         Messages.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
+    }
+
+    private void UpdateStatus() => Status = _state switch
+    {
+        "online" => Lang.T("chat_online"),
+        "connecting" => Lang.T("chat_connecting"),
+        _ => Lang.T("chat_offline")
+    };
+
+    protected override void OnLanguageChanged()
+    {
+        UpdateStatus();
+        foreach (var m in Messages) m.RefreshDateLabel();
     }
 
     /// <summary>Ekran açılanda: mesajları yüklə, canlı bağlantını qur, oxunmuş kimi qeyd et.</summary>
@@ -116,7 +132,7 @@ public partial class ChatViewModel : BaseViewModel
     {
         var msg = Text?.Trim();
         if (string.IsNullOrEmpty(msg) || IsSending) return;
-        if (msg.Length > ChatLimits.MaxMessageLength) { await Alert("Çox uzundur", $"Mesaj maksimum {ChatLimits.MaxMessageLength} simvol ola bilər."); return; }
+        if (msg.Length > ChatLimits.MaxMessageLength) { await Alert(Lang.T("chat_too_long_title"), Lang.T("chat_too_long", ChatLimits.MaxMessageLength)); return; }
 
         IsSending = true;
         try
@@ -134,22 +150,23 @@ public partial class ChatViewModel : BaseViewModel
             }
             Text = null;
         }
-        catch (ApiException ex) { await Alert("Göndərilmədi", ex.Message); }
+        catch (ApiException ex) { await Alert(Lang.T("chat_not_sent"), ex.Message); }
         finally { IsSending = false; OnPropertyChanged(nameof(CanSend)); }
     }
 
     [RelayCommand]
     private async Task Attach()
     {
-        var choice = await Shell.Current.DisplayActionSheetAsync("Fayl göndər", "Ləğv et", null,
-            "📷 Şəkil seç", "🎬 Video seç", "📸 Şəkil çək");
-        FileResult? file = choice switch
-        {
-            "📷 Şəkil seç" => (await MediaPicker.Default.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 }))?.FirstOrDefault(),
-            "🎬 Video seç" => (await MediaPicker.Default.PickVideosAsync(new MediaPickerOptions { SelectionLimit = 1 }))?.FirstOrDefault(),
-            "📸 Şəkil çək" => MediaPicker.Default.IsCaptureSupported ? await MediaPicker.Default.CapturePhotoAsync() : null,
-            _ => null
-        };
+        string pickPhoto = Lang.T("chat_pick_photo"), pickVideo = Lang.T("chat_pick_video"), takePhoto = Lang.T("chat_take_photo");
+        var choice = await Shell.Current.DisplayActionSheetAsync(Lang.T("chat_send_file"), Lang.T("common_cancel"), null,
+            pickPhoto, pickVideo, takePhoto);
+        FileResult? file = null;
+        if (choice == pickPhoto)
+            file = (await MediaPicker.Default.PickPhotosAsync(new MediaPickerOptions { SelectionLimit = 1 }))?.FirstOrDefault();
+        else if (choice == pickVideo)
+            file = (await MediaPicker.Default.PickVideosAsync(new MediaPickerOptions { SelectionLimit = 1 }))?.FirstOrDefault();
+        else if (choice == takePhoto && MediaPicker.Default.IsCaptureSupported)
+            file = await MediaPicker.Default.CapturePhotoAsync();
         if (file == null) return;
 
         var isVideo = file.ContentType?.StartsWith("video/") == true ||
@@ -158,7 +175,7 @@ public partial class ChatViewModel : BaseViewModel
         var max = isVideo ? ChatLimits.MaxVideoBytes : ChatLimits.MaxImageBytes;
         if (size > max)
         {
-            await Alert("Fayl çox böyükdür", $"{(isVideo ? "Video" : "Şəkil")} maksimum {max / 1024 / 1024} MB ola bilər.");
+            await Alert(Lang.T("chat_file_too_big_title"), Lang.T(isVideo ? "chat_video_max" : "chat_photo_max", max / 1024 / 1024));
             return;
         }
 
@@ -169,7 +186,7 @@ public partial class ChatViewModel : BaseViewModel
             Text = null;
             OnReceived(sent);
         }
-        catch (ApiException ex) { await Alert("Göndərilmədi", ex.Message); }
+        catch (ApiException ex) { await Alert(Lang.T("chat_not_sent"), ex.Message); }
         finally { IsSending = false; }
     }
 
@@ -182,7 +199,7 @@ public partial class ChatViewModel : BaseViewModel
 
         if (await Permissions.RequestAsync<Permissions.Microphone>() != PermissionStatus.Granted)
         {
-            await Alert("Mikrofon", "Səs mesajı üçün mikrofona icazə verin (Parametrlər → Tətbiqlər → DoctorEngine).");
+            await Alert(Lang.T("mic_title"), Lang.T("mic_permission"));
             return;
         }
         try
@@ -205,7 +222,7 @@ public partial class ChatViewModel : BaseViewModel
         catch (Exception ex)
         {
             IsRecording = false;
-            await Alert("Mikrofon", "Səs yazmaq mümkün olmadı: " + ex.Message);
+            await Alert(Lang.T("mic_title"), Lang.T("mic_failed", ex.Message));
         }
     }
 
@@ -229,13 +246,13 @@ public partial class ChatViewModel : BaseViewModel
         if (rec == null) return;
         try
         {
-            if (seconds < 1) { await Alert("Çox qısadır", "Səs mesajı ən azı 1 saniyə olmalıdır."); return; }
-            if (new FileInfo(rec.Path).Length > ChatLimits.MaxAudioBytes) { await Alert("Çox böyükdür", "Səs mesajı maksimum 16 MB ola bilər."); return; }
+            if (seconds < 1) { await Alert(Lang.T("voice_too_short_title"), Lang.T("voice_too_short")); return; }
+            if (new FileInfo(rec.Path).Length > ChatLimits.MaxAudioBytes) { await Alert(Lang.T("voice_too_big_title"), Lang.T("voice_too_big")); return; }
             IsSending = true;
             var sent = await _chat.SendAudioAsync(rec.Path, rec.ContentType);
             OnReceived(sent);
         }
-        catch (ApiException ex) { await Alert("Göndərilmədi", ex.Message); }
+        catch (ApiException ex) { await Alert(Lang.T("chat_not_sent"), ex.Message); }
         finally { IsSending = false; TryDelete(rec.Path); }
     }
 
@@ -264,29 +281,30 @@ public partial class ChatViewModel : BaseViewModel
     [RelayCommand]
     private async Task Options(ChatItem item)
     {
+        string edit = Lang.T("chat_edit"), delete = Lang.T("chat_delete"), copy = Lang.T("chat_copy");
         var actions = new List<string>();
-        if (item.IsMine && item.Text != null) actions.Add("✏️ Redaktə et");
-        if (item.IsMine || _auth.User?.IsAdmin == true) actions.Add("🗑 Sil");
-        if (item.Text != null) actions.Add("📋 Kopyala");
+        if (item.IsMine && item.Text != null) actions.Add(edit);
+        if (item.IsMine || _auth.User?.IsAdmin == true) actions.Add(delete);
+        if (item.Text != null) actions.Add(copy);
         if (actions.Count == 0) return;
 
-        var choice = await Shell.Current.DisplayActionSheetAsync(null, "Ləğv et", null, actions.ToArray());
-        switch (choice)
+        var choice = await Shell.Current.DisplayActionSheetAsync(null, Lang.T("common_cancel"), null, actions.ToArray());
+        if (choice == edit)
         {
-            case "✏️ Redaktə et":
-                Editing = item;
-                Text = item.Text;
-                break;
-            case "🗑 Sil":
-                if (!await Confirm("Mesaj silinsin?", item.IsMine
-                        ? "Mesaj hamı üçün silinəcək. Bu əməliyyat geri qaytarıla bilməz."
-                        : $"{item.UserName} istifadəçisinin mesajı admin olaraq silinəcək.", "Sil")) return;
-                try { await _chat.DeleteAsync(item.Id); Remove(item.Id); }
-                catch (ApiException ex) { await Alert("Silinmədi", ex.Message); }
-                break;
-            case "📋 Kopyala":
-                await Clipboard.Default.SetTextAsync(item.Text);
-                break;
+            Editing = item;
+            Text = item.Text;
+        }
+        else if (choice == delete)
+        {
+            if (!await Confirm(Lang.T("chat_delete_confirm_title"), item.IsMine
+                    ? Lang.T("chat_delete_confirm_mine")
+                    : Lang.T("chat_delete_confirm_admin", item.UserName), Lang.T("chat_delete_btn"))) return;
+            try { await _chat.DeleteAsync(item.Id); Remove(item.Id); }
+            catch (ApiException ex) { await Alert(Lang.T("chat_not_deleted"), ex.Message); }
+        }
+        else if (choice == copy)
+        {
+            await Clipboard.Default.SetTextAsync(item.Text);
         }
     }
 
@@ -381,7 +399,10 @@ public partial class ChatItem : ObservableObject
     public string? VideoUrl { get; }
     public string? AudioUrl { get; }
     public string Initial => string.IsNullOrEmpty(UserName) ? "?" : UserName[..1].ToUpperInvariant();
-    public string DateLabel { get; }
+    public string DateLabel => MakeDateLabel(Date);
+
+    /// <summary>Dil dəyişəndə tarix ayırıcısı ("Bu gün", "15 noyabr") yenidən yazılır.</summary>
+    public void RefreshDateLabel() => OnPropertyChanged(nameof(DateLabel));
 
     [ObservableProperty] private bool showName;
     [ObservableProperty] private bool showDate;
@@ -401,17 +422,15 @@ public partial class ChatItem : ObservableObject
         ImageUrl = m.AttachmentType == "image" ? url : null;
         VideoUrl = m.AttachmentType == "video" ? url : null;
         AudioUrl = m.AttachmentType == "audio" ? url : null;
-        DateLabel = MakeDateLabel(m.Date);
     }
 
     private static string MakeDateLabel(string iso)
     {
         if (!DateTime.TryParse(iso, out var d)) return iso;
         var today = DateTime.Today;
-        if (d.Date == today) return "Bu gün";
-        if (d.Date == today.AddDays(-1)) return "Dünən";
-        string[] months = { "yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avqust", "sentyabr", "oktyabr", "noyabr", "dekabr" };
-        return $"{d.Day} {months[d.Month - 1]}" + (d.Year != today.Year ? $" {d.Year}" : "");
+        if (d.Date == today) return Lang.T("day_today");
+        if (d.Date == today.AddDays(-1)) return Lang.T("day_yesterday");
+        return d.ToString(d.Year != today.Year ? "d MMMM yyyy" : "d MMMM", Lang.Current.Culture);
     }
 }
 

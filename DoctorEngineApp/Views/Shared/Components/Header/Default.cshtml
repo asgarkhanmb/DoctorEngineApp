@@ -1,4 +1,4 @@
-﻿@using DoctorEngineApp.Services.Interfaces
+@using DoctorEngineApp.Services.Interfaces
 @using Microsoft.AspNetCore.Mvc.Routing
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IWhatsappService WhatsAppService
@@ -15,10 +15,21 @@
     var site = await SiteSettings.GetAsync();
     var contact = await ContactInfo.GetFirstAsync();
     var phone = contact?.Phone;
+    var lang = L.Lang;
+    // motion.js canlı statusu bu mətnlərlə yazır ({0} — vaxt / dəqiqə)
+    var statusI18n = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        openSoon = L.T("status.openSoon"),
+        openUntil = L.T("status.openUntil"),
+        opensToday = L.T("status.opensToday"),
+        opensTomorrow = L.T("status.opensTomorrow"),
+        opensNext = L.T("status.opensNext"),
+        closed = L.T("status.closed")
+    });
 }
 
-<!-- Canlı məlumat zolağı: iş statusu (Bakı vaxtı ilə hər dəqiqə yenilənir), saatlar, telefon -->
-    <div class="de-topbar" data-de-hours data-weekdays="@contact?.Weekdays" data-weekend="@contact?.Weekend">
+<!-- Canlı məlumat zolağı: iş statusu (Bakı vaxtı ilə hər dəqiqə yenilənir), saatlar, dil, telefon -->
+    <div class="de-topbar" data-de-hours data-weekdays="@contact?.Weekdays" data-weekend="@contact?.Weekend" data-i18n="@statusI18n">
         <div class="de-topbar__inner">
             <span class="de-status" data-de-status hidden>
                 <span class="de-status__dot" aria-hidden="true"></span>
@@ -28,13 +39,35 @@
             {
                 <span class="de-topbar__item d-none d-md-inline-flex">
                     <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                    B.e–Cümə: @contact!.Weekdays @if (!string.IsNullOrWhiteSpace(contact.Weekend)) { <span>· Şənbə–Bazar: @contact.Weekend</span> }
+                    @L.T("topbar.weekdays"): @contact!.Weekdays @if (!string.IsNullOrWhiteSpace(contact.Weekend)) { <span>· @L.T("topbar.weekend"): @contact.Weekend</span> }
                 </span>
             }
             <span class="de-topbar__right">
                 <a asp-controller="Assistant" asp-action="Index" class="de-topbar__item d-none d-lg-inline-flex">
-                    <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI ilə sual ver
+                    <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> @L.T("topbar.askAi")
                 </a>
+
+                <!-- Dil seçimi: az / en / ru / tr -->
+                <span class="dropdown de-lang">
+                    <button type="button" class="de-topbar__item de-lang__btn" data-bs-toggle="dropdown" aria-expanded="false"
+                            aria-label="@L.T("lang.label"): @L.Languages.First(l => l.Code == lang).Name">
+                        <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                        <span>@lang.ToUpperInvariant()</span>
+                        <i class="fa-solid fa-chevron-down de-lang__caret" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end de-lang__menu">
+                        @foreach (var (code, name) in L.Languages)
+                        {
+                            <li>
+                                <a class="dropdown-item @(code == lang ? "active" : "")" lang="@code" hreflang="@code"
+                                   aria-current="@(code == lang ? "true" : null)"
+                                   asp-area="" asp-controller="Language" asp-action="Set" asp-route-lang="@code" asp-route-returnUrl="@returnUrl">
+                                    <span class="de-lang__code">@code.ToUpperInvariant()</span> @name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </span>
                 @if (!string.IsNullOrWhiteSpace(phone))
                 {
                     <a href="tel:@phone.Replace(" ", "")" class="de-topbar__item">
@@ -47,7 +80,7 @@
 
 <header class="s-header">
     <!-- Navbar Start -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0" aria-label="Əsas menyu">
+    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0" aria-label="@L.T("nav.main")">
         <a asp-controller="Home" asp-action="Index" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary">
                 <partial name="_BrandIcon" model="site" />@site.SiteName
@@ -56,19 +89,19 @@
 
         <!-- Mobile Toggle Button -->
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Menyunu aç">
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="@L.T("nav.toggle")">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto align-items-lg-center p-4 p-lg-0 pe-lg-5">
 
-                <a asp-controller="Home" asp-action="Index" class="nav-item nav-link @IsActive("Home")" aria-current="@AriaCurrent("Home")">Ana Səhifə</a>
-                <a asp-controller="About" asp-action="Index" class="nav-item nav-link @IsActive("About")" aria-current="@AriaCurrent("About")">Haqqımızda</a>
-                <a asp-controller="Service" asp-action="Index" class="nav-item nav-link @IsActive("Service")" aria-current="@AriaCurrent("Service")">Xidmətlər</a>
-                <a asp-controller="Reservation" asp-action="Index" class="nav-item nav-link @IsActive("Reservation")" aria-current="@AriaCurrent("Reservation")">Rezervasiya</a>
-                <a asp-controller="Contact" asp-action="Index" class="nav-item nav-link @IsActive("Contact", "Chat")" aria-current="@AriaCurrent("Contact", "Chat")">Əlaqə</a>
-                <a asp-controller="Assistant" asp-action="Index" class="nav-item nav-link de-nav-ai @IsActive("Assistant")" aria-current="@AriaCurrent("Assistant")"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> AI Köməkçi</a>
+                <a asp-controller="Home" asp-action="Index" class="nav-item nav-link @IsActive("Home")" aria-current="@AriaCurrent("Home")">@L.T("nav.home")</a>
+                <a asp-controller="About" asp-action="Index" class="nav-item nav-link @IsActive("About")" aria-current="@AriaCurrent("About")">@L.T("nav.about")</a>
+                <a asp-controller="Service" asp-action="Index" class="nav-item nav-link @IsActive("Service")" aria-current="@AriaCurrent("Service")">@L.T("nav.services")</a>
+                <a asp-controller="Reservation" asp-action="Index" class="nav-item nav-link @IsActive("Reservation")" aria-current="@AriaCurrent("Reservation")">@L.T("nav.reservation")</a>
+                <a asp-controller="Contact" asp-action="Index" class="nav-item nav-link @IsActive("Contact", "Chat")" aria-current="@AriaCurrent("Contact", "Chat")">@L.T("nav.contact")</a>
+                <a asp-controller="Assistant" asp-action="Index" class="nav-item nav-link de-nav-ai @IsActive("Assistant")" aria-current="@AriaCurrent("Assistant")"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> @L.T("nav.ai")</a>
 
                 <!-- İstifadəçi -->
                 <div class="de-user">
@@ -91,29 +124,29 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li class="de-dropdown-head">
                                     <strong>@userName</strong>
-                                    <small>@(User.IsInRole("Admin") ? "Administrator" : "İstifadəçi")</small>
+                                    <small>@(User.IsInRole("Admin") ? L.T("user.admin") : L.T("user.user"))</small>
                                 </li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
                                     <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">
-                                        <i class="fa-regular fa-id-card"></i> Profilim
+                                        <i class="fa-regular fa-id-card"></i> @L.T("user.profile")
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" asp-controller="Chat" asp-action="Index">
-                                        <i class="fa-regular fa-comments"></i> Canlı çat
+                                        <i class="fa-regular fa-comments"></i> @L.T("user.chat")
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" asp-controller="Reservation" asp-action="Index">
-                                        <i class="fa-regular fa-calendar-check"></i> Rezervasiya et
+                                        <i class="fa-regular fa-calendar-check"></i> @L.T("user.book")
                                     </a>
                                 </li>
                                 @if (User.IsInRole("Admin"))
                                 {
                                     <li>
                                         <a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                            <i class="fa-solid fa-gauge-high"></i> Admin Panel
+                                            <i class="fa-solid fa-gauge-high"></i> @L.T("user.adminPanel")
                                         </a>
                                     </li>
                                 }
@@ -121,7 +154,7 @@
                                 <li>
                                     <form method="post" asp-area="" asp-controller="Account" asp-action="Logout">
                                         <button type="submit" class="dropdown-item is-danger">
-                                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Çıxış
+                                            <i class="fa-solid fa-arrow-right-from-bracket"></i> @L.T("user.logout")
                                         </button>
                                     </form>
                                 </li>
@@ -130,8 +163,16 @@
                     }
                     else
                     {
-                        <a asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl" class="de-login-btn">
-                            <i class="fa-regular fa-user"></i> Daxil ol
+                        @* Böyük ekranda yalnız ikon (mətn ekran oxuyucusu və ipucu üçün qalır), mobil menyuda ikon + mətn *@
+                        <a asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl" class="de-login-btn"
+                           aria-label="@L.T("user.login")" title="@L.T("user.login")">
+                            @* Giriş ikonu: insan + içəri ox (öz SVG — currentColor, maska ilə kəsik) *@
+                            <svg class="de-login-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <defs><mask id="deLoginCut"><rect width="24" height="24" fill="#fff"/><path d="M10.8 16.8H18M16.3 11.6h2.9a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2h-2.9" fill="none" stroke="#000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>
+                            <g mask="url(#deLoginCut)" fill="currentColor"><circle cx="9.8" cy="6.4" r="4.7"/><path d="M1.6 20.9v-2.6c0-3 3.6-5 8.2-5 2.2 0 4.2.45 5.6 1.2V22H2.7a1.1 1.1 0 0 1-1.1-1.1z"/></g>
+                            <path d="M10.8 16.8H18M15.8 14.4l2.4 2.4-2.4 2.4M16.3 11.6h2.9a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2h-2.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span class="de-login-btn__text">@L.T("user.login")</span>
                         </a>
                     }
                 </div>
@@ -155,7 +196,7 @@
        class="whatsapp-btn"
        target="_blank"
        rel="noopener"
-       aria-label="WhatsApp ilə yazın">
+       aria-label="@L.T("wa.aria")">
         <i class="bi bi-whatsapp"></i>
     </a>
 }

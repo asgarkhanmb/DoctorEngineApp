@@ -1,4 +1,5 @@
-﻿using DoctorEngineApp.Data;
+﻿using DoctorEngineApp.Localization;
+using DoctorEngineApp.Data;
 using DoctorEngineApp.Services.Interfaces;
 using DoctorEngineApp.ViewModels;
 using DoctorEngineApp.ViewModels.Abouts;
@@ -114,7 +115,7 @@ namespace DoctorEngineApp.Controllers
                 return Json(new
                 {
                     success = false,
-                    message = firstError ?? "Bütün sahələri düzgün doldurun!"
+                    message = firstError ?? L.T("Bütün sahələri düzgün doldurun!")
                 });
             }
 
@@ -129,7 +130,7 @@ namespace DoctorEngineApp.Controllers
                 return Json(new
                 {
                     success = false,
-                    message = "Xəta baş verdi. Yenidən cəhd edin."
+                    message = L.T("Xəta baş verdi. Yenidən cəhd edin.")
                 });
             }
         }
