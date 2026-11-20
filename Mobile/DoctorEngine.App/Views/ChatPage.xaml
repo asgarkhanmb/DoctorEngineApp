@@ -1,0 +1,717 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- =====================================================
+     ŞƏXSİ ÇAT (WhatsApp üslubu)
+     Müştəri: öz yazışması. Usta: "Çatlar" siyahısı → müştərinin yazışması.
+     ===================================================== -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             x:Class="DoctorEngine.App.Views.ChatPage"
+             x:DataType="vm:ChatViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr tab_chat}">
+
+    <ContentPage.Resources>
+        <Color x:Key="WaTeal">#D81324</Color>
+        <Color x:Key="WaGreen">#D81324</Color>
+        <Color x:Key="WaBadge">#D81324</Color>
+        <Color x:Key="WaBlue">#53BDEB</Color>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{AppThemeBinding Light=#EFEAE2, Dark=#0B141A}">
+
+        <!-- ================= BAŞLIQ: YAZIŞMA ================= -->
+        <Grid IsVisible="{Binding ShowList, Converter={StaticResource InvertedBool}}"
+              BackgroundColor="{AppThemeBinding Light={StaticResource WaTeal}, Dark=#202C33}" Padding="6,10,8,10"
+              ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="4">
+            <!-- Geri (usta) -->
+            <Border Grid.Column="0" IsVisible="{Binding IsLoggedIn}" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                    BackgroundColor="Transparent" Padding="9" v:Motion.Press="True">
+                <Image Source="ic_back_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackToListCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+            <!-- Avatar -->
+            <Grid Grid.Column="1" WidthRequest="42" HeightRequest="42" Margin="4,0,0,0">
+                <Border StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#33FFFFFF">
+                    <Grid>
+                        <Image Source="ic_wrench_w.png" Margin="10" IsVisible="{Binding PeerShowsSupport}" />
+                        <Label Text="{Binding PeerInitial}" TextColor="White" FontFamily="BarlowBold" FontSize="18"
+                               HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding PeerShowsInitial}" />
+                        <Image Source="{Binding PeerAvatar}" Aspect="AspectFill" IsVisible="{Binding HasPeerAvatar}" BackgroundColor="White" />
+                        <Image Source="ic_users_w.png" Margin="10" IsVisible="{Binding PeerIsGroup}" />
+                    </Grid>
+                </Border>
+                <Ellipse Fill="{StaticResource WaBadge}" Stroke="{StaticResource WaTeal}" StrokeThickness="2" WidthRequest="13" HeightRequest="13"
+                         HorizontalOptions="End" VerticalOptions="End" IsVisible="{Binding PeerOnline}" />
+            </Grid>
+            <!-- Ad + vəziyyət -->
+            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GroupInfoCommand}" />
+                </VerticalStackLayout.GestureRecognizers>
+                <Label Text="{Binding PeerTitle}" TextColor="White" FontFamily="BarlowSemiBold" FontSize="17" LineBreakMode="TailTruncation" MaxLines="1" />
+                <Label Text="{Binding PeerStatus}" TextColor="#E6FFFFFF" FontSize="12.5" LineBreakMode="TailTruncation" MaxLines="1">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding PeerTyping}" Value="True">
+                            <Setter Property="FontAttributes" Value="Italic" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </VerticalStackLayout>
+            <!-- Video / səsli zəng -->
+            <Border Grid.Column="3" IsVisible="{Binding IsLoggedIn}" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                    BackgroundColor="Transparent" Padding="9" v:Motion.Press="True">
+                <Image Source="ic_video_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding VideoCallCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Border Grid.Column="4" IsVisible="{Binding IsLoggedIn}" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                    BackgroundColor="Transparent" Padding="10" v:Motion.Press="True">
+                <Image Source="ic_phonecall_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding AudioCallCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+            <!-- Axtarış -->
+            <Border Grid.Column="5" IsVisible="{Binding IsLoggedIn}" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                    BackgroundColor="Transparent" Padding="10" v:Motion.Press="True">
+                <Image Source="ic_search_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleSearchCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+        </Grid>
+
+        <!-- ================= BAŞLIQ: USTA — ÇATLAR ================= -->
+        <VerticalStackLayout IsVisible="{Binding ShowList}" BackgroundColor="{AppThemeBinding Light=White, Dark=#111B21}" Padding="16,14,16,8" Spacing="10">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="6">
+                <!-- Yeni çat: istifadəçinin adına toxun, yaz -->
+                <Border Grid.Column="4" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                        BackgroundColor="#D81324" v:Motion.Press="True">
+                    <Label Text="+" TextColor="White" FontFamily="BarlowBold" FontSize="26" Margin="0,-3,0,0"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NewChatCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Border Grid.Column="2" IsVisible="{Binding IsAdmin}" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                        BackgroundColor="#FDE2E4" Padding="10" v:Motion.Press="True">
+                    <Image Source="ic_users_r.png" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NewGroupCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Border Grid.Column="3" IsVisible="{Binding IsAdmin}" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                        BackgroundColor="#FDE2E4" Padding="10" v:Motion.Press="True">
+                    <Image Source="ic_megaphone_r.png" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BroadcastCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Label Text="{l:Tr chats_title}" FontFamily="BarlowBold" FontSize="24" TextColor="{AppThemeBinding Light={StaticResource WaTeal}, Dark=#E9EDEF}" />
+                <Border Grid.Column="1" IsVisible="{Binding HasTotalUnread}" StrokeShape="RoundRectangle 12" StrokeThickness="0"
+                        BackgroundColor="{StaticResource WaBadge}" Padding="8,2" VerticalOptions="Center">
+                    <Label Text="{Binding TotalUnread}" TextColor="White" FontFamily="BarlowBold" FontSize="13" />
+                </Border>
+            </Grid>
+            <Border StrokeShape="RoundRectangle 20" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}" Padding="12,0">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Image Source="ic_search_g.png" WidthRequest="18" HeightRequest="18" />
+                    <Entry Grid.Column="1" Text="{Binding ConversationFilter}" Placeholder="{l:Tr chats_search}" FontSize="15" />
+                </Grid>
+            </Border>
+            <HorizontalStackLayout Spacing="8">
+                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="14,6" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}">
+                    <Border.Triggers>
+                        <MultiTrigger TargetType="Border">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding UnreadOnly}" Value="False" />
+                                <BindingCondition Binding="{Binding GroupsOnly}" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFE4E6, Dark=#3B0D12}" />
+                        </MultiTrigger>
+                    </Border.Triggers>
+                    <Label Text="{l:Tr chats_all}" FontSize="14" FontFamily="BarlowSemiBold" TextColor="{AppThemeBinding Light=#54656F, Dark=#AEBAC1}" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SetFilterCommand}" CommandParameter="all" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="14,6" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding UnreadOnly}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFE4E6, Dark=#3B0D12}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="{l:Tr chats_unread}" FontSize="14" FontFamily="BarlowSemiBold" TextColor="{AppThemeBinding Light=#54656F, Dark=#AEBAC1}" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SetFilterCommand}" CommandParameter="unread" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Border StrokeShape="RoundRectangle 16" StrokeThickness="0" Padding="14,6" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}">
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding GroupsOnly}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFE4E6, Dark=#3B0D12}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Label Text="{l:Tr chats_groups}" FontSize="14" FontFamily="BarlowSemiBold" TextColor="{AppThemeBinding Light=#54656F, Dark=#AEBAC1}" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SetFilterCommand}" CommandParameter="groups" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <!-- ================= QONAQ ================= -->
+        <ScrollView Grid.Row="1" Grid.RowSpan="2" IsVisible="{Binding IsGuest}">
+            <VerticalStackLayout Padding="24,30,24,24" Spacing="16" VerticalOptions="Center">
+                <Grid HorizontalOptions="Center" WidthRequest="140" HeightRequest="140">
+                    <Ellipse Fill="{AppThemeBinding Light=#FFE4E6, Dark=#3B0D12}" />
+                    <Ellipse Fill="{AppThemeBinding Light=#FECDD3, Dark=#5A1219}" Margin="22" />
+                    <Border StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{StaticResource WaGreen}"
+                            WidthRequest="74" HeightRequest="74" Padding="20" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Image Source="ic_chat_w.png" />
+                    </Border>
+                </Grid>
+                <Label Text="{l:Tr chat_guest_title}" Style="{StaticResource SectionTitle}" FontSize="24" HorizontalTextAlignment="Center" />
+                <Label Text="{l:Tr chat_guest_text}" Style="{StaticResource Muted}" FontSize="15" HorizontalTextAlignment="Center" />
+
+                <VerticalStackLayout Spacing="10" Margin="0,6,0,6">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}" Padding="9">
+                            <Image Source="ic_attach_g.png" />
+                        </Border>
+                        <Label Grid.Column="1" Text="{l:Tr chat_feat_media}" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}" Padding="9">
+                            <Image Source="ic_mic_g.png" />
+                        </Border>
+                        <Label Grid.Column="1" Text="{l:Tr chat_feat_voice}" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}" Padding="9">
+                            <Image Source="ic_shield_g.png" />
+                        </Border>
+                        <Label Grid.Column="1" Text="{l:Tr chat_feat_private}" VerticalOptions="Center" FontFamily="BarlowSemiBold" />
+                    </Grid>
+                </VerticalStackLayout>
+
+                <Border StrokeShape="RoundRectangle 26" StrokeThickness="0" BackgroundColor="{StaticResource WaGreen}" HeightRequest="52" v:Motion.Press="True">
+                    <Label Text="{l:Tr chat_login_register}" TextColor="White" FontFamily="BarlowBold" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToLoginCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ================= USTA: YAZIŞMALAR SİYAHISI ================= -->
+        <CollectionView Grid.Row="1" Grid.RowSpan="2" IsVisible="{Binding ShowList}" ItemsSource="{Binding Conversations}" SelectionMode="None"
+                        BackgroundColor="{AppThemeBinding Light=White, Dark=#111B21}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="30,60" Spacing="10">
+                    <Image Source="ic_chat_g.png" WidthRequest="46" HeightRequest="46" />
+                    <Label Text="{l:Tr chats_empty}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ConversationItem">
+                    <SwipeView IsVisible="{Binding IsVisible}" Threshold="90" BackgroundColor="Transparent">
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Reveal">
+                                <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ClearConversationCommand, x:DataType=vm:ChatViewModel}"
+                                               CommandParameter="{Binding .}">
+                                    <Grid WidthRequest="88" BackgroundColor="#EA0038">
+                                        <Label Text="{l:Tr chat_clear_btn}" TextColor="White" FontFamily="BarlowSemiBold" FontSize="15"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Grid>
+                                </SwipeItemView>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="13" Padding="14,0,0,0"
+                          BackgroundColor="{AppThemeBinding Light=White, Dark=#111B21}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenConversationCommand, x:DataType=vm:ChatViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+                        <Grid WidthRequest="50" HeightRequest="50" VerticalOptions="Center">
+                            <Border StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#DFE5E7, Dark=#2A3942}">
+                                <Grid>
+                                    <Label Text="{Binding Initial}" FontFamily="BarlowBold" FontSize="20" TextColor="{AppThemeBinding Light=#54656F, Dark=#AEBAC1}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding ShowInitial}" />
+                                    <Image Source="ic_users_r.png" Margin="12" IsVisible="{Binding IsGroup}" />
+                                    <Image Source="ic_wrench_r.png" Margin="13">
+                                        <Image.Triggers>
+                                            <MultiTrigger TargetType="Image">
+                                                <MultiTrigger.Conditions>
+                                                    <BindingCondition Binding="{Binding IsSupport}" Value="True" />
+                                                    <BindingCondition Binding="{Binding HasAvatar}" Value="False" />
+                                                </MultiTrigger.Conditions>
+                                                <Setter Property="IsVisible" Value="True" />
+                                            </MultiTrigger>
+                                        </Image.Triggers>
+                                        <Image.IsVisible>False</Image.IsVisible>
+                                    </Image>
+                                    <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding HasAvatar}" />
+                                </Grid>
+                            </Border>
+                            <Ellipse Fill="{StaticResource WaBadge}" Stroke="White" StrokeThickness="2" WidthRequest="13" HeightRequest="13"
+                                     HorizontalOptions="End" VerticalOptions="End" IsVisible="{Binding Online}" />
+                        </Grid>
+                        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto" Padding="0,12,14,0" RowSpacing="3">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                <Label Text="{Binding Title}" FontSize="16.5" FontFamily="BarlowSemiBold" LineBreakMode="TailTruncation" MaxLines="1"
+                                       TextColor="{AppThemeBinding Light=#111B21, Dark=#E9EDEF}" />
+                                <Label Grid.Column="1" Text="{Binding TimeLabel}" FontSize="12" TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasUnread}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource WaBadge}" />
+                                            <Setter Property="FontAttributes" Value="Bold" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                            <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="4">
+                                <Label Text="{Binding Tick}" IsVisible="{Binding HasTick}" FontSize="13" TextColor="#8696A0" VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding TickRead}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource WaBlue}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Grid.Column="1" Text="{Binding SubtitleText}" FontSize="14" LineBreakMode="TailTruncation" MaxLines="1"
+                                       TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Typing}" Value="True">
+                                            <Setter Property="TextColor" Value="{StaticResource WaBadge}" />
+                                            <Setter Property="FontAttributes" Value="Italic" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Border Grid.Column="2" IsVisible="{Binding HasUnread}" StrokeShape="RoundRectangle 11" StrokeThickness="0"
+                                        BackgroundColor="{StaticResource WaBadge}" Padding="7,1" MinimumWidthRequest="22">
+                                    <Label Text="{Binding UnreadText}" TextColor="White" FontFamily="BarlowBold" FontSize="12" HorizontalOptions="Center" />
+                                </Border>
+                            </Grid>
+                            <BoxView Grid.Row="2" HeightRequest="1" Margin="0,9,0,0" Color="{AppThemeBinding Light=#F0F2F5, Dark=#222D34}" />
+                        </Grid>
+                    </Grid>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- ================= MESAJLAR ================= -->
+        <CollectionView x:Name="MessagesView" Grid.Row="1" ItemsSource="{Binding Messages}" IsVisible="{Binding ShowConversation}"
+                        SelectionMode="None" ItemsUpdatingScrollMode="KeepLastItemInView">
+            <CollectionView.Header>
+                <VerticalStackLayout Padding="0,10,0,4" Spacing="8">
+                    <Border HorizontalOptions="Center" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="12,6" Margin="24,0"
+                            BackgroundColor="{AppThemeBinding Light=#FFEECD, Dark=#182229}">
+                        <Label Text="{Binding PrivateNote}" FontSize="12.5" HorizontalTextAlignment="Center" TextColor="{AppThemeBinding Light=#54656F, Dark=#FFD279}" />
+                    </Border>
+                    <Border HorizontalOptions="Center" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="12,5"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#182229}" IsVisible="{Binding CanLoadMore}" v:Motion.Press="True">
+                        <Label Text="{l:Tr chat_load_older}" FontFamily="BarlowSemiBold" FontSize="13" TextColor="{StaticResource WaTeal}" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding LoadMoreCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HeightRequest="26" Color="{StaticResource WaGreen}" />
+                    <VerticalStackLayout Padding="32,30" Spacing="8" IsVisible="{Binding IsEmpty}">
+                        <Label Text="{l:Tr chat_empty_title}" Style="{StaticResource SectionTitle}" FontSize="18" HorizontalTextAlignment="Center" />
+                        <Label Text="{l:Tr chat_empty_text}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:ChatItem">
+                    <VerticalStackLayout Padding="0,0" Spacing="0">
+                        <!-- Tarix ayırıcısı: "BU GÜN" -->
+                        <Border IsVisible="{Binding ShowDate}" HorizontalOptions="Center" StrokeShape="RoundRectangle 8" StrokeThickness="0" Padding="12,5" Margin="0,10,0,6"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#182229}">
+                            <Label Text="{Binding DateLabel, Converter={StaticResource UpperAz}}" FontSize="12" TextColor="{AppThemeBinding Light=#54656F, Dark=#8696A0}" />
+                        </Border>
+
+                        <!-- Sağa sürüşdürmə → cavab (WhatsApp kimi) -->
+                        <SwipeView Threshold="70" BackgroundColor="Transparent">
+                            <SwipeView.LeftItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ReplyCommand, x:DataType=vm:ChatViewModel}"
+                                                   CommandParameter="{Binding .}">
+                                        <Border WidthRequest="34" HeightRequest="34" StrokeShape="Ellipse" StrokeThickness="0" Padding="8" Margin="10,0"
+                                                BackgroundColor="{AppThemeBinding Light=#E6FFFFFF, Dark=#33FFFFFF}" VerticalOptions="Center">
+                                            <Image Source="ic_reply_g.png" />
+                                        </Border>
+                                    </SwipeItemView>
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+
+                            <VerticalStackLayout Padding="10,0" Spacing="0">
+                                <VerticalStackLayout.Triggers>
+                                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsFirstInGroup}" Value="True">
+                                        <Setter Property="Margin" Value="0,6,0,0" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsFirstInGroup}" Value="False">
+                                        <Setter Property="Margin" Value="0,2,0,0" />
+                                    </DataTrigger>
+                                </VerticalStackLayout.Triggers>
+
+                                <!-- Balon -->
+                                <Border MaximumWidthRequest="300" MinimumWidthRequest="70" StrokeThickness="0" Padding="8,5,8,5" StrokeShape="RoundRectangle 9">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOutgoing}" Value="True">
+                                            <Setter Property="HorizontalOptions" Value="End" />
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#FFE4E6, Dark=#7F1D1D}" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOutgoing}" Value="False">
+                                            <Setter Property="HorizontalOptions" Value="Start" />
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#202C33}" />
+                                        </DataTrigger>
+                                        <!-- Quyruq tərəfdə künc iti (qrupun ilk mesajı) -->
+                                        <MultiTrigger TargetType="Border">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsOutgoing}" Value="True" />
+                                                <BindingCondition Binding="{Binding IsFirstInGroup}" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="StrokeShape" Value="RoundRectangle 9,0,9,9" />
+                                        </MultiTrigger>
+                                        <MultiTrigger TargetType="Border">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsOutgoing}" Value="False" />
+                                                <BindingCondition Binding="{Binding IsFirstInGroup}" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="StrokeShape" Value="RoundRectangle 0,9,9,9" />
+                                        </MultiTrigger>
+                                        <!-- Sitatdan keçəndə: çərçivəsiz, qısa müddət solğunlaşır (WhatsApp kimi) -->
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsFlashing}" Value="True">
+                                            <Setter Property="Opacity" Value="0.55" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.Shadow>
+                                        <Shadow Brush="#0B141A" Offset="0,1" Radius="1" Opacity="0.13" />
+                                    </Border.Shadow>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OptionsCommand, x:DataType=vm:ChatViewModel}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+
+                                    <VerticalStackLayout Spacing="3">
+                                        <!-- Göndərən (usta) -->
+                                        <HorizontalStackLayout IsVisible="{Binding ShowName}" Spacing="6">
+                                            <Label Text="{Binding UserName}" FontSize="13" FontFamily="BarlowSemiBold" TextColor="#D97706" />
+                                            <Border Style="{StaticResource Pill}" BackgroundColor="#1AD81324" Padding="6,0">
+                                                <Label Text="{l:Tr chat_badge_mechanic}" TextColor="{StaticResource WaTeal}" FontSize="10" FontFamily="BarlowBold" />
+                                            </Border>
+                                        </HorizontalStackLayout>
+
+                                        <!-- Cavab sitatı -->
+                                        <Border IsVisible="{Binding HasReply}" StrokeShape="RoundRectangle 6" StrokeThickness="0" Padding="0" Margin="0,0,0,2"
+                                                BackgroundColor="{AppThemeBinding Light=#0D0B141A, Dark=#26000000}">
+                                            <Grid ColumnDefinitions="4,*">
+                                                <BoxView Color="#D81324">
+                                                    <BoxView.Triggers>
+                                                        <DataTrigger TargetType="BoxView" Binding="{Binding ReplyIsOutgoing}" Value="True">
+                                                            <Setter Property="Color" Value="{StaticResource WaBlue}" />
+                                                        </DataTrigger>
+                                                    </BoxView.Triggers>
+                                                </BoxView>
+                                                <VerticalStackLayout Grid.Column="1" Padding="8,4,8,5" Spacing="1">
+                                                    <Label Text="{Binding ReplyName}" FontSize="12.5" FontFamily="BarlowSemiBold" TextColor="#B00F1D">
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding ReplyIsOutgoing}" Value="True">
+                                                                <Setter Property="TextColor" Value="#027EB5" />
+                                                            </DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
+                                                    <Label Text="{Binding ReplyText}" FontSize="13" MaxLines="2" LineBreakMode="TailTruncation"
+                                                           TextColor="{AppThemeBinding Light=#667781, Dark=#AEBAC1}" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=JumpToCommand, x:DataType=vm:ChatViewModel}"
+                                                                      CommandParameter="{Binding ReplyId}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+
+                                        <!-- Şəkil -->
+                                        <Border IsVisible="{Binding ImageUrl, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 6" StrokeThickness="0" Padding="0" Margin="-5,-2,-5,0">
+                                            <Image Source="{Binding ImageUrl}" Aspect="AspectFill" WidthRequest="260" HeightRequest="220" />
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenMediaCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding ImageUrl}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                        <!-- Video -->
+                                        <Border IsVisible="{Binding VideoUrl, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 6" StrokeThickness="0"
+                                                BackgroundColor="#111B21" WidthRequest="250" HeightRequest="150" Margin="-5,-2,-5,0">
+                                            <Border BackgroundColor="#8C000000" StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="52" HeightRequest="52" Padding="16"
+                                                    HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Image Source="ic_play_w.png" />
+                                            </Border>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenMediaCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding VideoUrl}" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                        <!-- Səs mesajı -->
+                                        <Grid IsVisible="{Binding AudioUrl, Converter={StaticResource HasValue}}" ColumnDefinitions="Auto,*" ColumnSpacing="10" WidthRequest="230">
+                                            <Border StrokeShape="Ellipse" StrokeThickness="0" WidthRequest="40" HeightRequest="40" Padding="11" BackgroundColor="{StaticResource WaGreen}">
+                                                <Grid>
+                                                    <Image Source="ic_play_w.png" IsVisible="{Binding IsPlaying, Converter={StaticResource InvertedBool}}" />
+                                                    <Label Text="❚❚" TextColor="White" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding IsPlaying}" />
+                                                </Grid>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=PlayAudioCommand, x:DataType=vm:ChatViewModel}" CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                            </Border>
+                                            <HorizontalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                                <BoxView WidthRequest="3" HeightRequest="10" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="18" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="26" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="14" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="22" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="8" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="16" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="24" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="12" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="20" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="10" CornerRadius="2" Color="#8696A0" />
+                                                <BoxView WidthRequest="3" HeightRequest="16" CornerRadius="2" Color="#8696A0" />
+                                            </HorizontalStackLayout>
+                                        </Grid>
+                                        <!-- Mətn -->
+                                        <Label Text="{Binding Text}" IsVisible="{Binding Text, Converter={StaticResource HasValue}}" FontSize="15.5"
+                                               TextColor="{AppThemeBinding Light=#111B21, Dark=#E9EDEF}">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsJumbo}" Value="True">
+                                                    <Setter Property="FontSize" Value="40" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                        <!-- Vaxt + ✓✓ -->
+                                        <HorizontalStackLayout HorizontalOptions="End" Spacing="4" Margin="12,0,0,0">
+                                            <Label Text="{l:Tr chat_edited}" FontSize="10.5" FontAttributes="Italic" IsVisible="{Binding IsEdited}"
+                                                   TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}" />
+                                            <Label Text="{Binding Time}" FontSize="11" TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}" />
+                                            <Label Text="{Binding Tick}" IsVisible="{Binding IsOutgoing}" FontSize="12" FontAttributes="Bold" TextColor="#8696A0">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding TickRead}" Value="True">
+                                                        <Setter Property="TextColor" Value="{StaticResource WaBlue}" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Border>
+
+                                <!-- Reaksiyalar -->
+                                <Border IsVisible="{Binding HasReactions}" StrokeShape="RoundRectangle 12" Stroke="{AppThemeBinding Light=White, Dark=#0B141A}" StrokeThickness="1.5"
+                                        BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}" Padding="7,2" Margin="10,-6,10,0">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOutgoing}" Value="True">
+                                            <Setter Property="HorizontalOptions" Value="End" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsOutgoing}" Value="False">
+                                            <Setter Property="HorizontalOptions" Value="Start" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.Shadow>
+                                        <Shadow Brush="#0B141A" Offset="0,1" Radius="3" Opacity="0.2" />
+                                    </Border.Shadow>
+                                    <Label Text="{Binding ReactionsText}" FontSize="14" TextColor="{AppThemeBinding Light=#667781, Dark=#AEBAC1}" />
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=ToggleReactionCommand, x:DataType=vm:ChatViewModel}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </VerticalStackLayout>
+                        </SwipeView>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.Footer>
+                <BoxView HeightRequest="8" Color="Transparent" />
+            </CollectionView.Footer>
+        </CollectionView>
+
+        <!-- ================= AXTARIŞ ================= -->
+        <Grid Grid.Row="1" IsVisible="{Binding IsSearching}" RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light=White, Dark=#111B21}">
+            <Border Margin="10,8" StrokeShape="RoundRectangle 20" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}" Padding="12,0">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                    <Image Source="ic_search_g.png" WidthRequest="18" HeightRequest="18" />
+                    <Entry x:Name="SearchEntry" Grid.Column="1" Text="{Binding SearchText}" Placeholder="{l:Tr chat_search_placeholder}" FontSize="15" />
+                    <Image Grid.Column="2" Source="ic_close_g.png" WidthRequest="20" HeightRequest="20">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleSearchCommand}" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
+            </Border>
+            <CollectionView Grid.Row="1" ItemsSource="{Binding SearchResults}" SelectionMode="None">
+                <CollectionView.Header>
+                    <Label Text="{l:Tr chat_search_none}" IsVisible="{Binding SearchEmpty}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" Margin="0,20" />
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ChatItem">
+                        <VerticalStackLayout Padding="16,10" Spacing="2">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding SenderLabel}" FontSize="12.5" TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}" />
+                                <Label Grid.Column="1" FontSize="12" TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding DateLabel}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding Time}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </Grid>
+                            <Label Text="{Binding Text}" FontSize="14.5" MaxLines="2" LineBreakMode="TailTruncation" TextColor="{AppThemeBinding Light=#111B21, Dark=#E9EDEF}" />
+                            <BoxView HeightRequest="1" Margin="0,8,0,0" Color="{AppThemeBinding Light=#F0F2F5, Dark=#222D34}" />
+                            <VerticalStackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=OpenSearchResultCommand, x:DataType=vm:ChatViewModel}"
+                                                      CommandParameter="{Binding .}" />
+                            </VerticalStackLayout.GestureRecognizers>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- ================= YAZMA SAHƏSİ ================= -->
+        <!-- "Yalnız ustalar yaza bilər" qrupu -->
+        <Border Grid.Row="2" IsVisible="{Binding ShowReadOnly}" StrokeThickness="0" Padding="16,14" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}">
+            <Label Text="{l:Tr group_readonly}" HorizontalTextAlignment="Center" FontSize="14" TextColor="{AppThemeBinding Light=#54656F, Dark=#AEBAC1}" />
+        </Border>
+
+        <VerticalStackLayout Grid.Row="2" IsVisible="{Binding ShowComposer}" Padding="6,4,6,8" Spacing="6">
+            <VerticalStackLayout.Triggers>
+                <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsGuest}" Value="True">
+                    <Setter Property="IsVisible" Value="False" />
+                </DataTrigger>
+            </VerticalStackLayout.Triggers>
+
+            <!-- Redaktə rejimi -->
+            <Border IsVisible="{Binding Editing, Converter={StaticResource HasValue}}" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="12,8"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="{l:Tr chat_editing}" FontSize="13" TextColor="{StaticResource WaTeal}" FontFamily="BarlowBold" VerticalOptions="Center" />
+                    <Image Grid.Column="1" Source="ic_close_g.png" WidthRequest="20" HeightRequest="20">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelEditCommand}" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
+            </Border>
+
+            <!-- Cavab verilən mesaj -->
+            <Border IsVisible="{Binding IsReplying}" StrokeShape="RoundRectangle 10" StrokeThickness="0" Padding="6"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Border StrokeShape="RoundRectangle 6" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#111B21}" Padding="0">
+                        <Grid ColumnDefinitions="4,*">
+                            <BoxView Color="#D81324" />
+                            <VerticalStackLayout Grid.Column="1" Padding="8,4" Spacing="1">
+                                <Label Text="{Binding ReplyName}" FontSize="12.5" FontFamily="BarlowSemiBold" TextColor="#B00F1D" />
+                                <Label Text="{Binding ReplyText}" FontSize="13" MaxLines="1" LineBreakMode="TailTruncation" TextColor="{AppThemeBinding Light=#667781, Dark=#AEBAC1}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                    <Image Grid.Column="1" Source="ic_close_g.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CancelReplyCommand}" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
+            </Border>
+
+            <!-- Emoji paneli -->
+            <Border IsVisible="{Binding ShowEmoji}" StrokeShape="RoundRectangle 14" StrokeThickness="0" Padding="6" HeightRequest="190"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}">
+                <CollectionView ItemsSource="{Binding Emojis}" SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="8" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Label Text="{Binding .}" FontSize="26" HorizontalOptions="Center" Padding="0,4">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatViewModel}}, Path=InsertEmojiCommand, x:DataType=vm:ChatViewModel}"
+                                                          CommandParameter="{Binding .}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Border>
+
+            <!-- Səs yazılır -->
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12" IsVisible="{Binding IsRecording}" HeightRequest="50" Padding="4,0">
+                <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=White, Dark=#202C33}" Padding="13" v:Motion.Press="True">
+                    <Image Source="ic_close_g.png" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CancelRecordCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Ellipse x:Name="RecDot" Grid.Column="1" Fill="#EA0038" WidthRequest="12" HeightRequest="12" VerticalOptions="Center" />
+                <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
+                    <Label Text="{l:Tr chat_recording}" Style="{StaticResource Muted}" FontSize="12" />
+                    <Label Text="{Binding RecordTime}" FontSize="18" FontFamily="BarlowBold" />
+                </VerticalStackLayout>
+                <Border Grid.Column="3" WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{StaticResource WaGreen}" Padding="13" v:Motion.Press="True">
+                    <Image Source="ic_send_w.png" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding ToggleRecordCommand}" />
+                    </Border.GestureRecognizers>
+                </Border>
+            </Grid>
+
+            <!-- Yazma sətri: [😊 Mesaj 📎] (🎤/➤) -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6" IsVisible="{Binding IsRecording, Converter={StaticResource InvertedBool}}">
+                <Border StrokeShape="RoundRectangle 24" StrokeThickness="0" Padding="4,0" BackgroundColor="{AppThemeBinding Light=White, Dark=#2A3942}">
+                    <Border.Shadow>
+                        <Shadow Brush="#0B141A" Offset="0,1" Radius="1" Opacity="0.1" />
+                    </Border.Shadow>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="2">
+                        <Border WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="Transparent" Padding="9" VerticalOptions="End" Margin="0,0,0,2">
+                            <Image Source="ic_smile_g.png" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleEmojiCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Editor Grid.Column="1" Text="{Binding Text}" Placeholder="{l:Tr chat_placeholder}" AutoSize="TextChanges" MaxLength="1000"
+                                MinimumHeightRequest="44" MaximumHeightRequest="120" FontSize="16" />
+                        <Border Grid.Column="2" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="Transparent" Padding="10" VerticalOptions="End" Margin="0,0,0,2">
+                            <Image Source="ic_attach_g.png" />
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding AttachCommand}" />
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </Grid>
+                </Border>
+                <Grid Grid.Column="1" VerticalOptions="End">
+                    <Border WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{StaticResource WaGreen}" Padding="13"
+                            IsVisible="{Binding CanSend}" v:Motion.Press="True">
+                        <Image Source="ic_send_w.png" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SendCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                    <Border WidthRequest="48" HeightRequest="48" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{StaticResource WaGreen}" Padding="13"
+                            IsVisible="{Binding CanSend, Converter={StaticResource InvertedBool}}" v:Motion.Press="True">
+                        <Image Source="ic_mic_w.png" />
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleRecordCommand}" />
+                        </Border.GestureRecognizers>
+                    </Border>
+                </Grid>
+            </Grid>
+            <ActivityIndicator IsRunning="{Binding IsSending}" IsVisible="{Binding IsSending}" HeightRequest="18" Color="{StaticResource WaGreen}" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

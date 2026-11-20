@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "DoctorEngine.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:5021",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7193;http://localhost:5020"
+    },
+    "DoctorEngine.Api (Wi-Fi)": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "http://localhost:5021",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://0.0.0.0:5020"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- API (presentation layı): mobil/desktop tətbiqlər üçün REST API + SignalR hub-ları.
+       Asılılıq istiqaməti: Api → Infrastructure → Application → Domain -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Saytla eyni user-secrets (Jwt:Key, Ai:ApiKey, EmailSettings:Password, ConnectionStrings) -->
+    <UserSecretsId>04e2fe2a-92d2-44ac-9801-815a0ff0a6d8</UserSecretsId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
+    <!-- dotnet ef: dotnet ef migrations add X -p Api/DoctorEngine.Infrastructure -s Api/DoctorEngine.Api -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.15">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.6.2" />
+    <!-- Zəmanət PDF-i (saytdakı Admin/Warranty/Print ilə eyni: wkhtmltopdf → wwwroot/Rotativa) -->
+    <PackageReference Include="Rotativa.AspNetCore" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Yüklənmiş fayllar (lokal test şəkilləri) publish-ə düşməsin — serverdəki uploads qovluğunun üzərinə yazılmasın -->
+    <Content Update="wwwroot\uploads\**" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DoctorEngine.Infrastructure\DoctorEngine.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

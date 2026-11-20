@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b141a" />
+    <title>Zəng · DoctorEngine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="/css/call.css" />
+    <script src="/config.js"></script>
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/i18n.js"></script>
+</head>
+<body>
+    <!-- Video / səsli zəng (WebRTC). /Call?c={yazışma}&video=1 — zəng et; /Call?id={zəng}&video=1 — cavab ver.
+         Giriş: sayt — DE.auth (token), mobil tətbiq (WebView) — token ünvanın "#t=" hissəsində (call.js özü oxuyur). -->
+    <main class="dc-call" data-state="init">
+        <section class="dc-call__grid" aria-live="polite"></section>
+        <div class="dc-call__center">
+            <div class="dc-call__avatar"><i class="fa-solid fa-user"></i></div>
+            <h1 class="dc-call__title"></h1>
+            <p class="dc-call__status">Qoşulur…</p>
+        </div>
+        <video class="dc-call__self" autoplay playsinline muted></video>
+        <header class="dc-call__top">
+            <span class="dc-call__lock"><i class="fa-solid fa-lock"></i> Birbaşa bağlantı</span>
+            <span class="dc-call__timer" hidden>0:00</span>
+        </header>
+        <footer class="dc-call__bar">
+            <button type="button" class="dc-call__btn" data-act="camera" title="Kamera" aria-label="Kamera"><i class="fa-solid fa-video"></i></button>
+            <button type="button" class="dc-call__btn" data-act="flip" title="Kameranı çevir" aria-label="Kameranı çevir" hidden><i class="fa-solid fa-camera-rotate"></i></button>
+            <button type="button" class="dc-call__btn" data-act="mic" title="Mikrofon" aria-label="Mikrofon"><i class="fa-solid fa-microphone"></i></button>
+            <button type="button" class="dc-call__btn is-end" data-act="end" title="Zəngi bitir" aria-label="Zəngi bitir"><i class="fa-solid fa-phone-slash"></i></button>
+        </footer>
+    </main>
+
+    <script>
+        (async function () {
+            const lang = new URLSearchParams(location.search).get("lang");   // mobil tətbiq dili ötürür
+            await DE.i18n.ready;
+            DE.i18n.translate(document.body);
+            document.title = DE.t("Zəng") + " · DoctorEngine";
+            const user = DE.auth.user();
+            const config = {
+                iceServers: (window.DE_CONFIG.iceServers || []).map((s) => ({ urls: s.urls, username: s.username, credential: s.credential })),
+                isAuthenticated: DE.auth.isAuthenticated(),
+                currentUser: user ? user.userName : null,
+                loginUrl: "/Account/Login?returnUrl=" + encodeURIComponent(location.pathname + location.search)
+            };
+            const el = document.createElement("script");
+            el.id = "dcCallConfig";
+            el.type = "application/json";
+            el.textContent = JSON.stringify(config);
+            document.body.appendChild(el);
+            for (const src of ["https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js", "/js/call.js"]) {
+                await new Promise((resolve) => { const s = document.createElement("script"); s.src = src; s.onload = s.onerror = resolve; document.body.appendChild(s); });
+            }
+        })();
+    </script>
+</body>
+</html>

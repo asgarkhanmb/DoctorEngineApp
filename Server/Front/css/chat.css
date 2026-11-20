@@ -1,0 +1,3152 @@
+/* =====================================================
+   DoctorEngine — Canlı çat
+   ===================================================== */
+
+.dc-chat {
+    --dc-primary: #D81324;
+    --dc-primary-dark: #b00f1d;
+    --dc-navy: #0B2154;
+    --dc-navy-2: #16306f;
+    --dc-bg: #f4f6fa;
+    --dc-surface: #ffffff;
+    --dc-border: #e3e7ef;
+    --dc-text: #1d2433;
+    --dc-muted: #7a8394;
+    --dc-radius: 18px;
+    --dc-shadow: 0 18px 50px rgba(11, 33, 84, .14);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 680px;
+    height: 540px;
+    margin: 0 auto;
+    background: var(--dc-surface);
+    border: 1px solid var(--dc-border);
+    border-radius: 22px;
+    box-shadow: var(--dc-shadow);
+    overflow: hidden;
+    font-family: "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--dc-text);
+}
+
+.dc-chat--full {
+    max-width: 880px;
+    height: calc(100vh - 230px);
+    min-height: 460px;
+}
+
+.dc-chat [hidden] { display: none !important; }
+
+/* ---------- HEADER ---------- */
+
+.dc-chat__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: linear-gradient(120deg, var(--dc-navy) 0%, var(--dc-navy-2) 100%);
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.dc-chat__logo {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: var(--dc-primary);
+    font-size: 20px;
+    box-shadow: 0 6px 16px rgba(216, 19, 36, .45);
+    flex-shrink: 0;
+}
+
+.dc-chat__heading { flex: 1; min-width: 0; }
+
+.dc-chat__heading h3 {
+    margin: 0;
+    color: #fff;
+    font-family: "Barlow", sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+.dc-chat__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 2px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, .78);
+}
+
+.dc-chat__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f5b301;
+}
+
+.dc-chat__status[data-state="online"] .dc-chat__dot {
+    background: #2ecc71;
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, .6);
+    animation: dc-pulse 2s infinite;
+}
+
+.dc-chat__status[data-state="offline"] .dc-chat__dot { background: #ff5b5b; }
+
+@keyframes dc-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, .6); }
+    70% { box-shadow: 0 0 0 7px rgba(46, 204, 113, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+}
+
+.dc-chat__icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .12);
+    color: inherit;
+    cursor: pointer;
+    transition: background .15s;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.dc-chat__header .dc-chat__icon-btn:hover { background: rgba(255, 255, 255, .24); color: #fff; }
+
+/* ---------- BODY ---------- */
+
+.dc-chat__body {
+    position: relative;
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px 18px 18px;
+    background:
+        radial-gradient(circle at 1px 1px, rgba(11, 33, 84, .05) 1px, transparent 0) 0 0 / 22px 22px,
+        var(--dc-bg);
+    scroll-behavior: smooth;
+}
+
+.dc-chat__more-wrap { text-align: center; }
+
+.dc-chat__more {
+    margin: 4px 0 10px;
+    padding: 6px 14px;
+    border: 1px solid var(--dc-border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--dc-navy);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.dc-chat__more:hover { border-color: var(--dc-navy); }
+
+.dc-chat__loading,
+.dc-chat__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 100%;
+    min-height: 200px;
+    color: var(--dc-muted);
+    text-align: center;
+    font-size: 14px;
+}
+
+.dc-chat__empty i { font-size: 42px; color: #c4cad6; }
+.dc-chat__empty p { margin: 0; }
+
+.dc-chat__spinner {
+    width: 26px;
+    height: 26px;
+    border: 3px solid #d8dde7;
+    border-top-color: var(--dc-primary);
+    border-radius: 50%;
+    animation: dc-spin .8s linear infinite;
+}
+
+@keyframes dc-spin { to { transform: rotate(360deg); } }
+
+/* Tarix ayırıcısı */
+.dc-sep {
+    display: flex;
+    justify-content: center;
+    margin: 14px 0 8px;
+}
+
+.dc-sep span {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(11, 33, 84, .08);
+    color: var(--dc-navy);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ---------- MESAJ ---------- */
+
+.dc-msg {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+    animation: dc-in .22s ease-out;
+}
+
+.dc-msg.is-grouped { margin-top: 3px; }
+
+@keyframes dc-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+}
+
+.dc-msg.is-removing {
+    opacity: 0;
+    transform: scale(.96);
+    transition: opacity .25s, transform .25s;
+}
+
+.dc-msg.is-mine { flex-direction: row-reverse; }
+
+.dc-msg__avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.dc-msg.is-mine .dc-msg__avatar { display: none; }
+.dc-msg.is-grouped .dc-msg__avatar { visibility: hidden; }
+.dc-msg.is-admin .dc-msg__avatar { background: var(--dc-primary) !important; }
+
+.dc-msg__content {
+    display: flex;
+    flex-direction: column;
+    max-width: min(78%, 520px);
+    min-width: 0;
+}
+
+.dc-msg.is-mine .dc-msg__content { align-items: flex-end; }
+
+.dc-msg__name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 3px 4px;
+    color: var(--dc-muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.dc-msg.is-grouped .dc-msg__name,
+.dc-msg.is-mine .dc-msg__name { display: none; }
+
+.dc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--dc-primary);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+}
+
+.dc-msg__bubble {
+    position: relative;
+    padding: 9px 13px 7px;
+    border-radius: var(--dc-radius);
+    border-bottom-left-radius: 6px;
+    background: var(--dc-surface);
+    border: 1px solid var(--dc-border);
+    box-shadow: 0 1px 2px rgba(11, 33, 84, .06);
+    overflow-wrap: anywhere;
+    min-width: 72px;
+}
+
+.dc-msg.is-admin:not(.is-mine) .dc-msg__bubble {
+    border-color: rgba(216, 19, 36, .35);
+    background: #fff7f7;
+}
+
+.dc-msg.is-mine .dc-msg__bubble {
+    background: linear-gradient(135deg, var(--dc-primary) 0%, var(--dc-primary-dark) 100%);
+    border-color: transparent;
+    border-bottom-left-radius: var(--dc-radius);
+    border-bottom-right-radius: 6px;
+    color: #fff;
+}
+
+.dc-msg__text {
+    white-space: pre-wrap;
+    font-size: 14.5px;
+    line-height: 1.45;
+}
+
+.dc-msg__text a { color: var(--dc-navy-2); text-decoration: underline; }
+.dc-msg.is-mine .dc-msg__text a { color: #fff; }
+
+/* ---------- Şəkil / video (WhatsApp ölçüləri: ~300px en, hündürlük ≤ 340px) ---------- */
+
+.dc-msg__bubble.has-media { padding: 3px 3px 6px; }
+.dc-msg__bubble.has-media .dc-msg__text { padding: 5px 8px 0; }
+.dc-msg__bubble.has-media .dc-msg__meta { padding: 0 8px; }
+
+.dc-msg__media {
+    margin: 0;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #0b0f19;
+    line-height: 0;
+}
+
+.dc-msg__media img,
+.dc-msg__media video {
+    display: block;
+    width: 300px;
+    max-width: 100%;
+    height: auto;
+    max-height: 340px;
+}
+
+.dc-msg__media img { cursor: zoom-in; min-height: 120px; object-fit: cover; background: #e9edf3; }
+.dc-msg__media video { min-height: 160px; max-height: 400px; object-fit: contain; background: #000; }
+
+/* Başlıqsız şəkil: saat şəklin üstündə, sağ aşağıda */
+.dc-msg__bubble.is-media-only { padding: 3px; }
+.dc-msg__bubble.is-media-only .dc-msg__meta {
+    position: absolute;
+    right: 9px;
+    bottom: 8px;
+    margin: 0;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, .45);
+    color: #fff;
+    pointer-events: none;
+}
+
+/* ---------- Səs mesajı ---------- */
+
+.dc-voice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 260px;
+    max-width: 100%;
+    padding: 3px 0 0;
+}
+
+.dc-voice__play {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--dc-navy);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform .1s;
+}
+
+.dc-voice__play:active { transform: scale(.92); }
+.dc-voice__play .fa-play { margin-left: 2px; }
+.dc-msg.is-mine .dc-voice__play { background: #fff; color: var(--dc-primary); }
+
+.dc-voice__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.dc-voice__track {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 30px;
+    cursor: pointer;
+    touch-action: none;
+    outline: none;
+}
+
+.dc-voice__track:focus-visible { box-shadow: 0 0 0 2px rgba(11, 33, 84, .25); border-radius: 4px; }
+
+.dc-voice__bar {
+    flex: 1;
+    min-width: 2px;
+    border-radius: 2px;
+    background: #c4cad6;
+    transition: background .12s, height .3s;
+}
+
+.dc-voice__bar.is-played { background: var(--dc-navy); }
+.dc-msg.is-mine .dc-voice__bar { background: rgba(255, 255, 255, .42); }
+.dc-msg.is-mine .dc-voice__bar.is-played { background: #fff; }
+
+.dc-voice__info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--dc-muted);
+}
+
+.dc-msg.is-mine .dc-voice__info { color: rgba(255, 255, 255, .8); }
+
+.dc-voice__speed {
+    padding: 0 7px;
+    border: 0;
+    border-radius: 9px;
+    background: rgba(11, 33, 84, .08);
+    color: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 17px;
+    cursor: pointer;
+}
+
+.dc-msg.is-mine .dc-voice__speed { background: rgba(255, 255, 255, .2); }
+.dc-voice.is-error .dc-voice__track { opacity: .4; pointer-events: none; }
+
+/* Saat səs pleyerinin altındakı sətrə, sağa oturur */
+.dc-msg__bubble.has-voice .dc-msg__meta { margin-top: -16px; }
+
+.dc-msg__meta {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--dc-muted);
+    white-space: nowrap;
+}
+
+.dc-msg.is-mine .dc-msg__meta { color: rgba(255, 255, 255, .78); }
+
+/* Əməliyyat düymələri */
+.dc-msg__actions {
+    display: flex;
+    gap: 4px;
+    align-self: center;
+    opacity: 0;
+    transition: opacity .15s;
+}
+
+.dc-msg:hover .dc-msg__actions,
+.dc-msg:focus-within .dc-msg__actions { opacity: 1; }
+
+@media (hover: none) {
+    .dc-msg__actions { opacity: .85; }
+}
+
+.dc-msg__action {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--dc-border);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--dc-muted);
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+}
+
+.dc-msg__action:hover { color: var(--dc-navy); border-color: var(--dc-navy); }
+.dc-msg__action.is-danger:hover { color: var(--dc-primary); border-color: var(--dc-primary); }
+
+/* ---------- REDAKTƏ ---------- */
+
+.dc-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: min(440px, 72vw);
+    padding: 10px;
+    background: #fff;
+    border: 2px solid var(--dc-navy);
+    border-radius: var(--dc-radius);
+    color: var(--dc-text);
+    box-shadow: 0 8px 24px rgba(11, 33, 84, .15);
+}
+
+.dc-edit textarea {
+    width: 100%;
+    min-height: 64px;
+    max-height: 200px;
+    padding: 8px 10px;
+    border: 1px solid var(--dc-border);
+    border-radius: 10px;
+    font: inherit;
+    font-size: 14px;
+    resize: vertical;
+    outline: none;
+}
+
+.dc-edit textarea:focus { border-color: var(--dc-navy); }
+
+.dc-edit__file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+    border: 1px dashed var(--dc-border);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--dc-muted);
+}
+
+.dc-edit__file .thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #e9edf3 center / cover no-repeat;
+    display: grid;
+    place-items: center;
+    color: var(--dc-navy);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.dc-edit__file .thumb video { width: 100%; height: 100%; object-fit: cover; }
+.dc-edit__file .label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dc-edit__file.is-removed .thumb { opacity: .35; }
+.dc-edit__file.is-removed .label { text-decoration: line-through; }
+
+.dc-edit__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.dc-edit__row .spacer { flex: 1; }
+
+.dc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border: 1px solid var(--dc-border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--dc-text);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dc-btn:hover { border-color: var(--dc-navy); }
+.dc-btn--primary { background: var(--dc-navy); border-color: var(--dc-navy); color: #fff; }
+.dc-btn--primary:hover { background: var(--dc-navy-2); }
+.dc-btn--primary:disabled { opacity: .6; cursor: wait; }
+.dc-btn input[type=file] { display: none; }
+
+.dc-edit__error { color: var(--dc-primary); font-size: 12.5px; }
+
+/* ---------- YENİ MESAJ DÜYMƏSİ ---------- */
+
+.dc-chat__jump {
+    position: absolute;
+    left: 50%;
+    bottom: 140px;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--dc-navy);
+    color: #fff;
+    font-size: 13px;
+    box-shadow: 0 6px 18px rgba(11, 33, 84, .3);
+    cursor: pointer;
+    z-index: 3;
+}
+
+/* ---------- COMPOSER ---------- */
+
+.dc-chat__composer {
+    flex-shrink: 0;
+    padding: 10px 14px 8px;
+    border-top: 1px solid var(--dc-border);
+    background: #fff;
+}
+
+.dc-chat__error {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #fdecee;
+    color: var(--dc-primary-dark);
+    font-size: 13px;
+}
+
+.dc-chat__preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 6px;
+    border: 1px solid var(--dc-border);
+    border-radius: 12px;
+    background: var(--dc-bg);
+}
+
+.dc-chat__preview-thumb {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 9px;
+    overflow: hidden;
+    background: #dfe4ec;
+    color: var(--dc-navy);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.dc-chat__preview-thumb img,
+.dc-chat__preview-thumb video { width: 100%; height: 100%; object-fit: cover; }
+
+.dc-chat__preview-meta {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+}
+
+.dc-chat__preview-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.dc-chat__preview-size { color: var(--dc-muted); font-size: 12px; }
+
+.dc-chat__preview .dc-chat__icon-btn { background: #fff; color: var(--dc-muted); border: 1px solid var(--dc-border); }
+.dc-chat__preview .dc-chat__icon-btn:hover { color: var(--dc-primary); border-color: var(--dc-primary); }
+
+.dc-chat__progress {
+    height: 4px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    background: #e8ebf1;
+    overflow: hidden;
+}
+
+.dc-chat__progress-bar {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--dc-primary), #ff5d6b);
+    transition: width .15s;
+}
+
+.dc-chat__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.dc-chat__attach,
+.dc-chat__send {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background .15s, transform .1s, opacity .15s;
+}
+
+.dc-chat__attach {
+    margin: 0;
+    background: var(--dc-bg);
+    color: var(--dc-navy);
+    font-size: 18px;
+}
+
+.dc-chat__attach:hover { background: #e6eaf2; }
+.dc-chat__attach input { display: none; }
+
+.dc-chat__send {
+    border: 0;
+    background: var(--dc-primary);
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 0 6px 14px rgba(216, 19, 36, .35);
+}
+
+
+.dc-chat__mic { font-size: 18px; }
+
+/* ---------- Səs yazma zolağı ---------- */
+
+.dc-rec {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+}
+
+.dc-rec__cancel,
+.dc-rec__pause {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--dc-bg);
+    color: var(--dc-muted);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.dc-rec__cancel:hover { color: var(--dc-primary); }
+.dc-rec__pause:hover { color: var(--dc-navy); }
+
+.dc-rec__dot {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--dc-primary);
+    animation: dc-blink 1s ease-in-out infinite;
+}
+
+.dc-rec.is-paused .dc-rec__dot { animation: none; opacity: .35; }
+
+.dc-rec__time {
+    min-width: 40px;
+    color: var(--dc-text);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.dc-rec__wave {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    color: var(--dc-navy);   /* canvas bu rəngi götürür */
+}
+
+.dc-rec.is-paused .dc-rec__wave { opacity: .45; }
+
+@keyframes dc-blink { 50% { opacity: .2; } }
+
+.dc-chat__send:hover:not(:disabled) { background: var(--dc-primary-dark); }
+.dc-chat__send:active:not(:disabled) { transform: scale(.94); }
+.dc-chat__send:disabled { opacity: .45; box-shadow: none; cursor: default; }
+
+.dc-chat__input {
+    flex: 1;
+    min-height: 44px;
+    max-height: 140px;
+    padding: 11px 16px;
+    border: 1px solid var(--dc-border);
+    border-radius: 22px;
+    background: var(--dc-bg);
+    font: inherit;
+    font-size: 14.5px;
+    line-height: 1.4;
+    resize: none;
+    outline: none;
+    transition: border-color .15s, background .15s;
+}
+
+.dc-chat__input:focus { border-color: var(--dc-navy); background: #fff; }
+
+.dc-chat__hint {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 6px;
+    padding: 0 4px;
+    color: var(--dc-muted);
+    font-size: 11.5px;
+}
+
+.dc-chat__hint kbd {
+    padding: 0 5px;
+    border: 1px solid var(--dc-border);
+    border-radius: 4px;
+    background: var(--dc-bg);
+    color: var(--dc-text);
+    font-size: 10.5px;
+    box-shadow: none;
+}
+
+.dc-chat__guest {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    border-top: 1px solid var(--dc-border);
+    background: #fff;
+    color: var(--dc-muted);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.dc-chat__guest a { color: var(--dc-primary); font-weight: 500; }
+
+.dc-chat__dropzone {
+    position: absolute;
+    inset: 78px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 2px dashed var(--dc-primary);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .93);
+    color: var(--dc-primary);
+    font-size: 15px;
+    font-weight: 500;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.dc-chat__dropzone i { font-size: 38px; }
+
+/* ---------- LIGHTBOX ---------- */
+
+.dc-lightbox {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(5, 10, 25, .88);
+    z-index: 10060;   /* çat panelinin üstündə */
+    cursor: zoom-out;
+    animation: dc-fade .15s ease-out;
+}
+
+.dc-lightbox[hidden] { display: none; }
+
+.dc-lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+}
+
+.dc-lightbox__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+@keyframes dc-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- MOBİL ---------- */
+
+/* Saytın üzən WhatsApp düyməsi göndər düyməsini örtməsin */
+.whatsapp-btn { transition: transform .25s ease, opacity .25s ease, bottom .4s ease; }
+
+@media (max-width: 992px) {
+    body.dc-composer-visible .whatsapp-btn {
+        opacity: 0;
+        transform: scale(.6);
+        pointer-events: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .dc-chat { height: 70vh; border-radius: 16px; }
+    .dc-chat--full { height: calc(100vh - 160px); }
+    .dc-chat__header { padding: 12px 14px; }
+    .dc-chat__body { padding: 10px 10px 14px; }
+    .dc-msg__content { max-width: 84%; }
+    .dc-chat__hint span:last-child { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dc-chat *, .dc-lightbox { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* =====================================================
+   ÜZƏN ÇAT DÜYMƏSİ + SAĞ PANEL + BİLDİRİŞ
+   ===================================================== */
+
+.dc-launcher {
+    position: fixed;
+    right: 24px;
+    bottom: calc(24px + var(--de-float-lift, 0px));
+    z-index: 10010;
+    display: grid;
+    place-items: center;
+    width: 55px;
+    height: 55px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #D81324 0%, #b00f1d 100%);
+    color: #fff;
+    font-size: 22px;
+    box-shadow: 0 8px 22px rgba(216, 19, 36, .4);
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, bottom .4s ease, opacity .2s;
+}
+
+.dc-launcher:hover { transform: scale(1.07); box-shadow: 0 12px 28px rgba(216, 19, 36, .5); }
+.dc-launcher:active { transform: scale(.94); }
+.dc-launcher:focus-visible { outline: 3px solid rgba(11, 33, 84, .45); outline-offset: 3px; }
+
+.dc-launcher__icon { grid-area: 1 / 1; transition: transform .25s ease, opacity .2s ease; }
+.dc-launcher__icon--close { opacity: 0; transform: rotate(-90deg) scale(.6); }
+.dc-launcher.is-open { background: #0B2154; box-shadow: 0 8px 22px rgba(11, 33, 84, .4); }
+.dc-launcher.is-open .dc-launcher__icon:not(.dc-launcher__icon--close) { opacity: 0; transform: rotate(90deg) scale(.6); }
+.dc-launcher.is-open .dc-launcher__icon--close { opacity: 1; transform: none; }
+
+.dc-launcher__badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border: 2px solid #fff;
+    border-radius: 11px;
+    background: #0B2154;
+    color: #fff;
+    font: 700 11.5px/18px "Ubuntu", system-ui, sans-serif;
+    text-align: center;
+}
+
+.dc-launcher__badge[hidden] { display: none; }
+
+.dc-launcher.has-unread:not(.is-open) { animation: dc-launcher-ring 2.4s ease-in-out infinite; }
+
+@keyframes dc-launcher-ring {
+    0%, 100% { box-shadow: 0 8px 22px rgba(216, 19, 36, .4), 0 0 0 0 rgba(216, 19, 36, .45); }
+    50% { box-shadow: 0 8px 22px rgba(216, 19, 36, .4), 0 0 0 12px rgba(216, 19, 36, 0); }
+}
+
+/* Panel: düymənin solunda, aşağı kənarı düymə ilə bir xətdə */
+.dc-drawer {
+    position: fixed;
+    right: calc(24px + 55px + 14px);
+    bottom: calc(24px + var(--de-float-lift, 0px));
+    z-index: 10005;
+    width: 350px;
+    max-width: calc(100vw - 24px - 55px - 14px - 16px);
+    height: min(520px, calc(100vh - 48px - var(--de-float-lift, 0px)));
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(18px) scale(.96);
+    transform-origin: bottom right;
+    transition: opacity .22s ease, transform .25s ease, visibility 0s linear .25s, bottom .4s ease;
+}
+
+.dc-drawer.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: opacity .22s ease, transform .25s ease, visibility 0s, bottom .4s ease;
+}
+
+.dc-drawer .dc-chat {
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(11, 33, 84, .28);
+}
+
+/* Paneldə yığcam ölçülər */
+.dc-drawer .dc-chat { border-radius: 16px; font-size: 13.5px; }
+.dc-drawer .dc-chat__header { gap: 10px; padding: 10px 10px 10px 12px; }
+.dc-drawer .dc-chat__logo { width: 32px; height: 32px; font-size: 14px; border-radius: 10px; box-shadow: 0 4px 10px rgba(216, 19, 36, .35); }
+.dc-drawer .dc-chat__heading h3 { font-size: 15.5px; line-height: 1.2; }
+.dc-drawer .dc-chat__status { gap: 5px; margin-top: 1px; font-size: 11.5px; }
+.dc-drawer .dc-chat__dot { width: 7px; height: 7px; }
+.dc-drawer .dc-chat__header .dc-chat__icon-btn { width: 30px; height: 30px; border-radius: 8px; font-size: 13px; }
+
+.dc-drawer .dc-chat__body { padding: 6px 10px 12px; }
+.dc-drawer .dc-msg { gap: 6px; margin-top: 8px; }
+.dc-drawer .dc-msg.is-grouped { margin-top: 2px; }
+.dc-drawer .dc-msg__avatar { width: 26px; height: 26px; font-size: 11px; }
+.dc-drawer .dc-msg__content { max-width: 80%; }
+.dc-drawer .dc-msg__name { font-size: 11px; }
+.dc-drawer .dc-msg__bubble { padding: 7px 10px 5px; border-radius: 14px; border-bottom-left-radius: 5px; }
+.dc-drawer .dc-msg.is-mine .dc-msg__bubble { border-bottom-left-radius: 14px; border-bottom-right-radius: 5px; }
+.dc-drawer .dc-msg__bubble.has-media { padding: 3px 3px 5px; }
+.dc-drawer .dc-msg__bubble.is-media-only { padding: 3px; }
+.dc-drawer .dc-msg__text { font-size: 13.5px; line-height: 1.4; }
+.dc-drawer .dc-msg__meta { font-size: 10.5px; }
+.dc-drawer .dc-msg__media { border-radius: 11px; }
+.dc-drawer .dc-msg__media img,
+.dc-drawer .dc-msg__media video { width: 230px; max-height: 260px; }
+.dc-drawer .dc-msg__media video { min-height: 130px; max-height: 300px; }
+.dc-drawer .dc-voice { width: 210px; gap: 8px; }
+.dc-drawer .dc-voice__play { width: 34px; height: 34px; font-size: 12px; }
+.dc-drawer .dc-voice__track { height: 26px; }
+.dc-drawer .dc-sep span { font-size: 11px; }
+
+.dc-drawer .dc-chat__composer { padding: 8px 10px 6px; }
+.dc-drawer .dc-chat__row { gap: 6px; align-items: flex-end; }
+.dc-drawer .dc-chat__attach,
+.dc-drawer .dc-chat__send { width: 38px; height: 38px; font-size: 15px; }
+.dc-drawer .dc-chat__send { box-shadow: 0 4px 10px rgba(216, 19, 36, .3); }
+.dc-drawer .dc-chat__input { min-height: 38px; padding: 9px 14px; border-radius: 19px; font-size: 13.5px; }
+.dc-drawer .dc-chat__hint { display: none; }
+.dc-drawer .dc-rec { min-height: 38px; gap: 8px; }
+.dc-drawer .dc-rec__cancel,
+.dc-drawer .dc-rec__pause { width: 34px; height: 34px; font-size: 14px; }
+.dc-drawer .dc-rec__time { font-size: 13.5px; }
+.dc-drawer .dc-chat__guest { padding: 12px; font-size: 13px; }
+.dc-drawer .dc-chat__empty i { font-size: 34px; }
+
+
+/* Bildiriş: düymənin solunda */
+.dc-toast {
+    position: fixed;
+    right: calc(24px + 55px + 14px);
+    bottom: calc(24px + var(--de-float-lift, 0px));
+    z-index: 10008;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 290px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 10px 10px 12px;
+    border: 1px solid #e3e7ef;
+    border-radius: 16px;
+    background: #fff;
+    color: #1d2433;
+    box-shadow: 0 16px 40px rgba(11, 33, 84, .2);
+    font-family: "Ubuntu", system-ui, sans-serif;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .22s ease, transform .22s ease;
+}
+
+.dc-toast.is-visible { opacity: 1; transform: none; }
+
+.dc-toast__icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #0B2154;
+    color: #fff;
+    font-size: 15px;
+}
+
+.dc-toast__icon.is-admin { background: #D81324; }
+.dc-toast__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.dc-toast__body b { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dc-toast__text {
+    color: #7a8394;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dc-toast__close {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #7a8394;
+    cursor: pointer;
+}
+
+.dc-toast__close:hover { background: #f4f6fa; color: #1d2433; }
+
+/* Mobil: panel bütün ekranı tutur, üzən düymələr gizlənir (bağla — başlıqdakı X) */
+@media (max-width: 576px) {
+    .dc-launcher { right: 16px; bottom: calc(16px + var(--de-float-lift, 0px)); width: 52px; height: 52px; font-size: 22px; }
+    .dc-toast { right: calc(16px + 52px + 10px); bottom: calc(16px + var(--de-float-lift, 0px)); max-width: calc(100vw - 16px - 52px - 10px - 12px); }
+
+    .dc-drawer {
+        inset: 0;
+        width: 100%;
+        max-width: none;
+        height: 100%;
+        height: 100dvh;
+        max-width: none;
+        transform: translateY(24px);
+    }
+
+    .dc-drawer .dc-chat { height: 100%; border: 0; border-radius: 0; }
+
+    body.dc-drawer-open { overflow: hidden; }
+    body.dc-drawer-open .dc-launcher,
+    body.dc-drawer-open .whatsapp-btn { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dc-launcher, .dc-drawer, .dc-toast { transition: none !important; animation: none !important; }
+}
+/* ---------- Bildiriş icazəsi zolağı ---------- */
+
+.dc-chat__push {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px 8px 12px;
+    border-bottom: 1px solid #f3d6d9;
+    background: #fff7f7;
+    color: var(--dc-text);
+    font-size: 12.5px;
+    line-height: 1.35;
+    flex-shrink: 0;
+}
+
+.dc-chat__push > i { color: var(--dc-primary); font-size: 14px; }
+.dc-chat__push span { flex: 1; min-width: 0; }
+
+.dc-chat__push-on {
+    padding: 5px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--dc-primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.dc-chat__push-on:hover { background: var(--dc-primary-dark); }
+
+.dc-chat__push-x {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--dc-muted);
+    cursor: pointer;
+}
+
+.dc-chat__push-x:hover { background: rgba(0, 0, 0, .06); color: var(--dc-text); }
+
+/* ---------- Açılış ekranı (html.de-intro, motion.css) ----------
+   Çat düyməsi z-index-i yüksək olduğu üçün açılış pərdəsinin ÜSTÜNDƏ görünürdü.
+   Pərdə qalxana qədər (~2s) düymə və bildirişlər gizli qalır, sonra yumşaq görünür. */
+/* "backwards": yalnız gözləmə müddətində gizlədir, sonra hover və digər effektlərə mane olmur */
+html.de-intro .dc-launcher,
+html.de-intro .dc-toast,
+html.de-intro .de-toasts {
+    animation: dc-after-intro .45s 2s cubic-bezier(.22, .61, .36, 1) backwards;
+}
+
+/* Oxunmamış mesaj varsa: əvvəl görünmə, sonra "zəng" animasiyası */
+html.de-intro .dc-launcher.has-unread:not(.is-open) {
+    animation: dc-after-intro .45s 2s cubic-bezier(.22, .61, .36, 1) backwards,
+               dc-launcher-ring 2.4s 2.45s ease-in-out infinite;
+}
+
+@keyframes dc-after-intro {
+    from { opacity: 0; visibility: hidden; transform: translateY(14px) scale(.9); }
+    to { opacity: 1; visibility: visible; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.de-intro .dc-launcher, html.de-intro .dc-toast, html.de-intro .de-toasts { animation: none; }
+}
+
+/* ---------- Paneldə redaktə (yığcam) ----------
+   .dc-edit eni min(440px, 72vw) idi — 350px-lik paneldən böyük olub kənara çıxırdı. */
+.dc-drawer .dc-msg.is-editing .dc-msg__content { flex: 1; max-width: 100%; }
+.dc-drawer .dc-msg.is-editing.is-mine .dc-msg__content { align-items: stretch; }
+
+.dc-drawer .dc-edit {
+    width: 100%;
+    gap: 6px;
+    padding: 8px;
+    border-width: 1.5px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(11, 33, 84, .12);
+}
+
+.dc-drawer .dc-edit textarea {
+    min-height: 40px;
+    max-height: 120px;
+    padding: 7px 9px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    resize: none;
+}
+
+.dc-drawer .dc-edit__file { gap: 8px; padding: 4px; border-radius: 8px; font-size: 12px; }
+.dc-drawer .dc-edit__file .thumb { width: 34px; height: 34px; border-radius: 6px; font-size: 13px; }
+
+.dc-drawer .dc-edit__row { gap: 5px; }
+.dc-drawer .dc-btn { gap: 5px; padding: 5px 9px; border-radius: 8px; font-size: 12px; }
+.dc-drawer .dc-btn i { font-size: 11px; }
+.dc-drawer .dc-edit__error { font-size: 11.5px; }
+
+/* Fayl düymələri bir sətirdə, "Ləğv et / Yadda saxla" alt sətirdə sağda */
+.dc-drawer .dc-edit > .dc-edit__row:last-of-type { row-gap: 6px; }
+.dc-drawer .dc-edit > .dc-edit__row > .dc-edit__row { flex: 1 1 100%; }
+.dc-drawer .dc-edit > .dc-edit__row > .spacer { display: none; }
+.dc-drawer .dc-edit > .dc-edit__row > .dc-btn { flex: 1 1 0; justify-content: center; }
+
+/* Yazı zolağı: mikrofon açılarkən ("hazırlanır") — boz nöqtə, göndər/fasilə hələ işləmir */
+.dc-rec.is-starting .dc-rec__dot { background: #9aa3b5; animation: dc-blink .6s ease-in-out infinite; }
+.dc-rec.is-starting .dc-rec__time { color: var(--dc-muted); }
+.dc-rec.is-starting .dc-rec__pause,
+.dc-rec.is-starting .dc-rec__send { opacity: .45; pointer-events: none; }
+
+/* =====================================================
+   WHATSAPP ÜSLUBU (.dc-wa) — şəxsi yazışmalar, ✓✓, cavab, reaksiyalar, emoji, axtarış
+   Köhnə üslubun üzərinə yazılır (daha yüksək spesifiklik: .dc-chat.dc-wa ...)
+   ===================================================== */
+
+.dc-chat.dc-wa {
+    --wa-teal: #D81324;
+    --wa-teal-dark: #B00F1D;
+    --wa-green: #D81324;
+    --wa-out: #FFE4E6;
+    --wa-in: #ffffff;
+    --wa-bg: #efeae2;
+    --wa-panel: #f0f2f5;
+    --wa-text: #111b21;
+    --wa-muted: #667781;
+    --wa-border: #e9edef;
+    --wa-blue: #53BDEB;
+    --wa-tick: #8696a0;
+    flex-direction: row;
+    border-radius: 14px;
+    border-color: #d1d7db;
+    color: var(--wa-text);
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, "Lucida Grande", Arial, "Ubuntu", sans-serif;
+}
+
+.dc-chat.dc-wa.dc-chat--full.dc-chat--list { max-width: 1240px; }
+
+/* ---------- Panel (yazışma) ---------- */
+.dc-chat.dc-wa .dc-pane {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+/* ---------- Başlıq ---------- */
+.dc-chat.dc-wa .dc-chat__header {
+    gap: 12px;
+    padding: 10px 14px;
+    min-height: 60px;
+    background: var(--wa-teal);
+    color: #fff;
+}
+.dc-chat.dc-wa .dc-chat__logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .18);
+    box-shadow: none;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.dc-chat.dc-wa .dc-chat__logo.has-img { background: #fff; }
+.dc-chat.dc-wa .dc-chat__logo img { width: 100%; height: 100%; object-fit: cover; }
+.dc-chat.dc-wa .dc-chat__heading { min-width: 0; flex: 1; }
+.dc-chat.dc-wa .dc-chat__heading h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #fff;
+}
+.dc-chat.dc-wa .dc-chat__status { gap: 0; font-size: 12.5px; opacity: .9; color: #fff; }
+.dc-chat.dc-wa .dc-chat__dot { display: none; }
+.dc-chat.dc-wa .dc-chat__status[data-state="typing"] .dc-chat__status-text { font-style: italic; }
+.dc-chat.dc-wa .dc-chat__status-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-chat.dc-wa .dc-chat__header .dc-chat__icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    font-size: 16px;
+}
+.dc-chat.dc-wa .dc-chat__header .dc-chat__icon-btn:hover { background: rgba(255, 255, 255, .14); }
+.dc-chat.dc-wa .dc-chat__back { margin-right: -6px; }
+
+/* ---------- Mesajlar sahəsi: WhatsApp fonu (orijinal naxış) ---------- */
+.dc-chat.dc-wa .dc-chat__body {
+    padding: 8px 6% 12px;
+    background-color: var(--wa-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23d6cdbf' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' opacity='.55'%3E%3Cpath d='M18 30l10-10m-3 13a5 5 0 1 1 7-7'/%3E%3Ccircle cx='120' cy='26' r='7'/%3E%3Cpath d='M120 15v4m0 14v4m-11-11h4m14 0h4'/%3E%3Cpath d='M58 92h26l5 8H53z'/%3E%3Ccircle cx='60' cy='102' r='3'/%3E%3Ccircle cx='82' cy='102' r='3'/%3E%3Cpath d='M128 120c6-8 14-8 20 0'/%3E%3Cpath d='M22 128l6 6 12-14'/%3E%3Cpath d='M92 40h14v10H92zM99 50v6'/%3E%3C/g%3E%3C/svg%3E");
+}
+.dc-chat.dc-wa .dc-chat__e2e {
+    margin: 6px auto 10px;
+    max-width: 420px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #ffeecd;
+    color: #54656f;
+    font-size: 12.5px;
+    line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 1px .5px rgba(11, 20, 26, .13);
+}
+.dc-chat.dc-wa .dc-chat__e2e i { margin-right: 4px; font-size: 11px; }
+
+/* Tarix ayırıcısı: "BU GÜN" */
+.dc-chat.dc-wa .dc-sep {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 6px;
+    position: sticky;
+    top: 4px;
+    z-index: 2;
+}
+.dc-chat.dc-wa .dc-sep::before, .dc-chat.dc-wa .dc-sep::after { display: none; }
+.dc-chat.dc-wa .dc-sep span {
+    padding: 5px 12px;
+    border-radius: 8px;
+    background: #fff;
+    color: #54656f;
+    font-size: 12.5px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .2px;
+    box-shadow: 0 1px .5px rgba(11, 20, 26, .13);
+}
+
+/* ---------- Mesaj ---------- */
+.dc-chat.dc-wa .dc-msg {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    touch-action: pan-y;
+}
+.dc-chat.dc-wa .dc-msg.is-grouped { margin-top: 2px; }
+.dc-chat.dc-wa .dc-msg.is-out { flex-direction: row-reverse; }
+.dc-chat.dc-wa .dc-msg__avatar { display: none; }
+
+.dc-chat.dc-wa .dc-msg__content {
+    max-width: min(75%, 560px);
+    align-items: flex-start;
+}
+.dc-chat.dc-wa .dc-msg.is-out .dc-msg__content { align-items: flex-end; }
+
+.dc-chat.dc-wa .dc-msg__bubble {
+    position: relative;
+    padding: 6px 8px 6px 9px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--wa-in);
+    color: var(--wa-text);
+    box-shadow: 0 1px .5px rgba(11, 20, 26, .13);
+    min-width: 64px;
+}
+.dc-chat.dc-wa .dc-msg.is-out .dc-msg__bubble { background: var(--wa-out); color: var(--wa-text); }
+.dc-chat.dc-wa .dc-msg.is-admin:not(.is-mine) .dc-msg__bubble { border: 0; }
+.dc-chat.dc-wa .dc-msg.is-in:not(.is-out) .dc-msg__bubble { background: var(--wa-in); }
+
+/* Quyruq: qrupun ilk mesajında */
+.dc-chat.dc-wa .dc-msg:not(.is-grouped) .dc-msg__bubble::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 13px;
+}
+.dc-chat.dc-wa .dc-msg.is-in:not(.is-grouped) .dc-msg__bubble { border-top-left-radius: 0; }
+.dc-chat.dc-wa .dc-msg.is-in:not(.is-grouped) .dc-msg__bubble::before {
+    left: -8px;
+    background: var(--wa-in);
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.dc-chat.dc-wa .dc-msg.is-out:not(.is-grouped) .dc-msg__bubble { border-top-right-radius: 0; }
+.dc-chat.dc-wa .dc-msg.is-out:not(.is-grouped) .dc-msg__bubble::before {
+    right: -8px;
+    background: var(--wa-out);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.dc-chat.dc-wa .dc-msg__name {
+    display: flex;
+    margin: 0 0 2px;
+    font-size: 12.8px;
+    font-weight: 600;
+}
+.dc-chat.dc-wa .dc-msg.is-grouped .dc-msg__name { display: none; }
+.dc-chat.dc-wa .dc-badge {
+    padding: 0 6px;
+    background: rgba(216, 19, 36, .1);
+    color: var(--wa-teal);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.dc-chat.dc-wa .dc-msg__text {
+    font-size: 14.2px;
+    line-height: 19px;
+    color: var(--wa-text);
+}
+.dc-chat.dc-wa .dc-msg__text.is-jumbo { font-size: 40px; line-height: 1.15; }
+.dc-chat.dc-wa .dc-msg__text a,
+.dc-chat.dc-wa .dc-msg.is-mine .dc-msg__text a { color: #027eb5; text-decoration: none; }
+.dc-chat.dc-wa .dc-msg__text a:hover { text-decoration: underline; }
+.dc-chat.dc-wa .dc-msg__text mark { background: #ffeb3b; color: inherit; padding: 0 1px; border-radius: 2px; }
+
+.dc-chat.dc-wa .dc-msg__meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+    margin: -2px 0 -2px 16px;
+    float: none;
+    color: var(--wa-muted);
+    font-size: 11px;
+    line-height: 15px;
+    white-space: nowrap;
+}
+.dc-chat.dc-wa .dc-msg.is-mine .dc-msg__meta { color: var(--wa-muted); }
+.dc-chat.dc-wa .dc-msg__edited { font-style: italic; margin-right: 2px; }
+
+/* ✓ / ✓✓ / mavi ✓✓ */
+.dc-ticks { display: inline-flex; align-items: center; color: #8696a0; line-height: 0; }
+.dc-ticks svg { width: 16px; height: 11px; }
+.dc-ticks[data-state="sent"] svg { width: 12px; }
+.dc-ticks[data-state="read"] { color: #53BDEB; }
+.dc-ticks[data-state="pending"] { font-size: 10px; }
+
+/* Media: başlıqsız şəkildə saat şəklin üstündə */
+.dc-chat.dc-wa .dc-msg__bubble.has-media { padding: 3px 3px 5px; }
+.dc-chat.dc-wa .dc-msg__bubble.has-media .dc-msg__text { padding: 4px 6px 0; }
+.dc-chat.dc-wa .dc-msg__bubble.has-media .dc-msg__meta { padding: 0 5px; }
+.dc-chat.dc-wa .dc-msg__media { border-radius: 6px; overflow: hidden; }
+.dc-chat.dc-wa .dc-msg__bubble.is-media-only .dc-msg__meta {
+    position: absolute;
+    right: 8px;
+    bottom: 7px;
+    margin: 0;
+    padding: 0 4px;
+    border-radius: 8px;
+    color: #fff;
+    background: linear-gradient(transparent, rgba(0, 0, 0, .25));
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
+}
+.dc-chat.dc-wa .dc-msg__bubble.is-media-only .dc-ticks { color: #fff; }
+.dc-chat.dc-wa .dc-msg__bubble.is-media-only .dc-ticks[data-state="read"] { color: #9de1fe; }
+
+/* Səs mesajı: WhatsApp rəngləri */
+.dc-chat.dc-wa .dc-voice__play,
+.dc-chat.dc-wa .dc-msg.is-mine .dc-voice__play { background: transparent; color: #54656f; box-shadow: none; }
+.dc-chat.dc-wa .dc-voice__bar { background: #b3bcc2; }
+.dc-chat.dc-wa .dc-voice__bar.is-played,
+.dc-chat.dc-wa .dc-msg.is-mine .dc-voice__bar.is-played { background: var(--wa-green); }
+.dc-chat.dc-wa .dc-msg.is-mine .dc-voice__time,
+.dc-chat.dc-wa .dc-msg.is-mine .dc-voice__rate { color: var(--wa-muted); }
+
+/* ---------- Cavab sitatı (balonun içində) ---------- */
+.dc-quote {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    width: 100%;
+    min-width: 160px;
+    margin: 0 0 5px;
+    padding: 5px 10px 6px 11px;
+    border: 0;
+    border-left: 4px solid #D81324;
+    border-radius: 6px;
+    background: rgba(11, 20, 26, .05);
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+}
+.dc-msg.is-out .dc-quote { background: rgba(11, 20, 26, .06); }
+.dc-quote.is-out { border-left-color: #53BDEB; }
+.dc-quote.is-in { border-left-color: #D81324; }
+.dc-quote:hover { background: rgba(11, 20, 26, .09); }
+.dc-quote__name { font-size: 12.8px; font-weight: 600; color: var(--wa-teal, #D81324); }
+.dc-quote.is-out .dc-quote__name { color: #027eb5; }
+.dc-quote__text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13px;
+    color: #667781;
+    line-height: 18px;
+    white-space: pre-wrap;
+}
+.dc-quote.is-deleted .dc-quote__text { font-style: italic; }
+
+/* ---------- Reaksiyalar ---------- */
+.dc-reacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin: -6px 8px 0;
+    position: relative;
+    z-index: 1;
+}
+.dc-react {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 24px;
+    padding: 0 7px;
+    border: 1px solid #fff;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(11, 20, 26, .2);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+.dc-react.is-mine { background: #FFE4E6; border-color: #FECDD3; }
+.dc-react__count { font-size: 11.5px; color: #667781; }
+
+/* ---------- Hover əməliyyatları ---------- */
+.dc-chat.dc-wa .dc-msg__actions {
+    position: static;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transform: none;
+    transition: opacity .15s;
+    flex-shrink: 0;
+}
+.dc-chat.dc-wa .dc-msg:hover .dc-msg__actions,
+.dc-chat.dc-wa .dc-msg:focus-within .dc-msg__actions { opacity: 1; }
+.dc-chat.dc-wa .dc-msg__action {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(255, 255, 255, .85);
+    color: #54656f;
+    box-shadow: 0 1px 2px rgba(11, 20, 26, .15);
+    font-size: 13px;
+}
+.dc-chat.dc-wa .dc-msg__action:hover { color: #111b21; background: #fff; }
+@media (hover: none) {
+    .dc-chat.dc-wa .dc-msg__actions { display: none; }
+}
+
+/* Sürüşdürmə (cavab) + vurğulama */
+.dc-chat.dc-wa .dc-msg.is-swiping .dc-msg__content::after {
+    content: "\f3e5";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: -34px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .9);
+    color: #54656f;
+    font-size: 12px;
+}
+.dc-chat.dc-wa .dc-msg__content { position: relative; }
+.dc-chat.dc-wa .dc-msg.is-flash .dc-msg__bubble { animation: dc-wa-flash 1.6s ease; }
+@keyframes dc-wa-flash {
+    0%, 30% { box-shadow: 0 0 0 4px rgba(216, 19, 36, .45); }
+    100% { box-shadow: 0 1px .5px rgba(11, 20, 26, .13); }
+}
+
+/* ---------- Mesaj menyusu ---------- */
+.dc-menu {
+    position: fixed;
+    z-index: 2147483000;
+    min-width: 210px;
+    padding: 6px 0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(11, 20, 26, .22);
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    animation: dc-wa-pop .14s ease-out;
+}
+.dc-menu[hidden] { display: none; }
+@keyframes dc-wa-pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+.dc-menu__reactions {
+    display: flex;
+    gap: 2px;
+    padding: 2px 8px 8px;
+    border-bottom: 1px solid #e9edef;
+}
+.dc-menu__reactions.is-expanded { flex-wrap: wrap; max-width: 280px; }
+.dc-menu__emoji {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .12s, background .12s;
+}
+.dc-menu__emoji:hover { transform: scale(1.18); background: #f0f2f5; }
+.dc-menu__emoji.is-mine { background: #FFE4E6; }
+.dc-menu__more { font-size: 14px; color: #54656f; background: #f0f2f5; }
+.dc-menu__actions { display: flex; flex-direction: column; padding-top: 4px; }
+.dc-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 18px;
+    border: 0;
+    background: transparent;
+    color: #3b4a54;
+    font-size: 14.5px;
+    text-align: left;
+    cursor: pointer;
+}
+.dc-menu__item i { width: 16px; color: #54656f; text-align: center; }
+.dc-menu__item:hover, .dc-menu__item:focus-visible { background: #f5f6f6; outline: none; }
+.dc-menu__item.is-danger, .dc-menu__item.is-danger i { color: #ea0038; }
+
+/* ---------- "Aşağı" düyməsi ---------- */
+.dc-chat.dc-wa .dc-chat__jump {
+    right: 18px;
+    left: auto;
+    bottom: 76px;
+    transform: none;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #54656f;
+    box-shadow: 0 1px 3px rgba(11, 20, 26, .3);
+    display: grid;
+    place-items: center;
+}
+.dc-chat__jump-count {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: #D81324;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+}
+
+/* ---------- Yazma sahəsi ---------- */
+.dc-chat.dc-wa .dc-chat__composer {
+    position: relative;
+    padding: 8px 10px;
+    border-top: 0;
+    background: var(--wa-panel);
+}
+.dc-chat.dc-wa .dc-chat__row { display: flex; align-items: flex-end; gap: 8px; }
+.dc-chat.dc-wa .dc-chat__field {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    min-width: 0;
+    padding: 3px 6px;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 1px .5px rgba(11, 20, 26, .1);
+}
+.dc-chat.dc-wa .dc-chat__input {
+    flex: 1;
+    min-height: 40px;
+    max-height: 140px;
+    padding: 10px 4px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--wa-text);
+    font-size: 15px;
+    line-height: 20px;
+    resize: none;
+    outline: none;
+}
+.dc-chat.dc-wa .dc-chat__emoji-btn,
+.dc-chat.dc-wa .dc-chat__attach {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #54656f;
+    font-size: 21px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.dc-chat.dc-wa .dc-chat__attach { font-size: 19px; transform: rotate(-45deg); }
+.dc-chat.dc-wa .dc-chat__emoji-btn:hover,
+.dc-chat.dc-wa .dc-chat__attach:hover,
+.dc-chat.dc-wa .dc-chat__emoji-btn.is-active { color: var(--wa-teal); }
+.dc-chat.dc-wa .dc-chat__send {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--wa-green);
+    color: #fff;
+    font-size: 18px;
+    box-shadow: 0 1px 2px rgba(11, 20, 26, .2);
+    flex-shrink: 0;
+}
+.dc-chat.dc-wa .dc-chat__send:hover:not(:disabled) { background: var(--wa-teal); }
+.dc-chat.dc-wa .dc-chat__send:disabled { background: var(--wa-green); opacity: .55; }
+.dc-chat.dc-wa .dc-chat__send i { margin-left: -2px; }
+.dc-chat.dc-wa .dc-chat__mic i { margin: 0; }
+
+/* Cavab zolağı (yazma sahəsinin üstündə) */
+.dc-chat.dc-wa .dc-reply {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    padding: 6px 6px 6px 0;
+    border-radius: 8px;
+    background: #fff;
+}
+.dc-reply__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 10px;
+    border-left: 4px solid #D81324;
+    border-radius: 4px;
+    background: #f0f2f5;
+}
+.dc-reply.is-out .dc-reply__body { border-left-color: #53BDEB; }
+.dc-reply__name { font-size: 12.8px; font-weight: 600; color: #D81324; }
+.dc-reply.is-out .dc-reply__name { color: #027eb5; }
+.dc-reply__text { font-size: 13px; color: #667781; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-chat.dc-wa .dc-reply .dc-chat__icon-btn { background: transparent; border: 0; color: #54656f; }
+
+/* Emoji paneli */
+.dc-chat.dc-wa .dc-emoji {
+    margin: 0 0 8px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(11, 20, 26, .12);
+    overflow: hidden;
+}
+.dc-emoji__tabs { display: flex; border-bottom: 1px solid #e9edef; }
+.dc-emoji__tabs button {
+    flex: 1;
+    height: 38px;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    filter: grayscale(1);
+    opacity: .7;
+}
+.dc-emoji__tabs button.is-active { border-bottom-color: var(--wa-green, #D81324); filter: none; opacity: 1; }
+.dc-emoji__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    max-height: 210px;
+    overflow-y: auto;
+    padding: 6px;
+}
+.dc-emoji__item {
+    height: 38px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+.dc-emoji__item:hover { background: #f0f2f5; }
+
+/* Səs yazma zolağı */
+.dc-chat.dc-wa .dc-rec { background: var(--wa-panel); }
+
+/* ---------- Axtarış ---------- */
+.dc-chat.dc-wa .dc-search {
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    max-height: 70%;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(11, 20, 26, .18);
+}
+.dc-search__bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 60px;
+    padding: 8px 10px;
+    background: var(--wa-teal, #D81324);
+}
+.dc-search__bar .dc-chat__icon-btn { background: transparent; border: 0; color: #fff; }
+.dc-search__input {
+    flex: 1;
+    height: 38px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 15px;
+    outline: none;
+}
+.dc-search__results { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+.dc-search__item { padding: 10px 16px; border-bottom: 1px solid #f0f2f5; cursor: pointer; }
+.dc-search__item:hover, .dc-search__item:focus { background: #f5f6f6; outline: none; }
+.dc-search__head { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #667781; }
+.dc-search__text { margin-top: 2px; font-size: 14px; color: #111b21; white-space: pre-wrap; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dc-search__text mark { background: transparent; color: var(--wa-green, #D81324); font-weight: 600; }
+.dc-search__none { padding: 18px; text-align: center; color: #667781; font-size: 14px; }
+
+/* ---------- Bildiriş zolağı ---------- */
+.dc-chat.dc-wa .dc-chat__push { background: #53BDEB; color: #fff; border: 0; }
+.dc-chat.dc-wa .dc-chat__push button { color: #fff; }
+
+/* =====================================================
+   USTA: YAZIŞMALAR SİYAHISI (WhatsApp "Çatlar")
+   ===================================================== */
+
+.dc-chat.dc-wa .dc-convs {
+    display: flex;
+    flex-direction: column;
+    width: 380px;
+    max-width: 42%;
+    min-height: 0;
+    border-right: 1px solid #d1d7db;
+    background: #fff;
+    flex-shrink: 0;
+}
+.dc-convs__header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 60px;
+    padding: 10px 14px 6px 18px;
+    background: #fff;
+}
+.dc-convs__header h3 { margin: 0; flex: 1; font-size: 21px; font-weight: 700; color: #111b21; }
+.dc-convs__header .dc-chat__icon-btn { background: transparent; border: 0; color: #54656f; border-radius: 50%; }
+.dc-convs__header .dc-chat__icon-btn:hover { background: #f0f2f5; }
+.dc-convs__total {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: #D81324;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 22px;
+    text-align: center;
+}
+.dc-convs__search {
+    position: relative;
+    margin: 4px 12px 6px;
+}
+.dc-convs__search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #54656f; font-size: 13px; }
+.dc-convs__search input {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px 0 40px;
+    border: 0;
+    border-radius: 8px;
+    background: #f0f2f5;
+    font-size: 14px;
+    outline: none;
+}
+.dc-convs__filters { display: flex; gap: 8px; padding: 4px 12px 8px; }
+.dc-convs__filters button {
+    height: 32px;
+    padding: 0 13px;
+    border: 0;
+    border-radius: 16px;
+    background: #f0f2f5;
+    color: #54656f;
+    font-size: 14px;
+    cursor: pointer;
+}
+.dc-convs__filters button.is-active { background: #FFE4E6; color: #D81324; font-weight: 600; }
+.dc-convs__list { list-style: none; margin: 0; padding: 0; flex: 1; overflow-y: auto; }
+.dc-conv {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 0 0 0 13px;
+    cursor: pointer;
+    outline: none;
+}
+.dc-conv:hover, .dc-conv:focus-visible { background: #f5f6f6; }
+.dc-conv.is-active { background: #f0f2f5; }
+.dc-avatar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 49px;
+    height: 49px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 19px;
+    font-weight: 600;
+    flex-shrink: 0;
+    overflow: visible;
+    user-select: none;
+}
+.dc-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.dc-avatar.is-online::after {
+    content: "";
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #D81324;
+    border: 2px solid #fff;
+}
+.dc-conv__main {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 15px 12px 0;
+    border-bottom: 1px solid #f0f2f5;
+}
+.dc-conv__top, .dc-conv__bottom { display: flex; align-items: center; gap: 6px; }
+.dc-conv__title { flex: 1; min-width: 0; font-size: 16.5px; color: #111b21; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-conv__time { font-size: 12px; color: #667781; flex-shrink: 0; }
+.dc-conv.has-unread .dc-conv__time { color: #D81324; font-weight: 600; }
+.dc-conv__bottom { margin-top: 2px; }
+.dc-conv__last {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 14px;
+    color: #667781;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dc-conv__last.is-typing { color: #D81324; font-style: italic; }
+.dc-conv.has-unread .dc-conv__last { color: #111b21; }
+.dc-conv__badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: #D81324;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.dc-convs__empty { padding: 40px 20px; text-align: center; color: #667781; }
+.dc-convs__empty i { font-size: 34px; opacity: .5; }
+.dc-convs__loading { display: grid; place-items: center; padding: 30px; }
+
+/* Yazışma seçilməyib */
+.dc-pane__placeholder {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 30px;
+    background: #f0f2f5;
+    color: #667781;
+    text-align: center;
+    border-bottom: 6px solid #D81324;
+}
+.dc-pane__placeholder h4 { margin: 10px 0 0; font-size: 28px; font-weight: 300; color: #41525d; }
+.dc-pane__placeholder p { margin: 0; max-width: 420px; font-size: 14px; }
+.dc-pane__placeholder span { margin-top: 18px; font-size: 13px; }
+.dc-pane__placeholder-icon {
+    display: grid;
+    place-items: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #fff;
+    color: #D81324;
+    font-size: 48px;
+    box-shadow: 0 2px 12px rgba(11, 20, 26, .08);
+}
+
+/* Usta: yazışma seçilməyibsə — sağ tərəfdə yer tutucu */
+.dc-chat.dc-wa.dc-chat--list:not(.has-conversation) .dc-pane > :not(.dc-pane__placeholder):not(.dc-search) { display: none !important; }
+.dc-chat.dc-wa.dc-chat--list:not(.has-conversation) .dc-pane__placeholder { display: flex; }
+.dc-chat.dc-wa:not(.dc-chat--list) .dc-chat__back { display: none; }
+
+/* Dar ekran / panel: siyahı və yazışma növbə ilə (WhatsApp mobil kimi) */
+.dc-chat.dc-wa.dc-chat--list:not(.dc-chat--full) .dc-convs,
+.dc-chat.dc-wa.dc-chat--list.dc-chat--drawer .dc-convs { width: 100%; max-width: none; border-right: 0; }
+.dc-chat.dc-wa.dc-chat--list:not(.dc-chat--full)[data-view="chat"] .dc-convs,
+.dc-chat.dc-wa.dc-chat--list:not(.dc-chat--full)[data-view="list"] .dc-pane { display: none; }
+
+@media (max-width: 899.98px) {
+    .dc-chat.dc-wa.dc-chat--list .dc-convs { width: 100%; max-width: none; border-right: 0; }
+    .dc-chat.dc-wa.dc-chat--list[data-view="chat"] .dc-convs,
+    .dc-chat.dc-wa.dc-chat--list[data-view="list"] .dc-pane { display: none; }
+}
+@media (min-width: 900px) {
+    .dc-chat.dc-wa.dc-chat--list.dc-chat--full .dc-chat__back { display: none; }
+}
+
+@media (max-width: 575.98px) {
+    .dc-chat.dc-wa .dc-chat__body { padding: 6px 10px 10px; }
+    .dc-chat.dc-wa .dc-msg__content { max-width: 85%; }
+}
+
+/* Panel (sağdan açılan) — kompakt ölçülər */
+.dc-drawer .dc-chat.dc-wa .dc-chat__header { min-height: 56px; padding: 8px 10px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__logo { width: 38px; height: 38px; border-radius: 50%; box-shadow: none; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__header .dc-chat__icon-btn { width: 34px; height: 34px; border-radius: 50%; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__body { padding: 6px 12px 10px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__bubble { padding: 6px 8px 6px 9px; border-radius: 8px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg.is-in:not(.is-grouped) .dc-msg__bubble { border-top-left-radius: 0; }
+.dc-drawer .dc-chat.dc-wa .dc-msg.is-out:not(.is-grouped) .dc-msg__bubble { border-top-right-radius: 0; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__content { max-width: 82%; }
+.dc-drawer .dc-chat.dc-wa .dc-msg { margin-top: 8px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg.is-grouped { margin-top: 2px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__bubble.has-media { padding: 3px 3px 5px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__bubble.is-media-only { padding: 3px; }
+
+/* =====================================================
+   QRUPLAR, YAYIM, MODAL PƏNCƏRƏLƏR, ZƏNG DÜYMƏLƏRİ
+   ===================================================== */
+.dc-avatar.is-group, .dc-avatar.is-support { background: #FDE2E4; color: #D81324; font-size: 20px; }
+.dc-chat.dc-wa.is-group .dc-chat__logo { background: rgba(255, 255, 255, .18); }
+.dc-conv__sender { font-weight: 600; color: #3b4a54; }
+.dc-chat.dc-wa .dc-chat__heading { cursor: pointer; border-radius: 8px; }
+.dc-chat.dc-wa .dc-chat__heading:focus-visible { outline: 2px solid rgba(255, 255, 255, .7); outline-offset: 2px; }
+.dc-chat.dc-wa .dc-chat__readonly {
+    padding: 14px 16px;
+    background: #f0f2f5;
+    color: #54656f;
+    font-size: 14px;
+    text-align: center;
+}
+.dc-chat.dc-wa .dc-chat__readonly i { margin-right: 6px; color: #D81324; }
+.dc-chat.dc-wa .dc-convs__filters { flex-wrap: wrap; }
+
+/* Modal */
+.dc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2147482000;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(11, 20, 26, .45);
+    animation: dc-wa-fade .15s ease-out;
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+@keyframes dc-wa-fade { from { opacity: 0; } to { opacity: 1; } }
+.dc-modal__box {
+    display: flex;
+    flex-direction: column;
+    width: min(480px, 100%);
+    max-height: min(680px, calc(100vh - 32px));
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 18px 48px rgba(11, 20, 26, .3);
+    overflow: hidden;
+    animation: dc-wa-pop .16s ease-out;
+}
+.dc-modal__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #D81324;
+    color: #fff;
+}
+.dc-modal__head h4 { flex: 1; margin: 0; font-size: 17px; font-weight: 600; color: #fff; }
+.dc-modal__head button { width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 16px; cursor: pointer; }
+.dc-modal__head button:hover { background: rgba(255, 255, 255, .15); }
+.dc-modal__body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.dc-modal__foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid #e9edef; flex-wrap: wrap; }
+.dc-modal label.dc-field { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: #54656f; }
+.dc-modal input[type="text"], .dc-modal input[type="search"], .dc-modal textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d7db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #111b21;
+    outline: none;
+    font-family: inherit;
+}
+.dc-modal input:focus, .dc-modal textarea:focus { border-color: #D81324; }
+.dc-modal textarea { min-height: 96px; resize: vertical; }
+.dc-switch { display: flex; align-items: center; gap: 10px; font-size: 14.5px; color: #111b21; cursor: pointer; }
+.dc-switch input { width: 18px; height: 18px; accent-color: #D81324; flex-shrink: 0; }
+.dc-switch small { display: block; color: #667781; font-size: 12.5px; }
+.dc-modal__btn {
+    height: 38px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 19px;
+    background: #f0f2f5;
+    color: #3b4a54;
+    font-size: 14.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.dc-modal__btn.is-primary { background: #D81324; color: #fff; }
+.dc-modal__btn.is-primary:hover { background: #B00F1D; }
+.dc-modal__btn.is-danger { background: #fff; color: #ea0038; border: 1px solid #f5c2cc; margin-right: auto; }
+.dc-modal__btn:disabled { opacity: .55; cursor: default; }
+.dc-modal__error { color: #ea0038; font-size: 13.5px; }
+.dc-modal__hint { color: #667781; font-size: 13px; margin: 0; }
+
+/* Üzv siyahısı */
+.dc-members { list-style: none; margin: 0; padding: 0; border: 1px solid #e9edef; border-radius: 10px; max-height: 280px; overflow-y: auto; }
+.dc-members li { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid #f0f2f5; }
+.dc-members li:last-child { border-bottom: 0; }
+.dc-members label { display: contents; cursor: pointer; }
+.dc-members .dc-avatar { width: 38px; height: 38px; font-size: 15px; }
+.dc-members__name { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 14.5px; color: #111b21; }
+.dc-members__name small { color: #667781; font-size: 12.5px; }
+.dc-members__tag { font-size: 11px; padding: 1px 7px; border-radius: 9px; background: #FDE2E4; color: #D81324; font-weight: 600; }
+.dc-members input[type="checkbox"] { width: 18px; height: 18px; accent-color: #D81324; }
+.dc-members__remove { border: 0; background: transparent; color: #ea0038; cursor: pointer; font-size: 14px; padding: 6px; }
+.dc-members.is-disabled { opacity: .45; pointer-events: none; }
+.dc-group-head { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.dc-group-head .dc-avatar { width: 84px; height: 84px; font-size: 34px; }
+.dc-group-head h5 { margin: 4px 0 0; font-size: 20px; color: #111b21; }
+.dc-group-head p { margin: 0; color: #667781; font-size: 14px; }
+
+/* ---------- Gələn zəng (call-ring.js) ---------- */
+.dc-ring {
+    position: fixed; z-index: 2147483100; left: 50%; top: 16px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px;
+    width: min(420px, calc(100vw - 24px)); padding: 14px 16px;
+    border-radius: 18px; background: #111b21; color: #e9edef;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    animation: dc-ring-in .25s ease-out;
+}
+@keyframes dc-ring-in { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translateX(-50%); } }
+.dc-ring__avatar { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: #D81324; color: #fff; font-size: 20px; flex-shrink: 0; animation: dc-ring-pulse 1.4s infinite; }
+@keyframes dc-ring-pulse { 0% { box-shadow: 0 0 0 0 rgba(216, 19, 36, .6); } 100% { box-shadow: 0 0 0 16px rgba(216, 19, 36, 0); } }
+.dc-ring__text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dc-ring__text b { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+.dc-ring__text span { font-size: 13px; color: #aebac1; }
+.dc-ring__btn { width: 46px; height: 46px; border: 0; border-radius: 50%; color: #fff; font-size: 18px; cursor: pointer; flex-shrink: 0; }
+.dc-ring__btn.is-decline { background: #3b4a54; }
+.dc-ring__btn.is-decline:hover { background: #ea0038; }
+.dc-ring__btn.is-accept { background: #D81324; animation: dc-ring-shake 1.2s infinite; }
+@keyframes dc-ring-shake { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-12deg); } 80% { transform: rotate(12deg); } 90% { transform: rotate(-8deg); } }
+/* =====================================================
+   KİÇİK ÇAT PANELİ (sağdan açılan) — ölçülər və dizayn
+   ===================================================== */
+
+/* "⋮" menyusu: tam səhifədə düymələr yan-yana, paneldə açılan siyahı */
+.dc-chat__tools { display: contents; }
+.dc-chat.dc-wa .dc-chat__tools-btn { display: none; }
+.dc-tool-label { display: none; }
+
+@media (min-width: 577px) {
+    .dc-drawer {
+        width: 400px;
+        max-width: calc(100vw - 24px - 55px - 14px - 16px);
+        /* saytın yuxarı menyusunu örtməsin */
+        height: min(640px, calc(100vh - 150px - var(--de-float-lift, 0px)));
+        min-height: 420px;
+    }
+}
+
+.dc-drawer .dc-chat.dc-wa {
+    border: 0;
+    border-radius: 18px;
+    font-size: 14px;
+    box-shadow: 0 24px 60px rgba(11, 20, 26, .3), 0 0 0 1px rgba(11, 20, 26, .06);
+}
+
+/* Başlıq: ← · şəkil · ad (tam görünür) · 📹 · 📞 · ⋮ · ✕ */
+.dc-drawer .dc-chat.dc-wa .dc-chat__header {
+    position: relative;
+    gap: 4px;
+    min-height: 60px;
+    padding: 8px 6px 8px 8px;
+}
+.dc-drawer .dc-chat.dc-wa .dc-chat__logo { width: 40px; height: 40px; margin: 0 6px 0 2px; font-size: 16px; border-radius: 50%; box-shadow: none; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__heading { flex: 1 1 auto; min-width: 0; padding: 2px 4px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__heading h3 { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__status { display: block; margin-top: 1px; font-size: 12px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__header .dc-chat__icon-btn {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    font-size: 16px;
+}
+.dc-drawer .dc-chat.dc-wa .dc-chat__back { margin-right: 0; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__tools-btn { display: grid; place-items: center; }
+
+.dc-drawer .dc-chat.dc-wa .dc-chat__tools {
+    display: none;
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 8px;
+    z-index: 9;
+    flex-direction: column;
+    min-width: 220px;
+    padding: 6px 0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(11, 20, 26, .24);
+    animation: dc-wa-pop .14s ease-out;
+}
+.dc-drawer .dc-chat.dc-wa.tools-open .dc-chat__tools { display: flex; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__tools .dc-chat__icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    width: auto;
+    height: auto;
+    padding: 11px 18px;
+    border-radius: 0;
+    background: transparent;
+    color: #3b4a54;
+    font-size: 14.5px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+.dc-drawer .dc-chat.dc-wa .dc-chat__tools .dc-chat__icon-btn:hover { background: #f5f6f6; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__tools i { width: 18px; color: #54656f; text-align: center; font-size: 15px; }
+.dc-drawer .dc-tool-label { display: inline; }
+
+/* Bildiriş zolağı: bir sətir, yığcam */
+.dc-drawer .dc-chat.dc-wa .dc-chat__push {
+    gap: 8px;
+    padding: 7px 8px 7px 12px;
+    font-size: 12.5px;
+    line-height: 1.3;
+}
+.dc-drawer .dc-chat.dc-wa .dc-chat__push span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__push-on { padding: 5px 10px; font-size: 12px; white-space: nowrap; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__push-x { width: 26px; height: 26px; }
+
+/* Mesajlar */
+.dc-drawer .dc-chat.dc-wa .dc-chat__body { padding: 6px 14px 10px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__e2e { margin: 6px auto 8px; padding: 5px 10px; font-size: 12px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__content { max-width: 84%; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__text { font-size: 14px; line-height: 19px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__meta { font-size: 11px; }
+.dc-drawer .dc-chat.dc-wa .dc-msg__name { font-size: 12.5px; }
+.dc-drawer .dc-chat.dc-wa .dc-quote { min-width: 0; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__jump { right: 14px; bottom: 74px; width: 38px; height: 38px; }
+
+/* Yazma sahəsi */
+.dc-drawer .dc-chat.dc-wa .dc-chat__composer { padding: 7px 8px 8px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__row { gap: 6px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__field { padding: 2px 4px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__input { min-height: 38px; padding: 9px 2px; font-size: 14.5px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__emoji-btn,
+.dc-drawer .dc-chat.dc-wa .dc-chat__attach { width: 36px; height: 36px; font-size: 19px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__attach { font-size: 17px; }
+.dc-drawer .dc-chat.dc-wa .dc-chat__send { width: 42px; height: 42px; font-size: 16px; }
+.dc-drawer .dc-chat.dc-wa .dc-emoji__grid { max-height: 170px; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); }
+
+/* "Çatlar" siyahısı */
+.dc-drawer .dc-chat.dc-wa .dc-convs__header { gap: 2px; min-height: 58px; padding: 10px 8px 4px 16px; }
+.dc-drawer .dc-chat.dc-wa .dc-convs__header h3 { font-size: 20px; }
+.dc-drawer .dc-chat.dc-wa .dc-convs__header .dc-chat__icon-btn { width: 36px; height: 36px; border-radius: 50%; font-size: 15px; }
+.dc-drawer .dc-chat.dc-wa .dc-convs__total { margin-right: 4px; }
+.dc-drawer .dc-chat.dc-wa .dc-convs__search { margin: 4px 12px 6px; }
+.dc-drawer .dc-chat.dc-wa .dc-convs__filters { gap: 6px; padding: 2px 12px 8px; }
+.dc-drawer .dc-chat.dc-wa .dc-convs__filters button { height: 30px; padding: 0 12px; font-size: 13.5px; }
+.dc-drawer .dc-chat.dc-wa .dc-conv { gap: 12px; padding-left: 12px; }
+.dc-drawer .dc-chat.dc-wa .dc-conv .dc-avatar { width: 46px; height: 46px; font-size: 18px; }
+.dc-drawer .dc-chat.dc-wa .dc-conv__main { padding: 11px 14px 11px 0; }
+.dc-drawer .dc-chat.dc-wa .dc-conv__title { font-size: 15.5px; }
+.dc-drawer .dc-chat.dc-wa .dc-conv__last { font-size: 13.5px; }
+
+/* Yer tutucu (siyahıdan yazışma seçilməyib) paneldə görünmür — panel tək sütundur */
+.dc-drawer .dc-chat.dc-wa .dc-pane__placeholder h4 { font-size: 22px; }
+
+/* =====================================================
+   TELEFON: "Canlı Çat" səhifəsi — kənardan-kənara, tam hündürlük, başlıqda "⋮" menyusu
+   ===================================================== */
+@media (max-width: 576px) {
+    .dc-chat.dc-wa.dc-chat--full {
+        width: 100vw;
+        max-width: none;
+        margin-left: calc(50% - 50vw);
+        height: calc(100dvh - 72px);
+        min-height: 420px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* Yazma sahəsi görünəndə saytın üzən düymələri onu örtməsin */
+    body.dc-composer-visible .dc-launcher { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    /* Başlıq: ← · şəkil · ad · 📹 · 📞 · ⋮ (axtarış, səs, tam ekran — menyuda) */
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__header { position: relative; gap: 4px; min-height: 58px; padding: 8px 6px 8px 8px; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__logo { width: 40px; height: 40px; margin: 0 6px 0 2px; font-size: 16px; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__heading { flex: 1 1 auto; min-width: 0; padding: 2px 4px; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__heading h3 { font-size: 16px; font-weight: 600; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__status { display: block; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__header .dc-chat__icon-btn { width: 36px; height: 36px; flex: 0 0 auto; font-size: 16px; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__tools-btn { display: grid; place-items: center; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__tools {
+        display: none;
+        position: absolute;
+        top: calc(100% - 4px);
+        right: 8px;
+        z-index: 9;
+        flex-direction: column;
+        min-width: 220px;
+        padding: 6px 0;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(11, 20, 26, .24);
+    }
+    .dc-chat.dc-wa.dc-chat--full.tools-open .dc-chat__tools { display: flex; }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__tools .dc-chat__icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        width: auto;
+        height: auto;
+        padding: 12px 18px;
+        border-radius: 0;
+        background: transparent;
+        color: #3b4a54;
+        font-size: 15px;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .dc-chat.dc-wa.dc-chat--full .dc-chat__tools i { width: 18px; color: #54656f; text-align: center; }
+    .dc-chat.dc-wa.dc-chat--full .dc-tool-label { display: inline; }
+
+    /* Bildiriş zolağı bir sətir */
+    .dc-chat.dc-wa .dc-chat__push { gap: 8px; padding: 7px 8px 7px 12px; font-size: 12.5px; }
+    .dc-chat.dc-wa .dc-chat__push span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dc-chat.dc-wa .dc-chat__push-on { padding: 5px 10px; font-size: 12px; white-space: nowrap; }
+
+    /* Yazma sahəsi: barmaq üçün rahat, iPhone-da yazanda səhifə böyüməsin (16px) */
+    .dc-chat.dc-wa .dc-chat__composer { padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); }
+    .dc-chat.dc-wa .dc-chat__input { font-size: 16px; }
+    .dc-chat.dc-wa .dc-chat__send { width: 46px; height: 46px; }
+
+    /* Mesajlar ekranın enini yaxşı istifadə etsin */
+    .dc-chat.dc-wa .dc-chat__body { padding: 6px 10px 10px; }
+    .dc-chat.dc-wa .dc-msg__content { max-width: 86%; }
+    .dc-chat.dc-wa .dc-msg__actions { display: none; }   /* toxunma: uzun basma → menyu */
+
+    /* Usta: siyahı və yazışma tam ekranda növbə ilə */
+    .dc-chat.dc-wa.dc-chat--full.dc-chat--list .dc-convs { border-right: 0; }
+}
+
+/* =====================================================
+   TELEFON: klaviatura açılanda sürüşmə olmasın (chat.js → fitToViewport)
+   --dc-vvh / --dc-vvtop — görünən hissə (klaviaturadan yuxarı), --dc-header-h — saytın başlığı
+   ===================================================== */
+.dc-chat.dc-wa .dc-chat__body,
+.dc-chat.dc-wa .dc-convs__list,
+.dc-chat.dc-wa .dc-search__results,
+.dc-chat.dc-wa .dc-emoji__grid { overscroll-behavior: contain; }
+
+@media (max-width: 576px) {
+    /* "Canlı Çat" səhifəsi: çat başlığın altında sabit, səhifənin özü sürüşmür */
+    html:has(body.dc-chat-page), body.dc-chat-page { overflow: hidden !important; height: 100%; }
+    body.dc-chat-page .dc-chat.dc-wa.dc-chat--full {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: calc(var(--dc-vvtop, 0px) + var(--dc-header-h, 64px));
+        width: 100%;
+        height: calc(var(--dc-vvh, 100dvh) - var(--dc-header-h, 64px));
+        min-height: 0;
+        margin: 0;
+        z-index: 1020;
+    }
+    body.dc-chat-page .whatsapp-btn,
+    body.dc-chat-page .de-totop,
+    body.dc-chat-page .dc-launcher { display: none !important; }
+
+    /* Sağdan açılan panel: klaviaturadan yuxarıda qalan hissəni tutur */
+    .dc-drawer {
+        inset: var(--dc-vvtop, 0px) 0 auto 0;
+        height: var(--dc-vvh, 100dvh);
+    }
+    html:has(body.dc-drawer-open) { overflow: hidden !important; }
+}
+/* =====================================================
+   Telefonda yazma sahəsinə toxunanda brauzer YAXINLAŞDIRMASIN
+   iPhone (Safari) şrifti 16px-dən kiçik olan sahəyə fokusda avtomatik zoom edir — bütün sahələr ≥ 16px.
+   ===================================================== */
+@media (max-width: 576px), (hover: none) and (pointer: coarse) {
+    .dc-chat input[type="text"],
+    .dc-chat input[type="search"],
+    .dc-chat input:not([type]),
+    .dc-chat textarea,
+    .dc-chat select,
+    .dc-modal input[type="text"],
+    .dc-modal input[type="search"],
+    .dc-modal textarea,
+    .dc-drawer .dc-chat.dc-wa .dc-chat__input,
+    .dc-drawer .dc-chat__input,
+    .dc-chat.dc-wa .dc-chat__input,
+    .dc-chat.dc-wa .dc-convs__search input,
+    .dc-chat.dc-wa .dc-search__input,
+    .dc-edit textarea {
+        font-size: 16px !important;
+    }
+}
+/* =====================================================
+   PROFİL ŞƏKİLLƏRİ — həmişə tam dairə, uzanmadan (Çatlar siyahısı, başlıq, üzvlər, qrup)
+   ===================================================== */
+.dc-avatar,
+.dc-chat.dc-wa .dc-chat__logo {
+    position: relative;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+}
+.dc-avatar img,
+.dc-chat.dc-wa .dc-chat__logo img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 25%;   /* üz adətən yuxarı hissədədir */
+}
+/* Şəkilli avatar: yüklənənə qədər boz fon, kənarda incə xətt */
+.dc-avatar:has(img) {
+    background: #dfe5e7 !important;
+    color: transparent;
+}
+.dc-avatar:has(img)::before,
+.dc-chat.dc-wa .dc-chat__logo.has-img::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(11, 20, 26, .08);
+    pointer-events: none;
+}
+.dc-chat.dc-wa .dc-chat__logo.has-img { overflow: hidden; background: #fff; }
+.dc-chat.dc-wa .dc-chat__logo.has-img::before { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .55); }
+/* Onlayn nöqtəsi şəklin üstündə qalsın */
+.dc-avatar.is-online::after { z-index: 2; }
+/* ✓ / ✓✓ ölçüsü (xətlə çəkilmiş işarələr) */
+.dc-ticks svg { width: 17px; height: 11px; overflow: visible; }
+.dc-ticks[data-state="sent"] svg { width: 12px; }
+
+/* =====================================================
+   Mesaja / sitata toxunanda qırmızı çərçivə olmasın
+   - sitatdan mesaja keçəndə: WhatsApp kimi bütün sətirin fonu qısa müddət yüngül tündləşir (çərçivəsiz)
+   - telefonun toxunma işığı və siçan klikindən sonra qalan fokus çərçivəsi söndürülür (klaviatura ilə gəzəndə qalır)
+   ===================================================== */
+.dc-chat.dc-wa .dc-msg.is-flash .dc-msg__bubble { animation: none; }
+.dc-chat.dc-wa .dc-msg.is-flash { animation: dc-wa-row-flash 1.8s ease; border-radius: 6px; }
+@keyframes dc-wa-row-flash {
+    0%, 35% { background-color: rgba(11, 20, 26, .10); }
+    100% { background-color: transparent; }
+}
+
+.dc-chat,
+.dc-chat *,
+.dc-menu,
+.dc-menu * { -webkit-tap-highlight-color: transparent; }
+
+.dc-chat button:focus:not(:focus-visible),
+.dc-chat a:focus:not(:focus-visible),
+.dc-chat [tabindex]:focus:not(:focus-visible),
+.dc-menu button:focus:not(:focus-visible) { outline: none; box-shadow: none; }
+.dc-chat.dc-wa .dc-quote:focus-visible,
+.dc-chat.dc-wa .dc-react:focus-visible { outline: 2px solid rgba(11, 20, 26, .35); outline-offset: 1px; }
+/* Yazma sahəsinə toxunanda saytın ümumi qırmızı fokus çərçivəsi (theme.css → :focus-visible) görünməsin */
+.dc-chat textarea:focus,
+.dc-chat textarea:focus-visible,
+.dc-chat input:focus,
+.dc-chat input:focus-visible,
+.dc-modal textarea:focus-visible,
+.dc-modal input:focus-visible {
+    outline: none !important;
+    outline-offset: 0 !important;
+}
+.dc-chat.dc-wa .dc-chat__input:focus { border: 0; box-shadow: none; background: transparent; }
+/* =====================================================
+   YENİ QRUP / QRUPU REDAKTƏ ET (WhatsApp "Yeni qrup" görünüşü)
+   ===================================================== */
+.dc-modal--group .dc-modal__box {
+    width: min(520px, 100%);
+    height: min(760px, calc(100vh - 32px));
+    max-height: none;
+}
+.dc-modal--group .dc-modal__body { padding: 0; gap: 0; overflow: hidden; }
+.dc-modal--group .dc-modal__foot { padding: 12px 16px; background: #fff; }
+.dc-modal--group .dc-modal__btn.is-primary { min-width: 140px; }
+
+.dc-gform { display: flex; flex-direction: column; flex: 1; min-height: 0; background: #f0f2f5; }
+
+/* Şəkil + ad */
+.dc-gform__top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 18px 6px;
+    background: #fff;
+}
+.dc-gform__pic {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #FDE2E4;
+    color: #D81324;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+.dc-gform__name {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #d1d7db;
+    transition: border-color .15s;
+}
+.dc-gform__name:focus-within { border-bottom-color: #D81324; }
+.dc-gform__name input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 40px 8px 2px;
+    border: 0;
+    background: transparent;
+    font-size: 17px;
+    color: #111b21;
+    outline: none !important;
+}
+.dc-gform__count { position: absolute; right: 2px; bottom: 9px; font-size: 12px; color: #8696a0; }
+.dc-gform__desc {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 12px 18px 16px 96px;
+    border: 0;
+    border-bottom: 1px solid #e9edef;
+    background: #fff;
+    font-size: 14.5px;
+    color: #3b4a54;
+    outline: none !important;
+}
+.dc-gform__desc::placeholder { color: #8696a0; }
+
+/* Açar düymələr (switch) */
+.dc-gform__settings { margin-top: 8px; background: #fff; }
+.dc-gform__toggle {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f2f5;
+}
+.dc-gform__toggle:last-child { border-bottom: 0; }
+.dc-gform__toggle:hover { background: #f8f9fa; }
+.dc-gform__toggle-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #f0f2f5;
+    color: #54656f;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.dc-gform__toggle-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dc-gform__toggle-text b { font-size: 15px; font-weight: 500; color: #111b21; }
+.dc-gform__toggle-text small { font-size: 12.5px; line-height: 1.35; color: #667781; }
+.dc-switch-input { position: absolute; opacity: 0; pointer-events: none; }
+.dc-switch-ui {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: #c4ccd1;
+    flex-shrink: 0;
+    transition: background .18s;
+}
+.dc-switch-ui::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(11, 20, 26, .3);
+    transition: transform .18s;
+}
+.dc-switch-input:checked + .dc-switch-ui { background: #D81324; }
+.dc-switch-input:checked + .dc-switch-ui::after { transform: translateX(18px); }
+.dc-switch-input:focus-visible + .dc-switch-ui { box-shadow: 0 0 0 3px rgba(216, 19, 36, .25); }
+.dc-gform__toggle:has(.dc-switch-input:checked) .dc-gform__toggle-icon { background: #FDE2E4; color: #D81324; }
+
+/* Üzvlər: qalan hündürlüyü tutur */
+.dc-gform__members { flex: 1; min-height: 0; display: flex; flex-direction: column; margin-top: 8px; background: #fff; }
+.dc-gform__members-head { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 18px 6px; }
+.dc-gform__members-head span:first-child { font-size: 14px; font-weight: 600; color: #D81324; text-transform: uppercase; letter-spacing: .3px; }
+.dc-gform__members-count { font-size: 13px; color: #667781; }
+
+.dc-gform__chips { display: flex; gap: 8px; padding: 4px 18px 8px; overflow-x: auto; scrollbar-width: thin; }
+.dc-gform__chips[hidden] { display: none; }
+.dc-gform__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 3px;
+    border: 0;
+    border-radius: 18px;
+    background: #f0f2f5;
+    color: #111b21;
+    font-size: 13.5px;
+    white-space: nowrap;
+    cursor: pointer;
+    flex-shrink: 0;
+    animation: dc-wa-pop .14s ease-out;
+}
+.dc-gform__chip:hover { background: #FDE2E4; }
+.dc-gform__chip .dc-avatar { width: 26px; height: 26px; font-size: 11px; }
+.dc-gform__chip i { font-size: 11px; color: #8696a0; }
+
+.dc-gform__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 14px 6px;
+    padding: 0 14px;
+    border-radius: 20px;
+    background: #f0f2f5;
+    color: #54656f;
+    font-size: 13px;
+}
+.dc-gform__search input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    border: 0;
+    background: transparent;
+    font-size: 14.5px;
+    color: #111b21;
+    outline: none !important;
+}
+
+.dc-gform__list { list-style: none; margin: 0; padding: 0 0 6px; flex: 1; min-height: 120px; overflow-y: auto; overscroll-behavior: contain; }
+.dc-gform__user {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 9px 18px;
+    cursor: pointer;
+    outline: none;
+}
+.dc-gform__user:hover, .dc-gform__user:focus-visible { background: #f5f6f6; }
+.dc-gform__user .dc-avatar { width: 44px; height: 44px; font-size: 17px; }
+.dc-gform__user-name { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 15px; color: #111b21; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-gform__user-name small { font-size: 12.5px; color: #667781; overflow: hidden; text-overflow: ellipsis; }
+.dc-gform__check {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #c4ccd1;
+    border-radius: 50%;
+    color: transparent;
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: background .12s, border-color .12s;
+}
+.dc-gform__user.is-selected .dc-gform__check { background: #D81324; border-color: #D81324; color: #fff; }
+.dc-gform__user.is-existing { cursor: default; opacity: .6; }
+.dc-gform__user.is-existing .dc-gform__check { background: #8696a0; border-color: #8696a0; color: #fff; }
+.dc-gform__empty { padding: 24px 18px; text-align: center; color: #667781; font-size: 14px; list-style: none; }
+
+/* "Bütün istifadəçilər" seçiləndə üzv seçimi lazım deyil */
+.dc-gform__allnote { display: none; margin: 8px 0 0; padding: 18px; background: #fff; color: #54656f; font-size: 14px; text-align: center; }
+.dc-gform__allnote i { color: #D81324; }
+.dc-gform.is-all-users .dc-gform__members { display: none; }
+.dc-gform.is-all-users .dc-gform__allnote { display: block; flex: 1; }
+.dc-gform .dc-modal__error { padding: 8px 18px; background: #fff; }
+
+/* Telefon: tam ekran */
+@media (max-width: 576px) {
+    .dc-modal--group { padding: 0; place-items: stretch; }
+    .dc-modal--group .dc-modal__box {
+        width: 100%;
+        height: var(--dc-vvh, 100dvh);
+        max-height: none;
+        border-radius: 0;
+        margin-top: var(--dc-vvtop, 0px);
+    }
+    .dc-modal--group .dc-modal__head { padding: 12px 10px 12px 16px; }
+    .dc-gform__name input, .dc-gform__desc, .dc-gform__search input { font-size: 16px; }
+    .dc-gform__desc { padding-left: 18px; }
+    .dc-modal--group .dc-modal__foot { padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); }
+    .dc-modal--group .dc-modal__foot .dc-modal__btn { flex: 1; }
+}
+
+/* Köhnə dialoq sahə çərçivəsi (.dc-modal input) yeni formada görünməsin */
+.dc-modal .dc-gform__name input[type="text"],
+.dc-modal .dc-gform__search input[type="search"],
+.dc-modal input[type="text"].dc-gform__desc {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+.dc-modal .dc-gform__name input[type="text"] { padding: 10px 40px 8px 2px; }
+.dc-modal .dc-gform__search input[type="search"] { padding: 0; height: 38px; }
+.dc-modal input[type="text"].dc-gform__desc { background: #fff; border-bottom: 1px solid #e9edef; padding: 12px 18px 16px 96px; }
+@media (max-width: 576px) { .dc-modal input[type="text"].dc-gform__desc { padding-left: 18px; } }
+.dc-gform__search:focus-within { box-shadow: inset 0 0 0 1px rgba(216, 19, 36, .35); }
+/* =====================================================
+   PROFİL VƏ MEDİA — yan panellər (WhatsApp kimi)
+   ===================================================== */
+.dc-convs__me {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-right: 6px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.dc-convs__me .dc-avatar { width: 38px; height: 38px; font-size: 15px; background: #dfe5e7; color: #fff; }
+.dc-convs__me:hover .dc-avatar { box-shadow: 0 0 0 3px #FDE2E4; }
+
+.dc-side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 14;
+    display: flex;
+    flex-direction: column;
+    background: #f0f2f5;
+    animation: dc-side-in .2s ease-out;
+}
+.dc-side--left { right: auto; width: 100%; }
+.dc-side--right { left: auto; width: 100%; }
+.dc-side--left[style*="width"] { right: auto; }
+.dc-side--right[style*="left"] { width: auto; right: 0; }
+.dc-side.is-leaving { animation: dc-side-out .18s ease-in forwards; }
+@keyframes dc-side-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes dc-side-out { to { opacity: 0; transform: translateX(24px); } }
+.dc-side--left { animation-name: dc-side-in-left; }
+@keyframes dc-side-in-left { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+
+.dc-side__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 60px;
+    padding: 10px 14px;
+    background: #D81324;
+    color: #fff;
+    flex-shrink: 0;
+}
+.dc-side__head h3 { margin: 0; font-size: 17px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-side__back { width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: #fff; font-size: 17px; cursor: pointer; }
+.dc-side__back:hover { background: rgba(255, 255, 255, .15); }
+.dc-side__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-bottom: 16px; }
+.dc-side__loading { padding: 40px 20px; text-align: center; color: #667781; }
+
+/* Profilim: böyük şəkil */
+.dc-pphoto { position: relative; display: grid; place-items: center; padding: 28px 0 10px; background: #fff; }
+.dc-pphoto__img { width: 160px !important; height: 160px !important; font-size: 60px !important; }
+.dc-pphoto__cam {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(11, 20, 26, .45);
+    color: #fff;
+    font-size: 13px;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity .15s;
+}
+.dc-pphoto__cam i { font-size: 22px; }
+.dc-pphoto:hover .dc-pphoto__cam, .dc-pphoto__cam:focus-visible { opacity: 1; }
+@media (hover: none) { .dc-pphoto__cam { opacity: 1; width: 46px; height: 46px; top: auto; bottom: 10px; left: calc(50% + 50px); transform: none; background: #D81324; font-size: 0; } .dc-pphoto__cam i { font-size: 18px; } }
+.dc-pphoto.is-busy .dc-pphoto__img { opacity: .5; }
+.dc-pphoto__remove { display: block; margin: 0 auto; padding: 6px 12px 14px; border: 0; background: #fff; width: 100%; color: #ea0038; font-size: 13.5px; cursor: pointer; }
+.dc-pphoto__remove[hidden] { display: none; }
+
+/* Redaktə olunan sətirlər */
+.dc-prow { margin-top: 8px; padding: 14px 20px 12px; background: #fff; }
+.dc-prow__label { display: block; margin-bottom: 8px; font-size: 13.5px; color: #D81324; }
+.dc-prow__line { display: flex; align-items: center; gap: 10px; min-height: 30px; }
+.dc-prow__line.is-editing { border-bottom: 2px solid #D81324; }
+.dc-prow__value { flex: 1; min-width: 0; font-size: 16px; color: #111b21; overflow-wrap: anywhere; }
+.dc-prow__value.is-empty { color: #8696a0; }
+.dc-prow__line input { flex: 1; min-width: 0; padding: 4px 0; border: 0; background: transparent; font-size: 16px; color: #111b21; outline: none !important; }
+.dc-prow__count { font-size: 12px; color: #8696a0; }
+.dc-prow__edit { width: 34px; height: 34px; border: 0; border-radius: 50%; background: transparent; color: #8696a0; cursor: pointer; flex-shrink: 0; }
+.dc-prow__edit:hover { background: #f0f2f5; color: #54656f; }
+.dc-prow__edit.is-ok { color: #D81324; }
+.dc-prow__hint { display: block; margin-top: 8px; font-size: 12.5px; color: #8696a0; }
+
+.dc-pinfo { margin-top: 8px; background: #fff; }
+.dc-pinfo__row { display: flex; align-items: center; gap: 18px; padding: 12px 20px; color: inherit; text-decoration: none; border-bottom: 1px solid #f0f2f5; }
+.dc-pinfo__row:last-child { border-bottom: 0; }
+.dc-pinfo__row > i { width: 20px; color: #8696a0; text-align: center; font-size: 16px; }
+.dc-pinfo__row span { display: flex; flex-direction: column; min-width: 0; }
+.dc-pinfo__row small { font-size: 12.5px; color: #667781; }
+.dc-pinfo__row b { font-size: 15px; font-weight: 400; color: #111b21; overflow-wrap: anywhere; }
+a.dc-pinfo__row:hover { background: #f8f9fa; }
+
+/* Əlaqə kartı */
+.dc-pcard { display: flex; flex-direction: column; align-items: center; padding: 26px 20px 16px; background: #fff; text-align: center; }
+.dc-pcard__img { width: 120px !important; height: 120px !important; font-size: 46px !important; }
+.dc-pcard h4 { margin: 14px 0 2px; font-size: 22px; font-weight: 500; color: #111b21; }
+.dc-pcard__sub { margin: 0; font-size: 15px; color: #667781; }
+.dc-pcard__status { margin: 4px 0 0; font-size: 13.5px; color: #667781; }
+.dc-pcard__status.is-online { color: #D81324; }
+.dc-pcard__actions { display: flex; gap: 12px; margin-top: 18px; }
+.dc-pcard__act {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 86px;
+    padding: 12px 6px 10px;
+    border: 1px solid #e9edef;
+    border-radius: 12px;
+    background: #fff;
+    color: #D81324;
+    font-size: 18px;
+    cursor: pointer;
+}
+.dc-pcard__act span { font-size: 13px; color: #3b4a54; }
+.dc-pcard__act:hover { background: #fdf2f3; border-color: #f5c2cc; }
+
+.dc-pblock { margin-top: 8px; padding: 14px 20px; background: #fff; }
+.dc-pblock__label { display: block; font-size: 14px; color: #667781; }
+.dc-pblock__text { margin: 6px 0 0; font-size: 15.5px; color: #111b21; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Media önizləmə */
+.dc-pmedia__head { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0; border: 0; background: transparent; cursor: pointer; text-align: left; }
+.dc-pmedia__count { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #667781; }
+.dc-pmedia__count i { font-size: 12px; }
+.dc-pmedia__strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
+.dc-pmedia__none { grid-column: 1 / -1; margin: 6px 0; font-size: 13.5px; color: #8696a0; }
+
+.dc-mthumb {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #dfe5e7;
+    cursor: pointer;
+}
+.dc-mthumb img, .dc-mthumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dc-mthumb:hover img, .dc-mthumb:hover video { opacity: .88; }
+.dc-mthumb__play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(11, 20, 26, .55);
+    color: #fff;
+    font-size: 12px;
+}
+
+/* Media görünüşü: tablar + şəbəkə */
+.dc-mtabs { position: sticky; top: 0; z-index: 2; display: flex; background: #fff; border-bottom: 1px solid #e9edef; }
+.dc-mtabs button { flex: 1; padding: 14px 6px 12px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: #667781; font-size: 14.5px; cursor: pointer; }
+.dc-mtabs button.is-active { color: #D81324; border-bottom-color: #D81324; font-weight: 600; }
+.dc-mview { padding: 6px; }
+.dc-mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+@media (min-width: 900px) { .dc-chat--full .dc-mgrid { grid-template-columns: repeat(4, 1fr); } }
+.dc-mrow { margin: 6px 4px; padding: 12px 14px; border-radius: 10px; background: #fff; }
+.dc-mrow__meta { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-size: 12.5px; color: #667781; }
+.dc-mrow__meta b { color: #111b21; font-weight: 600; }
+.dc-mrow audio { width: 100%; height: 36px; }
+.dc-mrow__text { font-size: 14.5px; color: #111b21; overflow-wrap: anywhere; white-space: pre-wrap; }
+.dc-mrow__text a { color: #027eb5; }
+.dc-mrow__go { margin-top: 8px; padding: 0; border: 0; background: transparent; color: #D81324; font-size: 13px; cursor: pointer; }
+.dc-mview__more { display: block; margin: 12px auto; padding: 8px 18px; border: 0; border-radius: 18px; background: #fff; color: #D81324; font-size: 14px; cursor: pointer; }
+
+/* Qrup üzvləri (panel daxilində) və idarə */
+.dc-members--flat { border: 0; border-radius: 0; max-height: none; margin: 8px -20px -14px; }
+.dc-members--flat li { padding: 10px 20px; }
+.dc-pactions { padding: 0; }
+.dc-pactions__btn { display: flex; align-items: center; gap: 18px; width: 100%; padding: 15px 20px; border: 0; border-bottom: 1px solid #f0f2f5; background: #fff; color: #3b4a54; font-size: 15px; text-align: left; cursor: pointer; }
+.dc-pactions__btn i { width: 20px; color: #8696a0; text-align: center; }
+.dc-pactions__btn:hover { background: #f8f9fa; }
+.dc-pactions__btn.is-danger, .dc-pactions__btn.is-danger i { color: #ea0038; }
+
+/* Video pəncərəsi */
+.dc-modal--video .dc-modal__box { width: min(860px, 100%); background: #000; }
+.dc-modal--video .dc-modal__body { padding: 0; background: #000; }
+.dc-video-full { display: block; width: 100%; max-height: 75vh; background: #000; }
+
+/* =====================================================
+   YAZIŞMANI SİL — siyahı menyusu (WhatsApp kimi)
+   ===================================================== */
+.dc-conv__more {
+    display: grid;
+    place-items: center;
+    width: 0;
+    height: 24px;
+    margin-left: -6px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #8696a0;
+    font-size: 13px;
+    opacity: 0;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: width .12s, opacity .12s, margin .12s;
+}
+@media (hover: hover) {
+    .dc-conv:hover .dc-conv__more,
+    .dc-conv:focus-within .dc-conv__more,
+    .dc-conv.is-menu .dc-conv__more { width: 24px; margin-left: 0; opacity: 1; }
+}
+.dc-conv__more:hover { color: #54656f; background: rgba(11, 20, 26, .06); }
+.dc-conv.is-menu { background: #f0f2f5; }
+/* telefonda uzun basanda mətn seçilməsin / sistem menyusu çıxmasın */
+.dc-conv { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+.dc-cmenu {
+    position: fixed;
+    z-index: 10050;
+    min-width: 200px;
+    padding: 6px 0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(11, 20, 26, .2), 0 1px 3px rgba(11, 20, 26, .12);
+    animation: dc-cmenu-in .12s ease-out;
+}
+@keyframes dc-cmenu-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.dc-cmenu__item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 11px 18px;
+    border: 0;
+    background: transparent;
+    color: #3b4a54;
+    font-size: 14.5px;
+    text-align: left;
+    cursor: pointer;
+    outline: none !important;
+}
+.dc-cmenu__item i { width: 18px; text-align: center; color: #8696a0; }
+.dc-cmenu__item:hover, .dc-cmenu__item:focus-visible { background: #f5f6f6; }
+.dc-cmenu__item.is-danger, .dc-cmenu__item.is-danger i { color: #ea0038; }
+
+.dc-modal--clear .dc-modal__box { width: min(420px, 100%); }
+.dc-clear__text { margin: 0; font-size: 15px; line-height: 1.5; color: #3b4a54; }
+.dc-clear__hint { margin: 10px 0 0; font-size: 13px; color: #8696a0; }
+.dc-modal--clear .dc-modal__foot { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+@media (max-width: 420px) {
+    .dc-modal--clear .dc-modal__foot { flex-direction: column-reverse; align-items: stretch; }
+    .dc-modal--clear .dc-modal__btn { width: 100%; }
+}
+.dc-chat__tools .dc-chat__clear-btn i { color: inherit; }
+
+/* =====================================================
+   YENİ ÇAT ("+") — istifadəçi seç, yaz
+   ===================================================== */
+.dc-convs__new { font-size: 18px; }
+.dc-convs__new i { transition: transform .15s; }
+.dc-convs__new:hover i { transform: rotate(90deg); }
+
+.dc-side--newchat .dc-side__body { background: #fff; padding-bottom: 8px; }
+.dc-newchat__search {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 10px 14px;
+    background: #fff;
+    border-bottom: 1px solid #f0f2f5;
+}
+.dc-newchat__search i { position: absolute; left: 28px; color: #8696a0; font-size: 14px; pointer-events: none; }
+.dc-newchat__search input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 0 14px 0 40px;
+    border: 0;
+    border-radius: 10px;
+    background: #f0f2f5;
+    color: #111b21;
+    font-size: 15px;
+    outline: none !important;
+}
+@media (hover: none) { .dc-newchat__search input { font-size: 16px; } }
+.dc-newchat__search input:focus { background: #fff; box-shadow: 0 0 0 2px #FDE2E4 inset, 0 0 0 1px #f5c2cc; }
+
+.dc-newchat__quick { padding: 6px 0; border-bottom: 8px solid #f0f2f5; }
+.dc-newchat__action {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    padding: 10px 16px;
+    border: 0;
+    background: transparent;
+    color: #111b21;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+}
+.dc-newchat__action:hover { background: #f5f6f6; }
+.dc-newchat__action-icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #D81324;
+    color: #fff;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.dc-newchat__label { margin: 0; padding: 16px 20px 8px; font-size: 13.5px; font-weight: 600; letter-spacing: .02em; color: #D81324; text-transform: uppercase; }
+.dc-newchat__list { margin: 0; padding: 0; list-style: none; }
+.dc-newchat__item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 16px;
+    cursor: pointer;
+    outline: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+.dc-newchat__item:hover, .dc-newchat__item:focus-visible { background: #f5f6f6; }
+.dc-newchat__item.is-busy { opacity: .55; pointer-events: none; }
+.dc-newchat__item .dc-avatar { width: 46px; height: 46px; font-size: 17px; flex-shrink: 0; }
+.dc-newchat__main { display: flex; flex-direction: column; min-width: 0; flex: 1; padding: 4px 0; border-bottom: 1px solid #f0f2f5; }
+.dc-newchat__item:last-child .dc-newchat__main { border-bottom: 0; }
+.dc-newchat__name { display: flex; align-items: center; gap: 8px; font-size: 16px; color: #111b21; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-newchat__name .dc-members__tag { flex-shrink: 0; }
+.dc-newchat__sub { margin-top: 2px; font-size: 13.5px; color: #667781; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dc-newchat__status { margin: 0; padding: 30px 20px; text-align: center; font-size: 14px; color: #8696a0; }
+.dc-newchat__status[hidden] { display: none; }

@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="DoctorEngine.App/DoctorEngine.App.csproj" />
-  <Project Path="DoctorEngine.Contracts/DoctorEngine.Contracts.csproj" />
-</Solution>

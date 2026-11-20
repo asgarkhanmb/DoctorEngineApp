@@ -1,0 +1,371 @@
+﻿@* =====================================================
+   CANLI ÇAT VİDJETİ (WhatsApp üslubu, şəxsi yazışmalar)
+   İstifadə: <partial name="_ChatWidget" />
+   Tam ekran: <partial name="_ChatWidget" view-data='new ViewDataDictionary(ViewData) { ["ChatFullPage"] = true }' />
+   Sağ panel (layout-da üzən düymə ilə): ViewData["ChatDrawer"] = true
+   - Müştəri: yalnız öz yazışması (ustalarla)
+   - Usta (admin): solda "Çatlar" siyahısı, sağda seçilmiş müştərinin yazışması (/Chat?c=istifadəçi)
+   Mesajlar /api/chat/* ilə yüklənir, SignalR (/chatHub) ilə canlı yenilənir.
+   ===================================================== *@
+@using DoctorEngineApp.Helpers.Enums
+@using DoctorEngineApp.Services
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@inject DoctorEngineApp.Services.Interfaces.IChatService ChatSvc
+@inject DoctorEngineApp.Services.PushService PushSvc
+@{
+    var fullPage = ViewData["ChatFullPage"] as bool? ?? false;
+    var drawer = ViewData["ChatDrawer"] as bool? ?? false;
+    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    var isAdmin = isAuthenticated && User.IsInRole(nameof(Roles.Admin));
+    var unreadCount = isAuthenticated && User.Identity?.Name is string me
+        ? await ChatSvc.GetUnreadCountAsync(me, isAdmin)
+        : 0;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+    var loginUrl = Url.Action("Login", "Account", new { returnUrl });
+    var registerUrl = Url.Action("Register", "Account");
+    // /Chat?c=... — birbaşa həmin yazışma açılır (push bildirişindən): usta üçün müştəri, hamı üçün qrup ("g:1")
+    var openConversation = isAuthenticated && fullPage ? Context.Request.Query["c"].ToString() : null;
+
+    var config = new
+    {
+        isAuthenticated,
+        currentUser = User.Identity?.Name,
+        isAdmin,
+        token = Antiforgery.GetAndStoreTokens(Context).RequestToken,
+        loginUrl,
+        maxLength = ChatService.MaxMessageLength,
+        maxImageBytes = ChatService.MaxImageBytes,
+        maxVideoBytes = ChatService.MaxVideoBytes,
+        maxAudioBytes = ChatService.MaxAudioBytes,
+        drawer,
+        fullPage,
+        unreadCount,
+        reactions = ChatService.AllowedReactions,
+        openConversation = string.IsNullOrWhiteSpace(openConversation) ? null : openConversation,
+        pushKey = isAuthenticated ? PushSvc.PublicKey : null
+    };
+}
+
+<section class="dc-chat dc-wa @(fullPage ? "dc-chat--full" : "") @(drawer ? "dc-chat--drawer" : "") @(isAdmin ? "dc-chat--admin" : "") @(isAuthenticated ? "dc-chat--list" : "") @(isAuthenticated && !isAdmin ? "has-conversation" : "")"
+         id="dcChat" data-view="@(isAdmin ? "list" : "chat")" aria-label="@L.T("Canlı çat")">
+
+    @if (isAuthenticated)
+    {
+        <!-- YAZIŞMALAR SİYAHISI (WhatsApp "Çatlar"): usta — bütün yazışmalar və qruplar, müştəri — ustalarla yazışma və qrupları -->
+        <aside class="dc-convs" aria-label="@L.T("Yazışmalar")">
+            <header class="dc-convs__header">
+                <button type="button" class="dc-convs__me" data-dc-profile title="@L.T("Profilim")" aria-label="@L.T("Profilim")">
+                    <span class="dc-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></span>
+                </button>
+                <h3>@L.T("Çatlar")</h3>
+                <span class="dc-convs__total" hidden></span>
+                @* Yeni çat: istifadəçinin adına toxun, yaz (ustalar üçün yeni qrup və yayım da buradadır) *@
+                <button type="button" class="dc-chat__icon-btn dc-convs__new" data-dc-new-chat title="@L.T("Yeni çat")" aria-label="@L.T("Yeni çat")">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                @if (!fullPage)
+                {
+                    <a class="dc-chat__icon-btn" asp-controller="Chat" asp-action="Index" title="@L.T("Tam ekranda aç")">
+                        <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                    </a>
+                }
+                @if (drawer)
+                {
+                    <button type="button" class="dc-chat__icon-btn" data-dc-close title="@L.T("Bağla")" aria-label="@L.T("Çatı bağla")">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                }
+            </header>
+            <div class="dc-convs__search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" placeholder="@L.T("Axtar")" aria-label="@L.T("Yazışmalarda axtar")" />
+            </div>
+            <div class="dc-convs__filters" role="tablist">
+                <button type="button" class="is-active" data-filter="all">@L.T("Hamısı")</button>
+                <button type="button" data-filter="unread">@L.T("Oxunmamış")</button>
+                <button type="button" data-filter="groups">@L.T("Qruplar")</button>
+            </div>
+            <ul class="dc-convs__list" role="listbox"></ul>
+            <div class="dc-convs__empty" hidden>
+                <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                <p>@L.T("Hələ yazışma yoxdur.")</p>
+            </div>
+            <div class="dc-convs__loading"><span class="dc-chat__spinner"></span></div>
+        </aside>
+    }
+
+    <div class="dc-pane">
+
+        @if (isAuthenticated)
+        {
+            <!-- Yazışma seçilməyib (geniş ekranda sağ tərəf) -->
+            <div class="dc-pane__placeholder">
+                <div class="dc-pane__placeholder-icon"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i></div>
+                <h4>@L.T("Canlı Usta Dəstəyi")</h4>
+                <p>@(isAdmin ? L.T("Müştəri ilə yazışmanı açmaq üçün soldan çat seçin.") : L.T("Yazışmanı açmaq üçün soldan çat seçin."))</p>
+                <span><i class="fa-solid fa-lock" aria-hidden="true"></i> @L.T("Hər müştəri yalnız öz yazışmasını görür.")</span>
+            </div>
+        }
+
+        <!-- BAŞLIQ -->
+        <header class="dc-chat__header">
+            @if (isAuthenticated)
+            {
+                <button type="button" class="dc-chat__icon-btn dc-chat__back" title="@L.T("Geri")" aria-label="@L.T("Yazışmalara qayıt")">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            }
+
+            <div class="dc-chat__logo" aria-hidden="true">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+
+            <div class="dc-chat__heading" role="button" tabindex="0" title="@L.T("Məlumat")">
+                <h3 class="dc-chat__title">@(isAdmin ? "" : L.T("Canlı Usta Dəstəyi"))</h3>
+                <span class="dc-chat__status" data-state="@(isAuthenticated ? "connecting" : "offline")">
+                    <span class="dc-chat__dot"></span>
+                    <span class="dc-chat__status-text">@(isAuthenticated ? L.T("Qoşulur…") : L.T("Giriş tələb olunur"))</span>
+                </span>
+            </div>
+
+            @if (isAuthenticated)
+            {
+                <button type="button" class="dc-chat__icon-btn" data-dc-call="video" title="@L.T("Video zəng")" aria-label="@L.T("Video zəng")" hidden>
+                    <i class="fa-solid fa-video"></i>
+                </button>
+                <button type="button" class="dc-chat__icon-btn" data-dc-call="audio" title="@L.T("Səsli zəng")" aria-label="@L.T("Səsli zəng")" hidden>
+                    <i class="fa-solid fa-phone"></i>
+                </button>
+                <!-- Əlavə əməliyyatlar: tam səhifədə yan-yana, paneldə "⋮" menyusunda -->
+                <button type="button" class="dc-chat__icon-btn dc-chat__tools-btn" data-dc-tools title="@L.T("Daha çox")" aria-label="@L.T("Daha çox")" aria-expanded="false" aria-haspopup="true">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="dc-chat__tools" role="menu">
+                    <button type="button" class="dc-chat__icon-btn" data-dc-search role="menuitem" title="@L.T("Axtar")" aria-label="@L.T("Yazışmada axtar")">
+                        <i class="fa-solid fa-magnifying-glass"></i><span class="dc-tool-label">@L.T("Mesajlarda axtar")</span>
+                    </button>
+                    <button type="button" class="dc-chat__icon-btn" data-dc-sound role="menuitem" title="@L.T("Bildiriş səsini söndür")" aria-label="@L.T("Bildiriş səsini söndür")" aria-pressed="false">
+                        <i class="fa-solid fa-bell"></i><span class="dc-tool-label">@L.T("Bildiriş səsi")</span>
+                    </button>
+                    <button type="button" class="dc-chat__icon-btn dc-chat__clear-btn" data-dc-clear role="menuitem" title="@L.T("Yazışmanı sil")" aria-label="@L.T("Yazışmanı sil")">
+                        <i class="fa-solid fa-trash-can"></i><span class="dc-tool-label">@L.T("Yazışmanı sil")</span>
+                    </button>
+                    @if (!fullPage && !isAdmin)
+                    {
+                        <a class="dc-chat__icon-btn" role="menuitem" asp-controller="Chat" asp-action="Index" title="@L.T("Tam ekranda aç")">
+                            <i class="fa-solid fa-up-right-and-down-left-from-center"></i><span class="dc-tool-label">@L.T("Tam ekranda aç")</span>
+                        </a>
+                    }
+                </div>
+            }
+
+            @if (drawer && !isAdmin)
+            {
+                <button type="button" class="dc-chat__icon-btn" data-dc-close title="@L.T("Bağla")" aria-label="@L.T("Çatı bağla")">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            }
+        </header>
+
+        @if (isAuthenticated)
+        {
+            <!-- YAZIŞMADA AXTARIŞ -->
+            <div class="dc-search" hidden>
+                <div class="dc-search__bar">
+                    <button type="button" class="dc-chat__icon-btn dc-search__close" title="@L.T("Bağla")" aria-label="@L.T("Axtarışı bağla")">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <input type="search" class="dc-search__input" placeholder="@L.T("Mesajlarda axtar…")" aria-label="@L.T("Mesajlarda axtar")" />
+                </div>
+                <ul class="dc-search__results"></ul>
+            </div>
+
+            <!-- Bildiriş icazəsi: sayt bağlı / arxa planda olanda da səs və bildiriş -->
+            <div class="dc-chat__push" hidden>
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                <span>@L.T("Sayt bağlı olanda da yeni mesajdan xəbər tutun.")</span>
+                <button type="button" class="dc-chat__push-on">@L.T("Bildirişləri aç")</button>
+                <button type="button" class="dc-chat__push-x" aria-label="@L.T("Bağla")" title="@L.T("Bağla")">
+                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            </div>
+        }
+
+        @if (!isAuthenticated)
+        {
+            <!-- QONAQ: yazışmalar göstərilmir, yalnız şablon mesaj -->
+            <div class="dc-chat__body" id="dcChatBody">
+                <div class="dc-chat__list">
+                    <div class="dc-sep"><span>@L.T("Bu gün")</span></div>
+                    <div class="dc-msg is-admin">
+                        <div class="dc-msg__content">
+                            <div class="dc-msg__bubble">
+                                <div class="dc-msg__text">@* pre-wrap: mətn bir sətirdə olmalıdır, yoxsa girinti ekranda görünür **@@L.T("Salam! 👋 Canlı Usta Dəstəyinə xoş gəlmisiniz.")<br />@L.T("Sualınızı ustalarımıza yaza bilərsiniz. Yazışmaları görmək və mesaj göndərmək üçün hesabınıza daxil olun.")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+        <!-- MESAJLAR -->
+        <div class="dc-chat__body" id="dcChatBody" role="log" aria-live="polite" aria-relevant="additions">
+
+            <div class="dc-chat__e2e">
+                <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                @(isAdmin ? L.T("Bu yazışmanı yalnız müştəri və ustalar görür.") : L.T("Bu yazışmanı yalnız siz və ustalarımız görür."))
+            </div>
+
+            <div class="dc-chat__more-wrap">
+                <button type="button" class="dc-chat__more" hidden>
+                    <i class="fa-solid fa-clock-rotate-left"></i> @L.T("Köhnə mesajları göstər")
+                </button>
+            </div>
+
+            <div class="dc-chat__list"></div>
+
+            <div class="dc-chat__loading">
+                <span class="dc-chat__spinner"></span>
+                @L.T("Mesajlar yüklənir…")
+            </div>
+
+            <div class="dc-chat__empty" hidden>
+                <i class="fa-regular fa-comments"></i>
+                <p>@L.T("Hələ mesaj yoxdur.")<br />@(isAdmin ? L.T("Müştəriyə ilk mesajı yazın.") : L.T("Sualınızı yazın — ustalarımız cavab verəcək."))</p>
+            </div>
+        </div>
+
+        <button type="button" class="dc-chat__jump" hidden aria-label="@L.T("Aşağı")">
+            <i class="fa-solid fa-chevron-down"></i>
+            <span class="dc-chat__jump-count" hidden></span>
+        </button>
+        }
+
+        @if (isAuthenticated)
+        {
+            <!-- "Yalnız ustalar yaza bilər" qrupu -->
+            <div class="dc-chat__readonly" hidden>
+                <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+                @L.T("Bu qrupda yalnız ustalar yaza bilər.")
+            </div>
+
+            <!-- YAZMA SAHƏSİ -->
+            <form class="dc-chat__composer" novalidate>
+
+                <div class="dc-chat__error" role="alert" hidden></div>
+
+                <!-- Cavab verilən mesaj -->
+                <div class="dc-reply" hidden>
+                    <div class="dc-reply__body">
+                        <span class="dc-reply__name"></span>
+                        <span class="dc-reply__text"></span>
+                    </div>
+                    <button type="button" class="dc-chat__icon-btn dc-reply__cancel" title="@L.T("Ləğv et")" aria-label="@L.T("Cavabı ləğv et")">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="dc-chat__preview" hidden>
+                    <div class="dc-chat__preview-thumb"></div>
+                    <div class="dc-chat__preview-meta">
+                        <span class="dc-chat__preview-name"></span>
+                        <span class="dc-chat__preview-size"></span>
+                    </div>
+                    <button type="button" class="dc-chat__icon-btn dc-chat__preview-remove" title="@L.T("Faylı çıxar")">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="dc-chat__progress" hidden>
+                    <div class="dc-chat__progress-bar"></div>
+                </div>
+
+                <!-- Emoji paneli -->
+                <div class="dc-emoji" hidden role="dialog" aria-label="@L.T("Emoji")">
+                    <div class="dc-emoji__tabs"></div>
+                    <div class="dc-emoji__grid"></div>
+                </div>
+
+                <div class="dc-chat__row">
+                    <div class="dc-chat__field">
+                        <button type="button" class="dc-chat__emoji-btn" title="@L.T("Emoji")" aria-label="@L.T("Emoji")" aria-expanded="false">
+                            <i class="fa-regular fa-face-smile"></i>
+                        </button>
+
+                        <textarea class="dc-chat__input" rows="1"
+                                  maxlength="@ChatService.MaxMessageLength"
+                                  placeholder="@L.T("Mesaj")"
+                                  aria-label="@L.T("Mesaj")"></textarea>
+
+                        <label class="dc-chat__attach" title="@L.T("Şəkil və ya video əlavə et")">
+                            <i class="fa-solid fa-paperclip"></i>
+                            <input type="file" class="dc-chat__file"
+                                   accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime,.mov,.m4v" />
+                        </label>
+                    </div>
+
+                    <button type="submit" class="dc-chat__send" title="@L.T("Göndər")" disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+
+                    <button type="button" class="dc-chat__send dc-chat__mic" title="@L.T("Səs mesajı yaz")" aria-label="@L.T("Səs mesajı yaz")" hidden>
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+
+                <!-- SƏS YAZMA ZOLAĞI -->
+                <div class="dc-rec" hidden>
+                    <button type="button" class="dc-rec__cancel" title="@L.T("Ləğv et")" aria-label="@L.T("Səs yazmanı ləğv et")">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <span class="dc-rec__dot" aria-hidden="true"></span>
+                    <span class="dc-rec__time" aria-live="off">0:00</span>
+                    <canvas class="dc-rec__wave" aria-hidden="true"></canvas>
+                    <button type="button" class="dc-rec__pause" title="@L.T("Fasilə")" aria-label="@L.T("Fasilə")">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                    <button type="button" class="dc-chat__send dc-rec__send" title="@L.T("Göndər")" aria-label="@L.T("Səs mesajını göndər")">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="dc-chat__dropzone" hidden>
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>@L.T("Şəkil və ya videonu buraya buraxın")</span>
+            </div>
+        }
+        else
+        {
+            <div class="dc-chat__guest">
+                <i class="fa-solid fa-lock"></i>
+                <span>
+                    @L.Html("Mesaj yazmaq üçün {0} və ya {1}.",
+                        $"<a href=\"{System.Net.WebUtility.HtmlEncode(loginUrl)}\">{System.Net.WebUtility.HtmlEncode(L.T("daxil olun"))}</a>",
+                        $"<a href=\"{System.Net.WebUtility.HtmlEncode(registerUrl)}\">{System.Net.WebUtility.HtmlEncode(L.T("qeydiyyatdan keçin"))}</a>")
+                </span>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Mesaj menyusu: reaksiyalar + əməliyyatlar (bir nüsxə, JS yerləşdirir) -->
+<div class="dc-menu" hidden role="menu">
+    <div class="dc-menu__reactions"></div>
+    <div class="dc-menu__actions"></div>
+</div>
+
+<!-- ŞƏKLİ BÖYÜK GÖSTƏRMƏ -->
+<div class="dc-lightbox" hidden role="dialog" aria-modal="true" aria-label="@L.T("Şəkil")">
+    <button type="button" class="dc-lightbox__close" title="@L.T("Bağla")"><i class="fa-solid fa-xmark"></i></button>
+    <img alt="" />
+</div>
+
+@if (isAuthenticated)
+{
+    <script id="dcChatConfig" type="application/json">@Json.Serialize(config)</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script src="~/js/call-ring.js" asp-append-version="true"></script>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

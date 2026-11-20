@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Yeni çat ("+"): istifadəçinin adına toxun, yaz -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             x:Class="DoctorEngine.App.Views.ChatNewPage"
+             x:DataType="vm:ChatNewViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="All"
+             BackgroundColor="{AppThemeBinding Light=White, Dark=#111B21}">
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Başlıq -->
+        <Grid BackgroundColor="#D81324" Padding="6,10,12,10" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Border WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="Transparent" Padding="9">
+                <Image Source="ic_back_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBack" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Label Grid.Column="1" Text="{l:Tr chat_new_title}" TextColor="White" FontFamily="BarlowSemiBold" FontSize="19" VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Axtarış -->
+        <Border Grid.Row="1" Margin="14,10" StrokeShape="RoundRectangle 20" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#F0F2F5, Dark=#202C33}" Padding="12,0">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                <Image Source="ic_search_g.png" WidthRequest="18" HeightRequest="18" />
+                <Entry Grid.Column="1" Text="{Binding Search}" Placeholder="{l:Tr chat_new_search}" FontSize="15" ClearButtonVisibility="WhileEditing" />
+            </Grid>
+        </Border>
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding People}" SelectionMode="None">
+            <CollectionView.Header>
+                <VerticalStackLayout>
+                    <!-- Usta: yeni qrup və yayım -->
+                    <VerticalStackLayout IsVisible="{Binding IsAdmin}" Padding="0,2,0,8">
+                        <Grid Padding="16,8" ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NewGroupCommand}" />
+                            </Grid.GestureRecognizers>
+                            <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#D81324" Padding="12">
+                                <Image Source="ic_users_w.png" />
+                            </Border>
+                            <Label Grid.Column="1" Text="{l:Tr group_new}" FontSize="16" VerticalOptions="Center" />
+                        </Grid>
+                        <Grid Padding="16,8" ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BroadcastCommand}" />
+                            </Grid.GestureRecognizers>
+                            <Border WidthRequest="46" HeightRequest="46" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#D81324" Padding="12">
+                                <Image Source="ic_megaphone_w.png" />
+                            </Border>
+                            <Label Grid.Column="1" Text="{l:Tr broadcast_title}" FontSize="16" VerticalOptions="Center" />
+                        </Grid>
+                        <BoxView HeightRequest="8" Margin="0,6,0,0" Color="{AppThemeBinding Light=#F0F2F5, Dark=#0B141A}" />
+                    </VerticalStackLayout>
+                    <Label Text="{l:Tr chat_new_users}" Margin="18,10,18,6" FontSize="13" FontFamily="BarlowSemiBold" TextColor="#D81324" />
+                    <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="#D81324" Margin="0,10" />
+                    <Label Text="{l:Tr chat_new_empty}" IsVisible="{Binding IsEmpty}" Margin="20,24" HorizontalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light=#8696A0, Dark=#8696A0}" />
+                </VerticalStackLayout>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:PersonItem">
+                    <Grid Padding="16,8" ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatNewViewModel}}, Path=OpenCommand, x:DataType=vm:ChatNewViewModel}"
+                                                  CommandParameter="{Binding .}" />
+                        </Grid.GestureRecognizers>
+                        <Grid WidthRequest="46" HeightRequest="46">
+                            <Border StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="{AppThemeBinding Light=#DFE5E7, Dark=#2A3942}">
+                                <Grid>
+                                    <Label Text="{Binding Initial}" FontFamily="BarlowBold" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"
+                                           TextColor="{AppThemeBinding Light=#54656F, Dark=#AEBAC1}" />
+                                    <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding HasAvatar}" />
+                                </Grid>
+                            </Border>
+                            <Ellipse Fill="#D81324" Stroke="White" StrokeThickness="2" WidthRequest="13" HeightRequest="13"
+                                     HorizontalOptions="End" VerticalOptions="End" IsVisible="{Binding Online}" />
+                        </Grid>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="{Binding FullName}" FontSize="16" LineBreakMode="TailTruncation" MaxLines="1"
+                                       TextColor="{AppThemeBinding Light=#111B21, Dark=#E9EDEF}" />
+                                <Border IsVisible="{Binding IsAdmin}" StrokeShape="RoundRectangle 9" StrokeThickness="0" BackgroundColor="#FDE2E4" Padding="7,1" VerticalOptions="Center">
+                                    <Label Text="{l:Tr chat_new_mechanic}" FontSize="11" FontFamily="BarlowSemiBold" TextColor="#D81324" />
+                                </Border>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding Subtitle}" FontSize="13" TextColor="{AppThemeBinding Light=#667781, Dark=#8696A0}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

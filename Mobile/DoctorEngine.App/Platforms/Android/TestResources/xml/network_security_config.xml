@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- YALNIZ TEST APK (-p:TestServerUrl=...): eyni Wi-Fi-dakı kompüterin lokal serverinə HTTP ilə qoşulmaq üçün
+     hər ünvana HTTP icazəlidir. Canlı (Release) APK bu faylı istifadə etmir — orada yalnız HTTPS. -->
+<network-security-config>
+	<base-config cleartextTrafficPermitted="true" />
+</network-security-config>
