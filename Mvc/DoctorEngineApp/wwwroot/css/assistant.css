@@ -1,0 +1,403 @@
+/* =====================================================
+   DoctorEngine.Az — AI Köməkçi səhifəsi
+   ===================================================== */
+
+.ai {
+    --ai-primary: #D81324;
+    --ai-primary-dark: #b00f1d;
+    --ai-navy: #0B2154;
+    --ai-navy-2: #16306f;
+    --ai-bg: #f5f7fb;
+    --ai-border: #e3e7ef;
+    --ai-text: #1d2433;
+    --ai-muted: #727b8e;
+
+    display: flex;
+    flex-direction: column;
+    height: min(78vh, 760px);
+    min-height: 560px;
+    border: 1px solid var(--ai-border);
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(11, 33, 84, .12);
+    overflow: hidden;
+    color: var(--ai-text);
+}
+
+.ai [hidden] { display: none !important; }
+
+/* ---------- Başlıq ---------- */
+
+.ai__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: linear-gradient(120deg, var(--ai-navy), var(--ai-navy-2));
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.ai__avatar {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--ai-primary), #ff5d6b);
+    font-size: 19px;
+    box-shadow: 0 6px 16px rgba(216, 19, 36, .45);
+    flex-shrink: 0;
+}
+
+.ai__title { flex: 1; min-width: 0; }
+.ai__title h2 { margin: 0; color: #fff; font-size: 19px; }
+
+.ai__status { display: inline-flex; align-items: center; gap: 7px; margin-top: 2px; font-size: 13px; color: rgba(255, 255, 255, .75); }
+.ai__dot { width: 8px; height: 8px; border-radius: 50%; background: #f5b301; }
+.ai__status.is-on .ai__dot { background: #2ecc71; box-shadow: 0 0 0 3px rgba(46, 204, 113, .25); }
+
+.ai__icon-btn {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.ai__icon-btn:hover { background: rgba(255, 255, 255, .24); }
+
+/* ---------- Gövdə ---------- */
+
+.ai__body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 22px;
+    background:
+        radial-gradient(circle at 1px 1px, rgba(11, 33, 84, .05) 1px, transparent 0) 0 0 / 22px 22px,
+        var(--ai-bg);
+}
+
+.ai__welcome { max-width: 620px; margin: 10px auto 18px; text-align: center; animation: ai-rise .5s ease-out both; }
+
+.ai__welcome-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid var(--ai-border);
+    color: var(--ai-primary);
+    font-size: 28px;
+    box-shadow: 0 10px 24px rgba(11, 33, 84, .08);
+}
+
+.ai__welcome h3 { margin-bottom: 8px; font-size: 21px; }
+.ai__welcome p { margin-bottom: 18px; color: var(--ai-muted); }
+
+.ai__suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; text-align: left; }
+
+.ai__chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--ai-border);
+    border-radius: 14px;
+    background: #fff;
+    color: var(--ai-text);
+    font-size: 14px;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+
+.ai__chip i { flex-shrink: 0; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: rgba(216, 19, 36, .09); color: var(--ai-primary); font-size: 13px; }
+.ai__chip:hover:not(:disabled) { border-color: rgba(216, 19, 36, .4); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11, 33, 84, .08); }
+.ai__chip:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ---------- Mesajlar ---------- */
+
+.ai__msg { display: flex; gap: 10px; margin-bottom: 16px; animation: ai-rise .25s ease-out both; }
+.ai__msg.is-user { flex-direction: row-reverse; }
+
+.ai__msg-avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--ai-primary), #ff5d6b);
+    color: #fff;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.ai__msg.is-user .ai__msg-avatar { display: none; }
+
+.ai__bubble {
+    max-width: min(82%, 640px);
+    padding: 12px 16px;
+    border-radius: 18px;
+    border-top-left-radius: 6px;
+    background: #fff;
+    border: 1px solid var(--ai-border);
+    box-shadow: 0 1px 2px rgba(11, 33, 84, .05);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.ai__msg.is-user .ai__bubble {
+    border: 0;
+    border-radius: 18px;
+    border-top-right-radius: 6px;
+    background: linear-gradient(135deg, var(--ai-primary), var(--ai-primary-dark));
+    color: #fff;
+    white-space: pre-wrap;
+}
+
+.ai__bubble p { margin: 0 0 8px; }
+.ai__bubble p:last-child, .ai__bubble ul:last-child, .ai__bubble ol:last-child { margin-bottom: 0; }
+.ai__bubble ul, .ai__bubble ol { margin: 4px 0 8px; padding-left: 20px; }
+.ai__bubble li { margin-bottom: 4px; }
+.ai__bubble strong { color: var(--ai-navy); }
+.ai__bubble h4 { margin: 10px 0 6px; font-size: 15.5px; }
+.ai__bubble code { padding: 1px 6px; border-radius: 6px; background: var(--ai-bg); font-size: 13.5px; }
+.ai__bubble a { color: var(--ai-primary); font-weight: 500; text-decoration: underline; text-underline-offset: 2px; }
+
+/* Yazılır… */
+.ai__typing { display: inline-flex; gap: 5px; padding: 4px 0; }
+.ai__typing span { width: 7px; height: 7px; border-radius: 50%; background: #b8bfcc; animation: ai-blink 1.2s infinite ease-in-out; }
+.ai__typing span:nth-child(2) { animation-delay: .15s; }
+.ai__typing span:nth-child(3) { animation-delay: .3s; }
+
+@keyframes ai-blink { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+/* Yazılarkən sonda kursor */
+.ai__bubble.is-streaming > :last-child::after {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 1em;
+    margin-left: 3px;
+    vertical-align: text-bottom;
+    background: var(--ai-primary);
+    border-radius: 2px;
+    animation: ai-caret 1s steps(2) infinite;
+}
+
+@keyframes ai-caret { 50% { opacity: 0; } }
+
+.ai__meta { display: flex; gap: 6px; margin-top: 6px; }
+
+.ai__meta button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border: 1px solid var(--ai-border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ai-muted);
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+}
+
+.ai__meta button:hover { color: var(--ai-navy); border-color: var(--ai-navy); }
+
+.ai__error {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 640px;
+    margin: 0 auto 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: #fdecee;
+    color: #991b1b;
+    font-size: 14px;
+    animation: ai-rise .25s ease-out both;
+}
+
+.ai__error button { margin-left: auto; border: 0; background: none; color: inherit; font-weight: 500; text-decoration: underline; cursor: pointer; white-space: nowrap; }
+
+/* ---------- Yazma sahəsi ---------- */
+
+.ai__composer { flex-shrink: 0; padding: 12px 16px 10px; border-top: 1px solid var(--ai-border); background: #fff; }
+
+.ai__input-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 6px 6px 6px 16px;
+    border: 1px solid var(--ai-border);
+    border-radius: 18px;
+    background: var(--ai-bg);
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.ai__input-wrap:focus-within { border-color: var(--ai-navy); background: #fff; box-shadow: 0 0 0 4px rgba(11, 33, 84, .07); }
+
+.ai__input {
+    flex: 1;
+    min-height: 40px;
+    max-height: 160px;
+    padding: 9px 0;
+    border: 0;
+    background: transparent;
+    color: var(--ai-text);
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.45;
+    resize: none;
+    outline: none;
+}
+
+.ai__send, .ai__stop {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: background .15s, transform .1s, opacity .15s;
+}
+
+.ai__send { background: var(--ai-primary); box-shadow: 0 6px 14px rgba(216, 19, 36, .3); }
+.ai__send:hover:not(:disabled) { background: var(--ai-primary-dark); }
+.ai__send:active:not(:disabled) { transform: scale(.94); }
+.ai__send:disabled { opacity: .4; box-shadow: none; cursor: default; }
+.ai__stop { background: var(--ai-navy); }
+.ai__stop:hover { background: var(--ai-navy-2); }
+
+.ai__hint { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; margin-top: 7px; padding: 0 6px; color: var(--ai-muted); font-size: 12px; }
+.ai__privacy { margin-left: auto; }
+.ai__counter:empty { display: none; }
+.ai__counter.is-warn { color: var(--ai-primary); }
+
+/* Gündəlik limit nişanı */
+.ai__quota {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: rgba(11, 33, 84, .06);
+    color: var(--ai-navy);
+}
+
+.ai__quota i { color: #f5a400; }
+.ai__quota.is-low { background: #fff4e0; color: #92400e; }
+.ai__quota.is-low i { color: #d97706; }
+
+/* Limit doldu */
+.ai__limit {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--ai-border);
+    background: #fff8e6;
+    color: #7a4b00;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.ai__limit i { margin-top: 2px; font-size: 18px; }
+.ai__limit a { color: var(--ai-primary); font-weight: 500; }
+
+.ai__offline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--ai-border);
+    background: #fff8e6;
+    color: #7a4b00;
+    font-size: 14px;
+}
+
+.ai__offline a { color: var(--ai-primary); font-weight: 500; }
+
+/* ---------- Yan panel ---------- */
+
+.ai-side { display: grid; gap: 16px; position: sticky; top: 96px; }
+
+.ai-card {
+    padding: 22px;
+    border: 1px solid #e3e7ef;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(11, 33, 84, .05);
+}
+
+.ai-card h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 17px; }
+.ai-card h3 i { color: #D81324; }
+.ai-card p { margin-bottom: 14px; font-size: 14.5px; }
+
+.ai-card--accent { background: linear-gradient(140deg, #0B2154, #16306f); border: 0; color: rgba(255, 255, 255, .8); }
+.ai-card--accent h3 { color: #fff; }
+.ai-card--accent h3 i { color: #ff8a94; }
+.ai-card--accent .btn-light { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .25); color: #fff; box-shadow: none; }
+.ai-card--accent .btn-light:hover { background: #fff; color: #0B2154; }
+
+.ai-card--note { background: #fffaf0; border-color: #f3e3bf; }
+.ai-card--note h3 i { color: #b45309; }
+.ai-card ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.ai-card ul li { margin-bottom: 6px; }
+
+.ai-steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.ai-steps li { position: relative; padding: 0 0 14px 44px; counter-increment: step; }
+.ai-steps li:last-child { padding-bottom: 0; }
+.ai-steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(216, 19, 36, .09);
+    color: #D81324;
+    font-weight: 700;
+    font-size: 14px;
+}
+.ai-steps b { display: block; color: #0B2154; font-weight: 500; }
+.ai-steps span { font-size: 13.5px; }
+
+@keyframes ai-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Mobil ---------- */
+
+@media (max-width: 991.98px) {
+    .ai { height: 80vh; min-height: 520px; }
+    .ai-side { position: static; }
+}
+
+@media (max-width: 575.98px) {
+    .ai { border-radius: 16px; height: 82vh; }
+    .ai__body { padding: 14px; }
+    .ai__suggestions { grid-template-columns: 1fr; }
+    .ai__bubble { max-width: 88%; }
+    .ai__hint span:first-child { font-size: 11.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ai *, .ai-side * { animation: none !important; transition: none !important; }
+}

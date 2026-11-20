@@ -1,0 +1,113 @@
+@model List<DoctorEngineApp.Models.Slider>
+
+@{
+    const int interval = 6000; // ms — CSS-dəki irəliləmə xətti ilə eyni olmalıdır (--de-hero-interval)
+    var slides = Model ?? new();
+    var multiple = slides.Count > 1;
+}
+
+<section class="de-hero" aria-roledescription="carousel" aria-label="@L.T("Əsas slayder")" style="--de-hero-interval:@(interval)ms">
+
+    @if (!slides.Any())
+    {
+        @* Slayd yoxdursa — standart başlıq (səhifə boş qalmasın) *@
+        <div class="de-hero__slide is-static">
+            <img class="de-hero__bg" src="~/assets/img/bmwserv.jpg" alt="" fetchpriority="high" />
+            <div class="de-hero__overlay"></div>
+            <div class="container de-hero__content">
+                <div class="de-hero__text">
+                    <span class="de-hero__badge">@L.T("Avto xidmətlər")</span>
+                    <h1 class="de-hero__title">@L.T("Dizel və benzin mühərriklərinin peşəkar təmiri")</h1>
+                    <div class="de-hero__actions">
+                        <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary de-hero__cta">@L.T("Rezervasiya") <i class="fa fa-arrow-right ms-2"></i></a>
+                        <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="btn de-hero__ghost"><i class="fa-regular fa-comments me-2"></i> @L.T("Usta ilə yazış")</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div id="header-carousel" class="carousel slide carousel-fade"
+             data-bs-ride="@(multiple ? "carousel" : "false")"
+             data-bs-interval="@interval"
+             data-bs-pause="hover"
+             data-bs-touch="true">
+
+            @if (multiple)
+            {
+                <div class="carousel-indicators de-hero__dots">
+                    @for (int i = 0; i < slides.Count; i++)
+                    {
+                        <button type="button" data-bs-target="#header-carousel" data-bs-slide-to="@i"
+                                class="@(i == 0 ? "active" : "")" aria-current="@(i == 0 ? "true" : null)"
+                                aria-label="@L.T("Slayd {0}", i + 1)"></button>
+                    }
+                </div>
+            }
+
+            <div class="carousel-inner">
+                @for (int i = 0; i < slides.Count; i++)
+                {
+                    var s = slides[i];
+                    var first = i == 0;
+
+                    <div class="carousel-item de-hero__slide @(first ? "active" : "")" role="group" aria-roledescription="slide" aria-label="@(i + 1) / @slides.Count">
+
+                        @* İlk şəkil dərhal (LCP), qalanları tənbəl yüklənir *@
+                        <img class="de-hero__bg" src="~/uploads/sliders/@s.Image1" alt=""
+                             loading="@(first ? "eager" : "lazy")" fetchpriority="@(first ? "high" : "low")" decoding="async" />
+                        <div class="de-hero__overlay"></div>
+
+                        <div class="container de-hero__content">
+                            <div class="row align-items-center g-4">
+                                <div class="col-lg-7">
+                                    <div class="de-hero__text">
+                                        <span class="de-hero__badge">@L.T(s.Title)</span>
+                                        @if (first)
+                                        {
+                                            <h1 class="de-hero__title">@L.T(s.Subtitle)</h1>
+                                        }
+                                        else
+                                        {
+                                            <h2 class="de-hero__title">@L.T(s.Subtitle)</h2>
+                                        }
+                                        <div class="de-hero__actions">
+                                            <a asp-controller="Reservation" asp-action="Index" class="btn btn-primary de-hero__cta">
+                                                @L.T("Rezervasiya") <i class="fa fa-arrow-right ms-2"></i>
+                                            </a>
+                                            <a asp-controller="Contact" asp-action="Index" asp-fragment="chat" class="btn de-hero__ghost">
+                                                <i class="fa-regular fa-comments me-2"></i> @L.T("Usta ilə yazış")
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                @* Sağ tərəf şəkli (Image2) artıq göstərilmir — hər slaydda yalnız bir (fon) şəkli var *@
+                            </div>
+                        </div>
+
+                        @if (multiple)
+                        {
+                            <div class="de-hero__progress" aria-hidden="true"><span></span></div>
+                        }
+                    </div>
+                }
+            </div>
+
+            @if (multiple)
+            {
+                <button class="carousel-control-prev de-hero__nav" type="button" data-bs-target="#header-carousel" data-bs-slide="prev">
+                    <span class="de-hero__nav-icon" aria-hidden="true"><i class="fa-solid fa-chevron-left"></i></span>
+                    <span class="visually-hidden">@L.T("Əvvəlki")</span>
+                </button>
+                <button class="carousel-control-next de-hero__nav" type="button" data-bs-target="#header-carousel" data-bs-slide="next">
+                    <span class="de-hero__nav-icon" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+                    <span class="visually-hidden">@L.T("Növbəti")</span>
+                </button>
+            }
+        </div>
+    }
+
+    <a href="#de-after-hero" class="de-hero__scroll" aria-label="@L.T("Aşağı sürüşdür")"><span></span></a>
+</section>
+<div id="de-after-hero"></div>

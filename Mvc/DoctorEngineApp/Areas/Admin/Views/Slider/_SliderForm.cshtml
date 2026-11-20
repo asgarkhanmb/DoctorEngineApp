@@ -1,0 +1,124 @@
+﻿@model SliderVM
+@{
+    var isEdit = Model.Id > 0;
+    string? img1 = string.IsNullOrEmpty(Model.ExistingImage1) ? null : Url.Content($"~/uploads/sliders/{Model.ExistingImage1}");
+}
+
+<style>
+    .sl-preview { position: relative; aspect-ratio: 16 / 7; border-radius: 12px; overflow: hidden; background: #0b2154 center / cover no-repeat; color: #fff; }
+    .sl-preview::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,15,38,.88), rgba(8,15,38,.6) 50%, rgba(8,15,38,.2)); }
+    .sl-preview__body { position: absolute; inset: 0; display: flex; align-items: center; justify-content: space-between; gap: 4%; padding: 0 6%; }
+    .sl-preview__text { max-width: 58%; }
+    .sl-preview__badge { color: #fff !important; line-height: 1.6; display: inline-block; padding: 2px 8px; border-radius: 99px; background: #D81324; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+    .sl-preview__title { margin: 8px 0 10px; font-size: clamp(14px, 2.2vw, 26px); font-weight: 700; line-height: 1.15; color: #fff; }
+    .sl-preview__btn { color: #fff !important; line-height: 1.6; display: inline-block; padding: 4px 12px; border-radius: 6px; background: #D81324; font-size: 10px; }
+    .sl-warn { display: none; margin-top: 8px; }
+    .sl-thumb { width: 72px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; }
+</style>
+
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="adm-card"><form asp-action="@(isEdit ? "Edit" : "Create")" method="post" enctype="multipart/form-data" novalidate class="adm-form"><div class="adm-card__body">
+            @if (isEdit)
+            {
+                <input asp-for="Id" type="hidden" />
+            }
+
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="mb-3">
+                <label class="form-label" asp-for="Title">Kiçik başlıq <small class="text-muted">(qırmızı nişan, məs: “Avto Xidmətlər”)</small></label>
+                <input asp-for="Title" class="form-control" maxlength="60" data-preview="badge" />
+                <span asp-validation-for="Title" ></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" asp-for="Subtitle">Əsas başlıq <small class="text-muted">(böyük yazı)</small></label>
+                <textarea asp-for="Subtitle" class="form-control" rows="2" maxlength="120" data-preview="title"></textarea>
+                <span asp-validation-for="Subtitle" ></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" asp-for="ImageFile1">
+                    Fon şəkli @(isEdit ? "" : "*")
+                    <small class="text-muted">(tövsiyə: 1920×900 px və ya daha böyük, JPG/WEBP)</small>
+                </label>
+                @if (img1 != null)
+                {
+                    <div class="mb-2"><img src="@img1" class="sl-thumb" alt="" /> <small class="text-muted">Mövcud şəkil — yenisini seçsəniz əvəz olunacaq</small></div>
+                }
+                <input asp-for="ImageFile1" type="file" class="form-control" accept="image/jpeg,image/png,image/webp" data-preview-image="bg" />
+                <span asp-validation-for="ImageFile1" ></span>
+                <div class="alert alert-warning sl-warn py-2 px-3 small" data-warn="bg"></div>
+            </div>
+
+            @* Sağ tərəf şəkli ləğv olunub — slaydda yalnız fon şəkli var *@
+            </div>
+            <div class="adm-form-actions">
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> @(isEdit ? "Yadda saxla" : "Yarat")</button>
+                <a asp-action="Index" class="btn btn-light">Ləğv et</a>
+            </div>
+        </form></div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="adm-card adm-card__body" style="position:sticky;top:84px">
+        <h6 class="text-muted mb-2">Saytda belə görünəcək:</h6>
+        <div class="sl-preview" id="slPreview" style="@(img1 != null ? $"background-image:url('{img1}')" : "")">
+            <div class="sl-preview__body">
+                <div class="sl-preview__text">
+                    <span class="sl-preview__badge" id="slBadge">@Model.Title</span>
+                    <div class="sl-preview__title" id="slTitle">@Model.Subtitle</div>
+                    <span class="sl-preview__btn">Rezervasiya →</span>
+                </div>
+            </div>
+        </div>
+        <small class="text-muted d-block mt-2">Telefonda mətn mərkəzə düzülür.</small>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const preview = document.getElementById("slPreview");
+        const MIN_WIDTH = 1280;
+
+        // Mətn önizləməsi
+        document.querySelectorAll("[data-preview]").forEach(function (input) {
+            const target = document.getElementById(input.dataset.preview === "badge" ? "slBadge" : "slTitle");
+            input.addEventListener("input", function () { target.textContent = input.value; });
+        });
+
+        // Fon şəklinin keyfiyyətini yoxla
+        function checkBackground(url) {
+            const warn = document.querySelector('[data-warn="bg"]');
+            const img = new Image();
+            img.onload = function () {
+                if (img.naturalWidth < MIN_WIDTH) {
+                    warn.textContent = "Diqqət: şəkil kiçikdir (" + img.naturalWidth + "×" + img.naturalHeight +
+                        " px). Saytda tam ekrana genişlənəcək və bulanıq görünəcək. Ən azı " + MIN_WIDTH + " px enində şəkil seçin.";
+                    warn.style.display = "block";
+                } else {
+                    warn.style.display = "none";
+                }
+            };
+            img.src = url;
+        }
+
+        // Şəkil önizləməsi
+        document.querySelectorAll("[data-preview-image]").forEach(function (input) {
+            input.addEventListener("change", function () {
+                const file = input.files[0];
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                preview.style.backgroundImage = "url('" + url + "')";
+                checkBackground(url);
+            });
+        });
+
+        @if (img1 != null)
+        {
+            @:checkBackground(@Json.Serialize(img1));
+        }
+    })();
+</script>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Gələn zəng (WhatsApp kimi tam ekran): Rədd et / Cavab ver -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             x:Class="DoctorEngine.App.Views.IncomingCallPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#0B141A">
+    <Grid RowDefinitions="*,Auto" Padding="24,60,24,50">
+        <VerticalStackLayout VerticalOptions="Center" Spacing="14">
+            <Grid WidthRequest="130" HeightRequest="130" HorizontalOptions="Center">
+                <Ellipse x:Name="Pulse" Fill="#33D81324" />
+                <Border StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#D81324" Margin="15">
+                    <Label x:Name="Initial" TextColor="White" FontSize="44" FontFamily="BarlowBold" HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+            </Grid>
+            <Label x:Name="TitleLabel" TextColor="White" FontSize="26" FontFamily="BarlowSemiBold" HorizontalTextAlignment="Center" />
+            <Label x:Name="SubtitleLabel" TextColor="#AEBAC1" FontSize="15" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*">
+            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                <Border WidthRequest="70" HeightRequest="70" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#3B4A54" Padding="21">
+                    <Image Source="ic_hangup_w.png" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnDecline" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Label Text="{l:Tr call_decline}" TextColor="#AEBAC1" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1" Spacing="10" HorizontalOptions="Center">
+                <Border WidthRequest="70" HeightRequest="70" StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#D81324" Padding="20">
+                    <Image x:Name="AcceptIcon" Source="ic_phone_w.png" />
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAccept" />
+                    </Border.GestureRecognizers>
+                </Border>
+                <Label Text="{l:Tr call_accept}" TextColor="#AEBAC1" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

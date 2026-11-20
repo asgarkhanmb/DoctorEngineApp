@@ -1,0 +1,398 @@
+/* =====================================================
+   DoctorEngine.Az — "canlı" sayt: hərəkət və mikro-interaksiyalar
+   Hamısı "prefers-reduced-motion" ilə söndürülür.
+   ===================================================== */
+
+/* ---------- 1. Səhifələr arası hamar keçid (View Transitions) ---------- */
+@view-transition { navigation: auto; }
+
+/* Header keçid zamanı yerində qalır, yalnız məzmun dəyişir */
+.s-header { view-transition-name: site-header; }
+
+::view-transition-old(root) { animation: de-vt-out .28s cubic-bezier(.4, 0, 1, 1) both; }
+::view-transition-new(root) { animation: de-vt-in .42s cubic-bezier(.22, .61, .36, 1) both; }
+
+@keyframes de-vt-out { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes de-vt-in { from { opacity: 0; transform: translateY(14px); } }
+
+/* Brauzer keçidi dəstəkləyirsə, köhnə "səhifə açılışı" animasiyası təkrarlanmasın */
+@supports (view-transition-name: none) {
+    body { animation: none !important; }
+}
+
+/* ---------- 2. Oxunma göstəricisi ---------- */
+.de-read-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    height: 3px;
+    background: linear-gradient(90deg, var(--de-primary), #ff5d6b 60%, #ffb3ba);
+    transform: scaleX(var(--de-read, 0));
+    transform-origin: left;
+    pointer-events: none;
+}
+
+/* ---------- 3. Canlı məlumat zolağı ---------- */
+.de-topbar {
+    position: relative;
+    z-index: 1031;
+    background: linear-gradient(90deg, #08183f, var(--de-navy) 50%, #08183f);
+    color: rgba(255, 255, 255, .78);
+    font-size: 13px;
+}
+
+/* Zolaq header-in üstündədir və səhifə ilə birgə sürüşüb gedir (header sticky qalır) */
+
+.de-topbar__inner {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 40px;
+    padding: 0 48px;
+    white-space: nowrap;
+}
+
+.de-topbar__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255, 255, 255, .78) !important;
+    transition: color .2s;
+}
+
+a.de-topbar__item:hover { color: #fff !important; }
+.de-topbar__item i { color: #ff8a94; font-size: 12px; }
+.de-topbar__right { display: inline-flex; align-items: center; gap: 22px; margin-left: auto; flex-shrink: 0; }
+/* Yer çatmasa status mətni "…" ilə qısalsın, sağdakı telefon kənara dirənməsin */
+.de-topbar__inner > .de-status { min-width: 0; }
+.de-topbar__inner > .de-status .de-status__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.de-topbar__inner > .de-topbar__item { min-width: 0; overflow: hidden; }
+
+/* Dil seçimi (az / en / ru / tr) */
+.de-lang__btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    font-weight: 500;
+    letter-spacing: .03em;
+    cursor: pointer;
+}
+.de-lang__btn:focus-visible { outline: 2px solid #ff8a94; outline-offset: 4px; border-radius: 4px; }
+.de-topbar__item .de-lang__caret { font-size: 9px; color: inherit; opacity: .7; transition: transform .2s; }
+.de-lang__btn[aria-expanded="true"] .de-lang__caret { transform: rotate(180deg); }
+
+.de-lang__menu {
+    min-width: 180px;
+    margin-top: 8px !important;
+    padding: 6px;
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(8, 24, 63, .22);
+    font-size: 14px;
+}
+.de-lang__menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #1b2440;
+}
+.de-lang__menu .dropdown-item:hover { background: #f1f4fa; }
+.de-lang__menu .dropdown-item.active { background: var(--de-navy); color: #fff; }
+.de-lang__code {
+    display: inline-block;
+    min-width: 26px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    opacity: .65;
+}
+
+.de-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 11px 3px 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .08);
+    color: #fff;
+    font-weight: 500;
+}
+
+.de-status__dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+}
+
+.de-status.is-open .de-status__dot { background: #22c55e; }
+.de-status.is-closed .de-status__dot { background: #ef4444; }
+
+.de-status.is-open .de-status__dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: de-ping 1.8s cubic-bezier(0, 0, .2, 1) infinite;
+}
+
+@keyframes de-ping { 75%, 100% { transform: scale(2.6); opacity: 0; } }
+
+@media (max-width: 991.98px) {
+    .de-topbar__inner { padding: 0 16px; gap: 12px; font-size: 12.5px; }
+    .de-topbar__right { gap: 14px; }
+}
+
+/* Kiçik telefonlar: telefon nömrəsi həmişə tam görünsün, status mətni lazım olsa "…" ilə qısalsın */
+@media (max-width: 420px) {
+    .de-topbar__inner { padding: 0 12px; gap: 8px; font-size: 12px; }
+    .de-topbar__right { flex-shrink: 0; }
+    .de-status { min-width: 0; padding: 3px 9px 3px 8px; }
+    .de-status__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* Footer: bu günün iş saatları */
+.de-hours div.is-today {
+    position: relative;
+    margin: 0 -10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border-bottom-color: transparent !important;
+    background: rgba(255, 255, 255, .06);
+}
+
+.de-hours div.is-today span::after {
+    content: "Bu gün";
+    margin-left: 8px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: var(--de-primary);
+    color: #fff;
+    font-size: 10.5px;
+    font-weight: 500;
+    vertical-align: 1px;
+}
+
+/* ---------- 4. Sürüşdürdükcə görünmə ---------- */
+.de-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s var(--de-ease), transform .7s var(--de-ease) !important;
+    transition-delay: var(--de-delay, 0s) !important;
+}
+
+.de-reveal.is-in { opacity: 1; transform: none; }
+
+/* ---------- 5. Xidmətlər lenti ---------- */
+.de-marquee {
+    position: relative;
+    margin: -24px 0 0;
+    padding: 18px 0;
+    overflow: hidden;
+    background: #fff;
+    border-bottom: 1px solid var(--de-border);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.de-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: de-marquee 38s linear infinite;
+}
+
+.de-marquee:hover .de-marquee__track,
+.de-marquee:focus-within .de-marquee__track { animation-play-state: paused; }
+
+.de-marquee__group {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin: 0;
+    padding: 0 14px;
+    list-style: none;
+}
+
+.de-marquee__group a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    color: var(--de-navy);
+    font-family: "Barlow", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background .2s, color .2s;
+}
+
+.de-marquee__group a:hover { background: var(--de-primary-soft); color: var(--de-primary); }
+.de-marquee__group img { width: 26px; height: 26px; object-fit: contain; }
+.de-marquee__group a > i { color: var(--de-primary); }
+.de-marquee__sep { color: #d4d9e3; font-size: 14px; }
+
+@keyframes de-marquee { to { transform: translateX(-50%); } }
+
+/* ---------- 6. Kartlarda siçanı izləyən işıq ---------- */
+.de-spot { position: relative; overflow: hidden; }
+
+.de-spot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(216, 19, 36, .09), transparent 45%);
+    opacity: 0;
+    transition: opacity .35s;
+    pointer-events: none;
+}
+
+.de-spot:hover::after { opacity: 1; }
+.de-spot > * { position: relative; z-index: 1; }
+
+/* Tünd kartlarda ağ işıq */
+.de-spot.is-dark::after { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .12), transparent 45%); }
+
+/* ---------- 7. Düymələrdə klik dalğası ---------- */
+.btn, .de-login-btn, .de-call { position: relative; overflow: hidden; isolation: isolate; }
+
+.de-ripple {
+    position: absolute;
+    z-index: -1;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .28;
+    transform: scale(0);
+    animation: de-ripple .6s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes de-ripple { to { transform: scale(40); opacity: 0; } }
+
+/* ---------- 8. Slayderdə parallaks ---------- */
+.de-hero .col-lg-5 {
+    transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+    transition: transform .4s ease-out;
+}
+
+/* ---------- 9. Şəkillər yumşaq görünsün ---------- */
+img.de-fade { opacity: 0; transition: opacity .6s ease; }
+img.de-fade.is-loaded { opacity: 1; }
+
+/* ---------- Hərəkəti azalt ---------- */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
+    .de-reveal { opacity: 1; transform: none; transition: none; }
+    .de-marquee__track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
+    .de-marquee__group[aria-hidden="true"] { display: none; }
+    .de-marquee { -webkit-mask-image: none; mask-image: none; }
+    .de-status.is-open .de-status__dot::after { animation: none; }
+    .de-ripple { display: none; }
+    .de-hero .col-lg-5 { transform: none; }
+    img.de-fade { opacity: 1; transition: none; }
+}
+
+/* ---------- 10. Açılış animasiyası (sessiyada bir dəfə) ----------
+   html.de-intro <head>-dəki skriptlə qoyulur. Ardıcıllıq:
+   0–1.3s açılış ekranı → 1.3–2.0s pərdə yuxarı qalxır → menyu düşür → slayder mətni canlanır */
+.de-splash { display: none; }
+
+html.de-intro .de-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(circle at 80% 15%, rgba(216, 19, 36, .35), transparent 45%),
+        radial-gradient(circle at 15% 90%, rgba(216, 19, 36, .2), transparent 40%),
+        linear-gradient(150deg, #0B2154, #060f2b);
+    cursor: pointer;
+    animation: de-splash-out .75s 1.3s cubic-bezier(.76, 0, .24, 1) forwards;
+}
+
+.de-splash__inner { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+.de-splash__logo {
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    border-radius: 22px;
+    background: #D81324;
+    color: #fff;
+    font-size: 36px;
+    box-shadow: 0 18px 50px rgba(216, 19, 36, .45);
+    animation: de-splash-pop .7s .1s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.de-splash__logo:has(.de-brand-logo) { width: auto; height: auto; padding: 0; background: transparent; box-shadow: none; }
+.de-splash__logo .de-brand-logo { height: 96px; max-width: 220px; border-radius: 18px; box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
+
+.de-splash__name {
+    color: #fff;
+    font-family: "Barlow", sans-serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -.3px;
+    animation: de-splash-rise .6s .35s cubic-bezier(.22, .61, .36, 1) both;
+}
+
+.de-splash__bar {
+    width: 160px;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, .15);
+    animation: de-splash-rise .5s .45s ease both;
+}
+.de-splash__bar span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #D81324, #ff6b78);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: de-splash-load .85s .5s cubic-bezier(.65, 0, .35, 1) forwards;
+}
+
+@keyframes de-splash-pop { from { opacity: 0; transform: scale(.6) rotate(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes de-splash-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes de-splash-load { to { transform: scaleX(1); } }
+@keyframes de-splash-skip { to { transform: translateY(-100%); visibility: hidden; } }
+@keyframes de-splash-out {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100%); visibility: hidden; }
+}
+
+/* Pərdə qalxanda: zolaq və menyu yuxarıdan düşür */
+html.de-intro .de-topbar { animation: de-intro-drop .6s 1.75s cubic-bezier(.22, .61, .36, 1) both; }
+html.de-intro .s-header { animation: de-intro-drop .65s 1.85s cubic-bezier(.22, .61, .36, 1) both; }
+@keyframes de-intro-drop { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: none; } }
+
+/* Slayder mətni açılışdan sonra canlansın (öz animasiyaları gecikdirilir) */
+html.de-intro .de-hero .carousel-item.active .de-hero__badge,
+html.de-intro .de-hero__slide.is-static .de-hero__badge { animation-delay: 1.95s; }
+html.de-intro .de-hero .carousel-item.active .de-hero__title,
+html.de-intro .de-hero__slide.is-static .de-hero__title { animation-delay: 2.1s; }
+html.de-intro .de-hero .carousel-item.active .de-hero__actions,
+html.de-intro .de-hero__slide.is-static .de-hero__actions { animation-delay: 2.28s; }
+html.de-intro .de-hero .carousel-item.active .de-hero__side,
+html.de-intro .de-hero__slide.is-static .de-hero__side { animation-delay: 2.15s, 3.2s; }
+
+/* Klikləyəndə dərhal keç */
+html.de-intro .de-splash.is-skip { animation: de-splash-skip .45s cubic-bezier(.76, 0, .24, 1) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+    html.de-intro .de-splash { display: none; }
+}

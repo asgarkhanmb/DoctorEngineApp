@@ -1,0 +1,105 @@
+/* DoctorEngine — zəng ekranı (WhatsApp zəng görünüşü, qırmızı vurğu) */
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #0b141a; color: #e9edef; font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; overflow: hidden; }
+
+.dc-call { position: fixed; inset: 0; display: flex; flex-direction: column; background: radial-gradient(circle at 50% 30%, #2a1418 0%, #0b141a 70%); }
+.dc-call [hidden] { display: none !important; }
+
+.dc-call__top {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+    background: linear-gradient(rgba(0, 0, 0, .55), transparent);
+    font-size: 13px; color: #d1d7db;
+}
+.dc-call__lock i { margin-right: 4px; font-size: 11px; }
+.dc-call__timer { font-variant-numeric: tabular-nums; font-size: 15px; font-weight: 600; color: #fff; }
+
+/* Mərkəz: zəng edilir / qoşulur */
+.dc-call__center {
+    position: absolute; inset: 0; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    text-align: center; padding: 24px; pointer-events: none;
+}
+.dc-call__avatar {
+    width: 120px; height: 120px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: #D81324; color: #fff; font-size: 48px;
+    box-shadow: 0 0 0 0 rgba(216, 19, 36, .5);
+}
+.dc-call[data-state="ringing"] .dc-call__avatar { animation: dc-call-pulse 1.6s infinite; }
+@keyframes dc-call-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(216, 19, 36, .55); }
+    100% { box-shadow: 0 0 0 36px rgba(216, 19, 36, 0); }
+}
+.dc-call__title { margin: 14px 0 0; font-size: 26px; font-weight: 500; color: #fff; }
+.dc-call__status { margin: 0; font-size: 15px; color: #d1d7db; }
+.dc-call.has-remote .dc-call__center { display: none; }
+.dc-call[data-state="ended"] .dc-call__center { display: flex; background: rgba(11, 20, 26, .85); }
+
+/* Uzaq iştirakçılar şəbəkəsi */
+.dc-call__grid {
+    position: absolute; inset: 0; z-index: 0;
+    display: grid; gap: 4px; padding: 0;
+    grid-template-columns: 1fr; grid-auto-rows: 1fr;
+}
+.dc-call__grid[data-count="2"] { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+@media (min-aspect-ratio: 1/1) { .dc-call__grid[data-count="2"] { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; } }
+.dc-call__grid[data-count="3"], .dc-call__grid[data-count="4"] { grid-template-columns: 1fr 1fr; }
+.dc-call__grid[data-count="5"], .dc-call__grid[data-count="6"] { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+@media (min-aspect-ratio: 1/1) { .dc-call__grid[data-count="5"], .dc-call__grid[data-count="6"] { grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; } }
+
+.dc-call__tile { position: relative; overflow: hidden; background: #111b21; display: grid; place-items: center; }
+.dc-call__tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.dc-call__tile.has-video video { opacity: 1; }
+.dc-call__grid[data-count="1"] .dc-call__tile video { object-fit: contain; background: #000; }
+.dc-call__tile-avatar {
+    width: 96px; height: 96px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: #D81324; color: #fff; font-size: 40px; font-weight: 600;
+}
+.dc-call__tile.has-video .dc-call__tile-avatar { display: none; }
+.dc-call__name {
+    position: absolute; left: 10px; bottom: 10px; z-index: 1;
+    padding: 3px 10px; border-radius: 12px;
+    background: rgba(0, 0, 0, .5); font-size: 13px; color: #fff;
+}
+.dc-call__tile[data-state="connecting"]::after, .dc-call__tile[data-state="new"]::after {
+    content: "…"; position: absolute; top: 10px; right: 12px; font-size: 22px; color: #fff; opacity: .7;
+}
+
+/* Öz kameram (kiçik pəncərə) */
+.dc-call__self {
+    position: absolute; z-index: 2;
+    right: 14px; bottom: calc(110px + env(safe-area-inset-bottom));
+    width: 120px; height: 170px; object-fit: cover;
+    border-radius: 12px; background: #111b21;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .45);
+    transform: scaleX(-1);
+    display: none;
+}
+.dc-call__self.is-back { transform: none; }
+.dc-call.has-self-video .dc-call__self { display: block; }
+.dc-call:not(.has-remote).has-self-video .dc-call__self { inset: 0; width: 100%; height: 100%; border-radius: 0; z-index: 0; opacity: .55; }
+@media (min-width: 900px) { .dc-call__self { width: 220px; height: 150px; } }
+
+/* Alt panel */
+.dc-call__bar {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+    display: flex; justify-content: center; gap: 18px;
+    padding: 18px 16px calc(22px + env(safe-area-inset-bottom));
+    background: linear-gradient(transparent, rgba(0, 0, 0, .6));
+}
+.dc-call__btn {
+    width: 58px; height: 58px; border: 0; border-radius: 50%;
+    background: rgba(255, 255, 255, .16); color: #fff; font-size: 21px; cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: transform .12s, background .12s;
+}
+.dc-call__btn:hover { background: rgba(255, 255, 255, .26); }
+.dc-call__btn:active { transform: scale(.94); }
+.dc-call__btn.is-off { background: #fff; color: #111b21; }
+.dc-call__btn.is-end { background: #ea0038; }
+.dc-call__btn.is-end:hover { background: #c4002f; }
+.dc-call[data-state="ended"] .dc-call__bar { display: none; }

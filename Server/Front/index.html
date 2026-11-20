@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="utf-8" />
+    <title>Ana Səhifə — DoctorEngine.az</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#0B2154" />
+    <link href="/assets/img/favicon.ico" rel="icon" />
+
+    <!-- Açılış animasiyası: sessiyada yalnız ilk dəfə -->
+    <script>
+        (function () {
+            try {
+                if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+                if (sessionStorage.getItem("de-intro")) return;
+                sessionStorage.setItem("de-intro", "1");
+                document.documentElement.classList.add("de-intro");
+            } catch (e) { }
+        })();
+    </script>
+
+    <link rel="stylesheet" href="/css/services.css" />
+    <link rel="stylesheet" href="/css/about.css" />
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="/assets/lib/animate/animate.min.css" rel="stylesheet" />
+    <link href="/assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+    <link href="/assets/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/css/style.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/theme.css" />
+    <link rel="stylesheet" href="/css/video-frame.css" />
+    <link rel="stylesheet" href="/css/motion.css" />
+    <link rel="stylesheet" href="/css/chat.css" />
+    <link rel="stylesheet" href="/css/de-ui.css" />
+    <style>html, body { overflow-x: hidden; } .navbar-toggler { position: relative; z-index: 9999 !important; } .navbar-collapse { position: relative; z-index: 9989 !important; }</style>
+
+    <!-- API ilə əlaqə və tərcümə — hər şeydən əvvəl -->
+    <script src="/config.js"></script>
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/i18n.js"></script>
+</head>
+<body>
+    <div class="de-splash" aria-hidden="true"></div>
+    <div id="de-header"></div>
+    <main id="de-main"></main>
+    <div id="de-footer"></div>
+
+    <script src="/js/core/layout.js"></script>
+    <script src="/js/core/chat-widget.js"></script>
+    <script src="/js/core/partials.js"></script>
+    <script src="/js/core/forms.js"></script>
+    <script src="/js/pages/home.js"></script>
+</body>
+</html>

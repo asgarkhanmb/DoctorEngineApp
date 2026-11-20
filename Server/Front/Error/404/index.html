@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0B2154" />
+    <title>404 — Səhifə tapılmadı | DoctorEngine.az</title>
+    <link href="/assets/img/favicon.ico" rel="icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=Ubuntu:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="/css/error.css" />
+    <script src="/config.js"></script>
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/i18n.js"></script>
+</head>
+<body class="err-page">
+    <!-- Xəta səhifəsi statikdir: API işləməsə də açılır (yalnız tərcümə üçün API-yə müraciət edir) -->
+    <header class="err-top">
+        <a href="/" class="err-brand">
+            <span class="err-brand__icon"><i class="fa-solid fa-gears" aria-hidden="true"></i></span>
+            <span>DoctorEngine.az</span>
+        </a>
+    </header>
+
+    <main class="err-main">
+        <section class="err-card" aria-labelledby="errTitle">
+            <div class="err-code" aria-hidden="true">
+                <span>4</span><span class="err-code__mid"><i class="fa-solid fa-gear"></i></span><span>4</span>
+            </div>
+            <h1 id="errTitle">Səhifə tapılmadı</h1>
+            <p class="err-text">Axtardığınız səhifə mövcud deyil, silinib və ya ünvanı dəyişib.</p>
+            <div class="err-actions">
+                <a href="/" class="err-btn err-btn--primary"><i class="fa-solid fa-house"></i> Ana səhifə</a>
+                <button type="button" class="err-btn err-btn--light" data-back hidden><i class="fa-solid fa-arrow-left"></i> Geri qayıt</button>
+            </div>
+            <nav class="err-links" aria-label="Faydalı keçidlər">
+                <span>Bəlkə bunlar lazımdır:</span>
+                <a href="/Service"><i class="fa-solid fa-screwdriver-wrench"></i> Xidmətlər</a>
+                <a href="/Reservation"><i class="fa-regular fa-calendar-check"></i> Rezervasiya</a>
+                <a href="/Contact"><i class="fa-regular fa-comments"></i> Əlaqə</a>
+            </nav>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            var back = document.querySelector("[data-back]");
+            try {
+                if (back && history.length > 1 && document.referrer && new URL(document.referrer).origin === location.origin) {
+                    back.hidden = false;
+                    back.addEventListener("click", function () { history.back(); });
+                }
+            } catch (e) { }
+            DE.i18n.ready.then(function () { DE.i18n.translate(document.body); });
+        })();
+    </script>
+</body>
+</html>

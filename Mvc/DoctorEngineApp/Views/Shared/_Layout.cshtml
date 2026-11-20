@@ -1,0 +1,190 @@
+﻿@inject DoctorEngineApp.Services.Interfaces.ISiteSettingService SiteSettings
+@{ var site = await SiteSettings.GetAsync(); }
+<!DOCTYPE html>
+<html lang="@L.Lang">
+<head>
+    <meta charset="utf-8" />
+
+    <title>@L.T(ViewData["Title"] as string) — @site.SiteName</title>
+    <meta name="description" content="@L.T("layout.metaDesc", site.SiteName)" />
+    <meta name="theme-color" content="#0B2154" />
+
+    <!-- Çoxdillilik: JS mətnləri (window.DE_I18N) və deT("...") — bütün skriptlərdən əvvəl -->
+    <script src="~/Language/Js?lang=@L.Lang&v=@L.JsVersion"></script>
+
+    <!-- Açılış animasiyası: sessiyada yalnız ilk dəfə (səhifə çəkilməzdən əvvəl qərar verilir — titrəmə olmasın) -->
+    <script>
+        (function () {
+            try {
+                if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+                if (sessionStorage.getItem("de-intro")) return;
+                sessionStorage.setItem("de-intro", "1");
+                document.documentElement.classList.add("de-intro");
+            } catch (e) { /* sessionStorage bağlıdırsa açılış göstərilmir */ }
+        })();
+    </script>
+
+    <!-- Optional CSS Section -->
+    @RenderSection("css", required: false)
+
+    <!-- Bootstrap & Local CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DoctorEngineApp.styles.css" asp-append-version="true" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+
+    <link href="~/assets/img/favicon.ico" rel="icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Ubuntu:wght@400;500&display=swap"
+          rel="stylesheet">
+
+    <!-- Icon Fonts -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <!-- Library CSS -->
+    <link href="~/assets/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="~/assets/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="~/assets/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css"
+          rel="stylesheet" />
+
+    <!-- Template CSS -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/assets/css/style.css" rel="stylesheet">
+
+    <!-- Saytın vahid dizayn qatı (şablondan sonra) -->
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/video-frame.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/motion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/de-ui.css" asp-append-version="true" />
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Scroll Fix -->
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+        }
+
+        .navbar-toggler {
+            position: relative;
+            z-index: 9999 !important;
+        }
+
+        .navbar-collapse {
+            position: relative;
+            z-index: 9989 !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Açılış ekranı (yalnız html.de-intro olanda görünür) -->
+    <div class="de-splash" aria-hidden="true">
+        <div class="de-splash__inner">
+            <span class="de-splash__logo"><partial name="_BrandIcon" model="site" /></span>
+            <span class="de-splash__name">@site.SiteName</span>
+            <span class="de-splash__bar"><span></span></span>
+        </div>
+    </div>
+
+    <!-- Header Component -->
+    @await Component.InvokeAsync("Header")
+
+
+    <!-- Main Content -->
+    @RenderBody()
+
+
+    <!-- Footer Component -->
+    @await Component.InvokeAsync("Footer")
+
+    <!-- Yuxarı qayıt -->
+    <button type="button" class="de-totop" aria-label="@L.T("layout.toTop")" title="@L.T("layout.toTop")">
+        <svg class="de-totop__ring" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+            <circle class="track" cx="24" cy="24" r="22" />
+            <circle class="bar" cx="24" cy="24" r="22" pathLength="100" />
+        </svg>
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <!-- Canlı çat: sağ aşağıda üzən düymə + sağda açılan panel.
+         Səhifədə çat artıq varsa (Əlaqə, Canlı Çat) — düymə həmin çata aparır, panel yaradılmır. -->
+    @{
+        var inlineChat = ViewData["InlineChat"] as bool? ?? false;
+    }
+    <button type="button" class="dc-launcher" title="@L.T("layout.chatTitle")" aria-label="@L.T("layout.chatOpen")"
+            aria-expanded="false" @(inlineChat ? "" : "aria-controls=dcDrawer")>
+        <i class="fa-solid fa-comment-dots dc-launcher__icon" aria-hidden="true"></i>
+        <i class="fa-solid fa-xmark dc-launcher__icon dc-launcher__icon--close" aria-hidden="true"></i>
+        <span class="dc-launcher__badge" hidden></span>
+    </button>
+
+    @if (!inlineChat)
+    {
+        <div class="dc-drawer" id="dcDrawer" aria-hidden="true">
+            <partial name="_ChatWidget" view-data='new ViewDataDictionary(ViewData) { ["ChatDrawer"] = true }' />
+        </div>
+    }
+
+
+    <!-- jQuery & Bootstrap JS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/no-autocomplete.js" asp-append-version="true"></script>
+
+
+    <!-- Libraries JS -->
+    <script src="~/assets/lib/wow/wow.min.js"></script>
+
+    <script src="~/assets/lib/easing/easing.min.js"></script>
+
+    <script src="~/assets/lib/waypoints/waypoints.min.js"></script>
+
+    <script src="~/assets/lib/counterup/counterup.min.js"></script>
+
+    <script src="~/assets/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <script src="~/assets/lib/tempusdominus/js/moment.min.js"></script>
+
+    <script src="~/assets/lib/tempusdominus/js/moment-timezone.min.js"></script>
+
+    <script src="~/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+
+    <!-- Template JS -->
+    <script src="~/assets/js/main.js" asp-append-version="true"></script>
+    <script src="~/js/theme.js" asp-append-version="true"></script>
+    <script src="~/js/chat-launcher.js" asp-append-version="true"></script>
+    <partial name="_Toasts" />
+    <script src="~/js/de-ui.js" asp-append-version="true"></script>
+    <script src="~/js/video-frame.js" asp-append-version="true"></script>
+    <script src="~/js/motion.js" asp-append-version="true"></script>
+
+
+    <!-- Optional JS Section -->
+    @RenderSection("js", required: false)
+
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

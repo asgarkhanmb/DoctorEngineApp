@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="DoctorEngine.Api/DoctorEngine.Api.csproj" />
+  <Project Path="DoctorEngine.Application/DoctorEngine.Application.csproj" />
+  <Project Path="DoctorEngine.Domain/DoctorEngine.Domain.csproj" />
+  <Project Path="DoctorEngine.Infrastructure/DoctorEngine.Infrastructure.csproj" />
+</Solution>
