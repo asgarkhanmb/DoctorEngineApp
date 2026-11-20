@@ -57,11 +57,18 @@
                 <!-- ================= BAŞLIQ + MƏRHƏLƏLƏR ================= -->
                 <Border Style="{StaticResource PageHeader}">
                     <VerticalStackLayout Spacing="16">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="{l:Tr booking_eyebrow}" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
-                            <Label Text="{l:Tr booking_title}" Style="{StaticResource HeaderTitle}" />
-                            <Label Text="{l:Tr booking_subtitle}" Style="{StaticResource HeaderSubtitle}" />
-                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <!-- Rezervasiya artıq tab deyil — ana səhifə / xidmətlər / profildən açılır -->
+                            <Border Style="{StaticResource GlassIconButton}" VerticalOptions="Start" Padding="9">
+                                <Image Source="ic_back_w.png" />
+                                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnBackTapped" /></Border.GestureRecognizers>
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                <Label Text="{l:Tr booking_eyebrow}" TextColor="#FF8A95" FontFamily="BarlowBold" FontSize="12" CharacterSpacing="1.5" />
+                                <Label Text="{l:Tr booking_title}" Style="{StaticResource HeaderTitle}" />
+                                <Label Text="{l:Tr booking_subtitle}" Style="{StaticResource HeaderSubtitle}" />
+                            </VerticalStackLayout>
+                        </Grid>
 
                         <Grid ColumnDefinitions="*,*,*,*">
                             <BoxView Color="{StaticResource GlassBorder}" HeightRequest="2" VerticalOptions="Start" Margin="40,14,40,0" Grid.ColumnSpan="4" />

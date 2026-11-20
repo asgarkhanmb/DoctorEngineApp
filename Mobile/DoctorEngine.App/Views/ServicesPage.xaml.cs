@@ -9,6 +9,7 @@ public partial class ServicesPage : ContentPage
     public ServicesPage(ServicesViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("services");   // Instagram kimi alt menyu (ikonlar)
         this.CenterOnWideScreens();
         this.UseHeaderStatusBar();
         BindingContext = _vm = vm;

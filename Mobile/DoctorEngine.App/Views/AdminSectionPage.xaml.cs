@@ -9,6 +9,7 @@ public partial class AdminSectionPage : ContentPage
     public AdminSectionPage(AdminSectionViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("profile", floating: false);   // alt menyu bütün səhifələrdə (aid olduğu bölmə seçilmiş görünür)
         this.CenterOnWideScreens();
         this.UseHeaderStatusBar();
         BindingContext = _vm = vm;

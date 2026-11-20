@@ -9,6 +9,7 @@ public partial class ChatGroupPage : ContentPage
     public ChatGroupPage(ChatGroupViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("chat", floating: false);   // alt menyu bütün səhifələrdə (aid olduğu bölmə seçilmiş görünür)
         this.CenterOnWideScreens();
         BindingContext = _vm = vm;
     }

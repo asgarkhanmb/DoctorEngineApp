@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Bildirişlər — Instagram-dakı "ürək" bölməsi kimi: kim bəyəndi, kim rəy yazdı, kim cavab verdi. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             x:Class="DoctorEngine.App.Views.NotificationsPage"
+             x:DataType="vm:NotificationsViewModel"
+             Shell.NavBarIsVisible="False"
+             SafeAreaEdges="Container"
+             BackgroundColor="{AppThemeBinding Light=White, Dark=Black}"
+             Title="{l:Tr notif_title}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{AppThemeBinding Light=White, Dark=Black}">
+
+        <!-- Başlıq + kiçik əməliyyatlar -->
+        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="18" Padding="18,14,18,10">
+            <Label Text="{l:Tr notif_title}" FontFamily="BarlowBold" FontSize="24" VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light=#111111, Dark=White}" />
+            <Image Grid.Column="1" Source="ic_checks_g.png" WidthRequest="22" HeightRequest="22" VerticalOptions="Center"
+                   IsVisible="{Binding HasUnread}" SemanticProperties.Description="{l:Tr notif_read_all}">
+                <Image.GestureRecognizers><TapGestureRecognizer Command="{Binding ReadAllCommand}" /></Image.GestureRecognizers>
+            </Image>
+            <Image Grid.Column="2" Source="ic_trash_g.png" WidthRequest="20" HeightRequest="20" VerticalOptions="Center"
+                   IsVisible="{Binding IsLoggedIn}" SemanticProperties.Description="{l:Tr notif_delete_all}">
+                <Image.GestureRecognizers><TapGestureRecognizer Command="{Binding DeleteAllCommand}" /></Image.GestureRecognizers>
+            </Image>
+        </Grid>
+
+        <RefreshView Grid.Row="1" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}" IsVisible="{Binding IsLoggedIn}">
+            <CollectionView ItemsSource="{Binding Items}" SelectionMode="None"
+                            RemainingItemsThreshold="5" RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="32,80" Spacing="10" HorizontalOptions="Center">
+                        <Border WidthRequest="84" HeightRequest="84" StrokeShape="Ellipse" StrokeThickness="2" Padding="22"
+                                Stroke="{AppThemeBinding Light=#111111, Dark=White}" HorizontalOptions="Center">
+                            <Image Source="{AppThemeBinding Light=nav_notifications_k.png, Dark=nav_notifications_w.png}" />
+                        </Border>
+                        <Label Text="{l:Tr notif_empty}" FontFamily="BarlowBold" FontSize="18" HorizontalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light=#111111, Dark=White}"
+                               IsVisible="{Binding IsEmpty, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}" />
+                        <Label Text="{l:Tr notif_empty_hint}" FontSize="14" TextColor="#8A8F98" HorizontalTextAlignment="Center"
+                               IsVisible="{Binding IsEmpty, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}" />
+                        <ActivityIndicator IsRunning="{Binding IsBusy, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}"
+                                           IsVisible="{Binding IsBusy, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}"
+                                           Color="{StaticResource Primary}" />
+                        <Label Text="{Binding ErrorMessage, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}"
+                               TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:NotificationItem">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="16,10,12,10">
+                            <Grid.Triggers>
+                                <DataTrigger TargetType="Grid" Binding="{Binding IsUnread}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F2F6FF, Dark=#0D1726}" />
+                                </DataTrigger>
+                            </Grid.Triggers>
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenCommand, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}"
+                                                      CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+
+                            <!-- Avatar + kiçik növ nişanı (ürək / rəy) -->
+                            <Grid WidthRequest="46" HeightRequest="46" VerticalOptions="Start">
+                                <Border StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}">
+                                    <Grid>
+                                        <Label Text="{Binding Initial}" TextColor="White" FontFamily="BarlowBold" FontSize="17"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                        <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" IsVisible="{Binding HasAvatar}" />
+                                    </Grid>
+                                </Border>
+                                <Border WidthRequest="20" HeightRequest="20" StrokeShape="Ellipse" StrokeThickness="2" Padding="3"
+                                        HorizontalOptions="End" VerticalOptions="End" Margin="0,0,-3,-3"
+                                        Stroke="{AppThemeBinding Light=White, Dark=Black}" BackgroundColor="#111111">
+                                    <Image Source="{Binding TypeIcon}" />
+                                </Border>
+                            </Grid>
+
+                            <!-- Mətn: Ad + əməliyyat + rəy + vaxt -->
+                            <Label Grid.Column="1" FontSize="14" LineBreakMode="WordWrap" MaxLines="3" VerticalOptions="Center">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="{Binding ActorName}" FontFamily="BarlowBold" TextColor="{AppThemeBinding Light=#111111, Dark=White}" />
+                                        <Span Text=" " />
+                                        <Span Text="{Binding Action}" TextColor="{AppThemeBinding Light=#111111, Dark=#F2F2F2}" />
+                                        <Span Text="{Binding SnippetText}" TextColor="{AppThemeBinding Light=#111111, Dark=#F2F2F2}" />
+                                        <Span Text="  " />
+                                        <Span Text="{Binding TimeAgo}" TextColor="#8A8F98" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+
+                            <!-- Kiçik ikonlar: oxundu / sil; oxunmamışda mavi nöqtə -->
+                            <HorizontalStackLayout Grid.Column="2" Spacing="14" VerticalOptions="Center">
+                                <Ellipse WidthRequest="8" HeightRequest="8" Fill="#3D7BD9" VerticalOptions="Center" IsVisible="{Binding IsUnread}" />
+                                <Image Source="ic_check2_g.png" WidthRequest="17" HeightRequest="17" VerticalOptions="Center">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsRead}" Value="True">
+                                            <Setter Property="Opacity" Value="0.35" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ToggleReadCommand, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                                <Image Source="ic_trash_g.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center">
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding DeleteCommand, x:DataType=vm:NotificationsViewModel, Source={RelativeSource AncestorType={x:Type vm:NotificationsViewModel}}}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="8" Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Daxil olmayıb -->
+        <VerticalStackLayout Grid.Row="1" IsVisible="{Binding IsLoggedIn, Converter={StaticResource InvertedBool}}"
+                             VerticalOptions="Center" Spacing="12" Padding="32">
+            <Label Text="{l:Tr notif_login}" FontSize="15" TextColor="#8A8F98" HorizontalTextAlignment="Center" />
+            <Button Text="{l:Tr reels_login_btn}" Command="{Binding LoginCommand}" HorizontalOptions="Center" Padding="24,0" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

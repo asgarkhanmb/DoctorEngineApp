@@ -10,6 +10,7 @@ public partial class ProfilePage : ContentPage
     public ProfilePage(ProfileViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("profile");   // Instagram kimi alt menyu (ikonlar)
         this.CenterOnWideScreens();
         this.UseHeaderStatusBar();
         BindingContext = _vm = vm;
@@ -24,7 +25,7 @@ public partial class ProfilePage : ContentPage
     }
 
     private void OnChatClicked(object? sender, EventArgs e) => Go("//chat");
-    private void OnBookingClicked(object? sender, EventArgs e) => Go("//booking");
+    private void OnBookingClicked(object? sender, EventArgs e) => Go("booking");
     private void OnAiClicked(object? sender, EventArgs e) => Go("ai");
     private void OnEditProfileClicked(object? sender, EventArgs e) => Go("profile-edit");
     private void OnAdminClicked(object? sender, EventArgs e) => Go("admin");

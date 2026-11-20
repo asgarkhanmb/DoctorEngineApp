@@ -5,16 +5,20 @@
        xmlns:views="clr-namespace:DoctorEngine.App.Views"
        x:Class="DoctorEngine.App.AppShell"
        Shell.FlyoutBehavior="Disabled"
+       Shell.TabBarIsVisible="False"
        Title="DoctorEngine">
 
-    <!-- Alt menyu: saytın əsas bölmələri -->
+    <!-- Bölmələr. Shell-in öz tab paneli gizlidir (Windows-da yuxarıda görünürdü) — alt menyu Views/BottomNav.cs-dədir -->
     <TabBar>
         <ShellContent Title="{l:Tr tab_home}" Icon="tab_home.png" Route="home"
                       ContentTemplate="{DataTemplate views:HomePage}" />
         <ShellContent Title="{l:Tr tab_services}" Icon="tab_services.png" Route="services"
                       ContentTemplate="{DataTemplate views:ServicesPage}" />
-        <ShellContent Title="{l:Tr tab_booking}" Icon="tab_booking.png" Route="booking"
-                      ContentTemplate="{DataTemplate views:BookingPage}" />
+        <!-- Instagram Reels kimi video lenti (Android alt menyusu maks. 5 tab — Rezervasiya ana səhifədən / xidmətlərdən / profildən açılır) -->
+        <ShellContent Title="{l:Tr tab_reels}" Icon="tab_reels.png" Route="reels"
+                      ContentTemplate="{DataTemplate views:ReelsPage}" />
+        <ShellContent Title="{l:Tr notif_title}" Route="notifications"
+                      ContentTemplate="{DataTemplate views:NotificationsPage}" />
         <ShellContent Title="{l:Tr tab_chat}" Icon="tab_chat.png" Route="chat"
                       ContentTemplate="{DataTemplate views:ChatPage}" />
         <ShellContent Title="{l:Tr tab_profile}" Icon="tab_profile.png" Route="profile"

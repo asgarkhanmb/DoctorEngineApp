@@ -7,6 +7,7 @@ public partial class AiPage : ContentPage
     public AiPage(AiViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("home", floating: false);   // alt menyu bütün səhifələrdə (aid olduğu bölmə seçilmiş görünür)
         this.CenterOnWideScreens();
         this.UseHeaderStatusBar();
         BindingContext = vm;

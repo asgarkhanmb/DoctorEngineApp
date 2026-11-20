@@ -2,6 +2,7 @@
 using DoctorEngine.App.ViewModels;
 using DoctorEngine.App.Views;
 using Microsoft.Extensions.Logging;
+using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
 
 namespace DoctorEngine.App;
@@ -16,6 +17,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .AddAudio()   // Plugin.Maui.Audio — səs mesajı yazma / oxutma
+            .UseMauiCommunityToolkitMediaElement(isAndroidForegroundServiceEnabled: false)   // Videolar (Reels) — video oynadıcı
             .ConfigureFonts(fonts =>
             {
                 // Saytın şrifti — Barlow (bütün Azərbaycan hərfləri: ə, ğ, ı, İ, ş, ç, ö, ü)
@@ -87,6 +89,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IVoiceRecorder, VoiceRecorder>();
         builder.Services.AddSingleton<IAudioPlayback, AudioPlayback>();
         builder.Services.AddSingleton<AdminClient>();
+        builder.Services.AddSingleton<ReelsService>();
 
         // Ekranlar və onların məntiqi (tablar yaddaşda qalır)
         builder.Services.AddSingleton<HomeViewModel>();
@@ -94,13 +97,17 @@ public static class MauiProgram
         builder.Services.AddSingleton<BookingViewModel>();
         builder.Services.AddSingleton<ChatViewModel>();
         builder.Services.AddSingleton<ProfileViewModel>();
+        builder.Services.AddSingleton<ReelsViewModel>();
+        builder.Services.AddSingleton<NotificationsViewModel>();   // bildirişlər + alt menyudakı nişan
         builder.Services.AddTransient<AiViewModel>();
 
         builder.Services.AddSingleton<HomePage>();
         builder.Services.AddSingleton<ServicesPage>();
-        builder.Services.AddSingleton<BookingPage>();
+        builder.Services.AddTransient<BookingPage>();   // artıq tab deyil — "booking" marşrutu ilə açılır (VM tək nüsxədir, seçimlər qalır)
         builder.Services.AddSingleton<ChatPage>();
         builder.Services.AddSingleton<ProfilePage>();
+        builder.Services.AddSingleton<ReelsPage>();
+        builder.Services.AddSingleton<NotificationsPage>();
         builder.Services.AddTransient<AiPage>();
 
         // Profil redaktəsi və mobil admin panel — hər açılışda yeni nüsxə
@@ -122,6 +129,10 @@ public static class MauiProgram
         builder.Services.AddTransient<AdminSectionPage>();
         builder.Services.AddTransient<AdminFormViewModel>();
         builder.Services.AddTransient<AdminFormPage>();
+        builder.Services.AddTransient<ReelCommentsViewModel>();
+        builder.Services.AddTransient<ReelCommentsPage>();
+        builder.Services.AddTransient<ReelNewViewModel>();
+        builder.Services.AddTransient<ReelNewPage>();
         builder.Services.AddSingleton<AppShell>();
 
         var app = builder.Build();

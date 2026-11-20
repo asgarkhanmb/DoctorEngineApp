@@ -8,7 +8,10 @@ public partial class AppShell : Shell
     {
         InitializeComponent();
         // Tablardan kənar ekranlar (yuxarıdan açılır, "geri" ilə qayıdılır)
+        Routing.RegisterRoute("booking", typeof(BookingPage));      // rezervasiya (alt menyuda yeri "Videolar"a verildi)
         Routing.RegisterRoute("ai", typeof(AiPage));
+        Routing.RegisterRoute("reel-comments", typeof(ReelCommentsPage));
+        Routing.RegisterRoute("reel-new", typeof(ReelNewPage));   // admin: video paylaş
         Routing.RegisterRoute("profile-edit", typeof(EditProfilePage));
         Routing.RegisterRoute("chat-group", typeof(ChatGroupPage));
         Routing.RegisterRoute("chat-new", typeof(ChatNewPage));       // yeni çat: istifadəçi seç   // usta: qrup yarat / redaktə

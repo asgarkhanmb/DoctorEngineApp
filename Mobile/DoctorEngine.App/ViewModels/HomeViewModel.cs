@@ -142,7 +142,7 @@ public partial class HomeViewModel : BaseViewModel
 
     [RelayCommand]
     private Task Book(CategoryItem? category) =>
-        Shell.Current.GoToAsync(category?.ReservationServiceId is int id ? $"//booking?serviceId={id}" : "//booking");
+        Shell.Current.GoToAsync(category?.ReservationServiceId is int id ? $"booking?serviceId={id}" : "booking");
 
     [RelayCommand] private Task PlayVideo(string? url) => OpenAsync(url);
 

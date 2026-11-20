@@ -40,7 +40,7 @@ public class ApiClient
     private static HttpClient Create() => new()
     {
         BaseAddress = new Uri(AppConfig.BaseUrl.TrimEnd('/') + "/"),
-        Timeout = TimeSpan.FromSeconds(100)
+        Timeout = Timeout.InfiniteTimeSpan   // hər sorğunun öz vaxt limiti var (SendRawAsync) — böyük video yükləmələri üçün
     };
 
     // ================= SADƏ ÇAĞIRIŞLAR =================
@@ -84,6 +84,14 @@ public class ApiClient
     {
         using var res = await SendRawAsync(() => new HttpRequestMessage(HttpMethod.Post, path) { Content = content() }, ct);
         await EnsureSuccessAsync(res, ct);
+    }
+
+    /// <summary>Uzun yükləmə (Reels videosu) — standart 100 saniyəlik limit əvəzinə <paramref name="timeout"/>.</summary>
+    public async Task<T> UploadAsync<T>(string path, Func<HttpContent> content, TimeSpan timeout, CancellationToken ct = default)
+    {
+        using var res = await SendRawAsync(() => new HttpRequestMessage(HttpMethod.Post, path) { Content = content() }, ct, timeout: timeout);
+        await EnsureSuccessAsync(res, ct);
+        return (await res.Content.ReadFromJsonAsync<T>(Json.Options, ct))!;
     }
 
     /// <summary>Axın kimi cavab (AI köməkçi) — çağıran tərəf bağlamalıdır.</summary>
@@ -141,14 +149,18 @@ public class ApiClient
         return (await res.Content.ReadFromJsonAsync<T>(Json.Options, ct))!;
     }
 
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(100);
+
     private async Task<HttpResponseMessage> SendRawAsync(Func<HttpRequestMessage> build, CancellationToken ct,
-        HttpCompletionOption completion = HttpCompletionOption.ResponseContentRead)
+        HttpCompletionOption completion = HttpCompletionOption.ResponseContentRead, TimeSpan? timeout = null)
     {
         var token = await GetValidAccessTokenAsync(ct);
         HttpResponseMessage res;
+        using var limit = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        limit.CancelAfter(timeout ?? DefaultTimeout);
         try
         {
-            res = await _http.SendAsync(WithAuth(build(), token), completion, ct);
+            res = await _http.SendAsync(WithAuth(build(), token), completion, limit.Token);
         }
         catch (HttpRequestException)
         {
@@ -164,7 +176,7 @@ public class ApiClient
         {
             res.Dispose();
             if (await RefreshAsync(token, ct))
-                return await _http.SendAsync(WithAuth(build(), _tokens.AccessToken), completion, ct);
+                return await _http.SendAsync(WithAuth(build(), _tokens.AccessToken), completion, limit.Token);
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }
         return res;

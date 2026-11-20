@@ -11,6 +11,7 @@ public partial class HomePage : ContentPage
     public HomePage(HomeViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("home");   // Instagram kimi alt menyu (ikonlar)
         this.CenterOnWideScreens();
         this.UseHeaderStatusBar();
         BindingContext = _vm = vm;

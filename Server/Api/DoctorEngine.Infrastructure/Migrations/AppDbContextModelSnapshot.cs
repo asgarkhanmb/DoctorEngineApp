@@ -51,6 +51,54 @@ namespace DoctorEngineApp.Migrations
                     b.ToTable("Abouts");
                 });
 
+            modelBuilder.Entity("DoctorEngineApp.Models.AppNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActorUserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int?>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ReelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Snippet")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserName", "Id");
+
+                    b.HasIndex("UserName", "IsRead");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("DoctorEngineApp.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -660,6 +708,154 @@ namespace DoctorEngineApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PushSubscriptions");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.Reel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorUserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Caption")
+                        .HasMaxLength(2200)
+                        .HasColumnType("nvarchar(2200)");
+
+                    b.Property<int>("CommentCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LikeCount")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("SoftDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("VideoPath")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SoftDeleted", "Id");
+
+                    b.ToTable("Reels");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.ReelComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("EditedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LikeCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReplyToUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Sticker")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("ReelId", "Id");
+
+                    b.ToTable("ReelComments");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.ReelCommentLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentId", "UserName")
+                        .IsUnique();
+
+                    b.ToTable("ReelCommentLikes");
+                });
+
+            modelBuilder.Entity("DoctorEngineApp.Models.ReelLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReelId", "UserName")
+                        .IsUnique();
+
+                    b.ToTable("ReelLikes");
                 });
 
             modelBuilder.Entity("DoctorEngineApp.Models.RefreshToken", b =>

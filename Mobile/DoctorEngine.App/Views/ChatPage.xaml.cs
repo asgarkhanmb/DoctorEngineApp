@@ -9,6 +9,7 @@ public partial class ChatPage : ContentPage
     public ChatPage(ChatViewModel vm)
     {
         InitializeComponent();
+        this.UseBottomNav("chat", floating: false);   // Instagram kimi alt menyu; yazı sahəsi örtülməsin
         this.CenterOnWideScreens();
         this.UseHeaderStatusBar();
         BindingContext = _vm = vm;

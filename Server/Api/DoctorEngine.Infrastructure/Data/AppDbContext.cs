@@ -34,6 +34,11 @@ namespace DoctorEngineApp.Data
         public DbSet<WarrantyItem> WarrantyItems { get; set; }
         public DbSet<SiteSetting> SiteSettings { get; set; } = null!;
         public DbSet<ContentTranslation> ContentTranslations { get; set; } = null!;   // AI tərcümələri (en/ru/tr)
+        public DbSet<Reel> Reels { get; set; } = null!;                     // "Videolar" lenti (Reels)
+        public DbSet<ReelLike> ReelLikes { get; set; } = null!;
+        public DbSet<ReelComment> ReelComments { get; set; } = null!;
+        public DbSet<ReelCommentLike> ReelCommentLikes { get; set; } = null!;   // rəy bəyənmələri
+        public DbSet<AppNotification> Notifications { get; set; } = null!;   // tətbiq daxili bildirişlər (bəyənmə, rəy, cavab)
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

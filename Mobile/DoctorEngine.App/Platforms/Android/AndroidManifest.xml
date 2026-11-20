@@ -4,6 +4,8 @@
 	             android:networkSecurityConfig="@xml/network_security_config" android:label="DoctorEngine"></application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
+	<!-- Bildirişlər (bəyənmə, rəy, cavab) telefonun bildiriş panelində — Android 13+ -->
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 	<!-- Səs mesajı -->
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<!-- Şəkil / video çəkmək və seçmək -->

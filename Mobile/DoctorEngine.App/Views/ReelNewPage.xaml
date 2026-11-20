@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Admin: yeni video paylaşmaq -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:v="clr-namespace:DoctorEngine.App.Views"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="DoctorEngine.App.Views.ReelNewPage"
+             x:DataType="vm:ReelNewViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             SafeAreaEdges="All"
+             Title="{l:Tr reels_new_title}">
+
+    <Grid RowDefinitions="Auto,*,Auto" BackgroundColor="{AppThemeBinding Light={StaticResource Background}, Dark={StaticResource BackgroundDark}}">
+        <v:BackHeader Title="{l:Tr reels_new_title}" Subtitle="{l:Tr reels_new_subtitle}" Icon="ic_video_w.png" />
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="16" Padding="16,16,16,24">
+
+                <!-- Önizləmə -->
+                <Border StrokeThickness="0" StrokeShape="RoundRectangle 18" BackgroundColor="#0B1222" HeightRequest="420"
+                        HorizontalOptions="Center" WidthRequest="260">
+                    <Grid>
+                        <toolkit:MediaElement x:Name="Preview" ShouldShowPlaybackControls="False" ShouldLoopPlayback="True"
+                                              ShouldAutoPlay="True" ShouldMute="True" Aspect="AspectFill"
+                                              IsVisible="{Binding HasFile}" />
+                        <VerticalStackLayout IsVisible="{Binding HasFile, Converter={StaticResource InvertedBool}}"
+                                             VerticalOptions="Center" HorizontalOptions="Center" Spacing="12" Padding="20">
+                            <Border WidthRequest="70" HeightRequest="70" StrokeShape="Ellipse" StrokeThickness="0" Padding="20"
+                                    Background="{StaticResource PrimaryGradient}" HorizontalOptions="Center">
+                                <Image Source="ic_plus_w.png" />
+                            </Border>
+                            <Label Text="{l:Tr reels_pick_hint}" TextColor="#B9C6E6" FontSize="14" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PickCommand}" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
+                </Border>
+                <Label Text="{Binding FileInfo}" IsVisible="{Binding HasFile}" Style="{StaticResource Muted}" HorizontalTextAlignment="Center" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" IsEnabled="{Binding CanEdit}">
+                    <Button Text="{l:Tr reels_pick}" Command="{Binding PickCommand}" Style="{StaticResource NavyButton}" />
+                    <Button Grid.Column="1" Text="{l:Tr reels_record}" Command="{Binding RecordCommand}" Style="{StaticResource NavyButton}" />
+                </Grid>
+
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="{l:Tr reels_caption}" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource Field}" Padding="12,4">
+                        <Editor Text="{Binding Caption}" Placeholder="{l:Tr reels_caption_placeholder}" AutoSize="TextChanges"
+                                MinimumHeightRequest="90" MaxLength="2200" FontSize="15" IsEnabled="{Binding CanEdit}" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <Border Style="{StaticResource ErrorBox}" IsVisible="{Binding HasError}">
+                    <Label Text="{Binding ErrorMessage}" TextColor="{StaticResource PrimaryDark}" FontSize="14" />
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Paylaş / yüklənmə -->
+        <Border Grid.Row="2" StrokeThickness="0" Padding="16,10,16,14"
+                BackgroundColor="{AppThemeBinding Light={StaticResource Surface}, Dark={StaticResource SurfaceDark}}">
+            <Grid>
+                <Button Text="{l:Tr reels_publish}" Command="{Binding PublishCommand}"
+                        IsVisible="{Binding IsUploading, Converter={StaticResource InvertedBool}}" />
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding IsUploading}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding UploadText}" FontFamily="BarlowBold" VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={StaticResource Navy}, Dark={StaticResource TextDark}}" />
+                        <Button Grid.Column="1" Text="{l:Tr common_cancel}" Command="{Binding CancelUploadCommand}" Style="{StaticResource LinkButton}" />
+                    </Grid>
+                    <ProgressBar Progress="{Binding Progress}" ProgressColor="{StaticResource Primary}" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

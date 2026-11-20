@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    "Videolar" — Instagram Reels kimi tam ekran şaquli lent.
+    Ekranda bir oynadıcı (MediaElement) var: yuxarı / aşağı sürüşdürəndə "Stage" animasiya ilə çıxır,
+    növbəti video yüklənir və aşağıdan / yuxarıdan daxil olur. Bir toxunuş — dayandır / davam et,
+    iki toxunuş — bəyən (böyük ürək). Sağda: bəyən, rəylər, paylaş, (admin) seçimlər.
+-->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:l="clr-namespace:DoctorEngine.App.Localization"
+             xmlns:vm="clr-namespace:DoctorEngine.App.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="DoctorEngine.App.Views.ReelsPage"
+             x:DataType="vm:ReelsViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="Black"
+             SafeAreaEdges="Container"
+             Title="{l:Tr tab_reels}">
+
+    <ContentPage.Resources>
+        <Style x:Key="ReelAction" TargetType="VerticalStackLayout">
+            <Setter Property="Spacing" Value="3" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="ReelActionIcon" TargetType="Image">
+            <Setter Property="WidthRequest" Value="30" />
+            <Setter Property="HeightRequest" Value="30" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="ReelActionText" TargetType="Label">
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontFamily" Value="BarlowSemiBold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="Shadow">
+                <Setter.Value><Shadow Brush="Black" Opacity="0.6" Radius="4" Offset="0,1" /></Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopButton" TargetType="Border">
+            <Setter Property="WidthRequest" Value="40" />
+            <Setter Property="HeightRequest" Value="40" />
+            <Setter Property="StrokeShape" Value="Ellipse" />
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="BackgroundColor" Value="#33000000" />
+            <Setter Property="Padding" Value="9" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid x:Name="Root" BackgroundColor="Black">
+
+        <!-- ================= SƏHNƏ: video + üzərindəki məlumat (birlikdə sürüşür) ================= -->
+        <Grid x:Name="Stage" IsVisible="{Binding HasCurrent}">
+
+            <toolkit:MediaElement x:Name="Player"
+                                  ShouldShowPlaybackControls="False"
+                                  ShouldLoopPlayback="True"
+                                  ShouldAutoPlay="True"
+                                  ShouldKeepScreenOn="True"
+                                  ShouldMute="{Binding IsMuted}"
+                                  Aspect="AspectFill"
+                                  BackgroundColor="Black" />
+
+            <!-- Aşağıda mətn oxunsun deyə tündləşmə -->
+            <BoxView InputTransparent="True" VerticalOptions="End" HeightRequest="320">
+                <BoxView.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0" />
+                        <GradientStop Color="#B3000000" Offset="1" />
+                    </LinearGradientBrush>
+                </BoxView.Background>
+            </BoxView>
+            <BoxView InputTransparent="True" VerticalOptions="Start" HeightRequest="110">
+                <BoxView.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#80000000" Offset="0" />
+                        <GradientStop Color="#00000000" Offset="1" />
+                    </LinearGradientBrush>
+                </BoxView.Background>
+            </BoxView>
+
+            <ActivityIndicator x:Name="Spinner" Color="White" IsRunning="True" WidthRequest="44" HeightRequest="44"
+                               HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" />
+
+            <!-- Toxunuş qatı: sürüşdür, toxun (dayandır), iki toxun (bəyən) -->
+            <Grid x:Name="TouchLayer" BackgroundColor="Transparent">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStageTapped" />
+                    <PanGestureRecognizer PanUpdated="OnPan" />
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <!-- Dayandırılıb -->
+            <Border x:Name="PausedBadge" IsVisible="False" InputTransparent="True" WidthRequest="78" HeightRequest="78"
+                    StrokeShape="Ellipse" StrokeThickness="0" BackgroundColor="#59000000" Padding="22,20,18,20"
+                    HorizontalOptions="Center" VerticalOptions="Center">
+                <Image Source="ic_play_w.png" />
+            </Border>
+
+            <!-- İki toxunuşda böyük ürək -->
+            <Image x:Name="BigHeart" Source="ic_heart_big.png" WidthRequest="110" HeightRequest="110" Opacity="0"
+                   InputTransparent="True" HorizontalOptions="Center" VerticalOptions="Center" />
+
+            <!-- ===== Sağ sütun: əməliyyatlar ===== -->
+            <VerticalStackLayout x:Name="Actions" x:DataType="vm:ReelItem" BindingContext="{Binding Current, x:DataType=vm:ReelsViewModel}"
+                                 HorizontalOptions="End" VerticalOptions="End" Spacing="20" Margin="0,0,10,34" WidthRequest="58">
+                <VerticalStackLayout Style="{StaticResource ReelAction}">
+                    <Image x:Name="LikeIcon" Source="{Binding LikeIcon}" Style="{StaticResource ReelActionIcon}" WidthRequest="32" HeightRequest="32" />
+                    <Label Text="{Binding LikesText}" Style="{StaticResource ReelActionText}" />
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnLikeTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                </VerticalStackLayout>
+                <VerticalStackLayout Style="{StaticResource ReelAction}">
+                    <Image Source="ic_comment_w.png" Style="{StaticResource ReelActionIcon}" />
+                    <Label Text="{Binding CommentsText}" Style="{StaticResource ReelActionText}" />
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCommentsTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                </VerticalStackLayout>
+                <VerticalStackLayout Style="{StaticResource ReelAction}">
+                    <Image Source="ic_share_w.png" Style="{StaticResource ReelActionIcon}" WidthRequest="27" HeightRequest="27" />
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnShareTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                </VerticalStackLayout>
+                <VerticalStackLayout Style="{StaticResource ReelAction}" IsVisible="{Binding CanDelete}" Padding="0,4">
+                    <Image Source="ic_more_w.png" Style="{StaticResource ReelActionIcon}" WidthRequest="26" HeightRequest="26" />
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMoreTapped" />
+                    </VerticalStackLayout.GestureRecognizers>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- ===== Aşağı: müəllif, vaxt, mətn, baxış ===== -->
+            <VerticalStackLayout x:DataType="vm:ReelItem" BindingContext="{Binding Current, x:DataType=vm:ReelsViewModel}"
+                                 VerticalOptions="End" Margin="14,0,78,22" Spacing="8">
+                <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="10">
+                    <Border WidthRequest="36" HeightRequest="36" StrokeShape="Ellipse" Stroke="White" StrokeThickness="1.5"
+                            Background="{StaticResource PrimaryGradient}">
+                        <Grid>
+                            <Label Text="{Binding Initial}" TextColor="White" FontFamily="BarlowBold" FontSize="15"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                            <Image Source="{Binding AuthorAvatarUrl}" Aspect="AspectFill" IsVisible="{Binding HasAvatar}" />
+                        </Grid>
+                    </Border>
+                    <Label Grid.Column="1" Text="{Binding Author}" TextColor="White" FontFamily="BarlowBold" FontSize="15"
+                           VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                    <Label Grid.Column="2" Text="{Binding TimeAgo, StringFormat='· {0}'}" TextColor="#D9FFFFFF" FontSize="13"
+                           VerticalOptions="Center" />
+                </Grid>
+                <Label x:Name="CaptionLabel" Text="{Binding Caption}" IsVisible="{Binding HasCaption}" TextColor="White" FontSize="14"
+                       MaxLines="2" LineBreakMode="TailTruncation">
+                    <Label.Shadow><Shadow Brush="Black" Opacity="0.5" Radius="3" Offset="0,1" /></Label.Shadow>
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCaptionTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <HorizontalStackLayout Spacing="6" Opacity="0.85">
+                    <Image Source="ic_eye_w.png" WidthRequest="15" HeightRequest="15" VerticalOptions="Center" />
+                    <Label Text="{Binding ViewsText}" TextColor="White" FontSize="12" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- İzləmə zolağı -->
+            <Grid VerticalOptions="End" HeightRequest="2.5" InputTransparent="True" BackgroundColor="#40FFFFFF">
+                <BoxView x:Name="ProgressFill" Color="White" HorizontalOptions="Start" WidthRequest="0" />
+            </Grid>
+        </Grid>
+
+        <!-- ================= BOŞ / XƏTA ================= -->
+        <VerticalStackLayout IsVisible="{Binding IsEmpty}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="14" Padding="32">
+            <Border WidthRequest="86" HeightRequest="86" StrokeShape="Ellipse" StrokeThickness="0" Background="{StaticResource PrimaryGradient}"
+                    HorizontalOptions="Center" Padding="24">
+                <Image Source="ic_video_w.png" />
+            </Border>
+            <Label Text="{l:Tr reels_empty}" TextColor="White" FontFamily="BarlowBold" FontSize="20" HorizontalTextAlignment="Center" />
+            <Button Text="{l:Tr reels_share_new}" IsVisible="{Binding IsAdmin}" Command="{Binding NewReelCommand}" HorizontalOptions="Center" Padding="22,0" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout IsVisible="{Binding HasError}" VerticalOptions="Center" HorizontalOptions="Center" Spacing="14" Padding="32">
+            <Label Text="{Binding ErrorMessage}" TextColor="White" FontSize="15" HorizontalTextAlignment="Center" />
+            <Button Text="{l:Tr common_refresh}" Command="{Binding RefreshCommand}" HorizontalOptions="Center" Padding="22,0" />
+        </VerticalStackLayout>
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" Color="White"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+
+        <!-- ================= YUXARI: başlıq + səs + (admin) yeni video ================= -->
+        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" Padding="16,10,14,0" VerticalOptions="Start">
+            <Label Text="{l:Tr reels_title}" TextColor="White" FontFamily="BarlowBold" FontSize="24" VerticalOptions="Center">
+                <Label.Shadow><Shadow Brush="Black" Opacity="0.5" Radius="4" Offset="0,1" /></Label.Shadow>
+            </Label>
+            <Border Grid.Column="1" Style="{StaticResource TopButton}" IsVisible="{Binding HasCurrent}">
+                <Image x:Name="MuteIcon" Source="ic_volume_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleMuteCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+            <Border Grid.Column="2" Style="{StaticResource TopButton}" IsVisible="{Binding IsAdmin}" Background="{StaticResource PrimaryGradient}">
+                <Image Source="ic_plus_w.png" />
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NewReelCommand}" />
+                </Border.GestureRecognizers>
+            </Border>
+        </Grid>
+
+        <!-- ================= Aşağı dartıb yenilə (ilk videoda) ================= -->
+        <Border x:Name="PullIndicator" WidthRequest="40" HeightRequest="40" StrokeShape="Ellipse" StrokeThickness="0"
+                BackgroundColor="#E6FFFFFF" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,64,0,0"
+                Opacity="0" InputTransparent="True" Padding="9">
+            <Grid>
+                <Image x:Name="PullArrow" Source="ic_down_g.png" />
+                <ActivityIndicator x:Name="PullSpinner" Color="{StaticResource Primary}" IsRunning="False" IsVisible="False" />
+            </Grid>
+        </Border>
+
+        <!-- ================= "Yeni videolar" — bölməyə qayıdanda yeni paylaşılıbsa ================= -->
+        <Border x:Name="NewPill" IsVisible="{Binding HasNewVideos}" StrokeShape="RoundRectangle 18" StrokeThickness="0"
+                BackgroundColor="{StaticResource Primary}" Padding="14,7" HorizontalOptions="Center" VerticalOptions="Start" Margin="0,66,0,0">
+            <Border.Shadow><Shadow Brush="Black" Opacity="0.35" Radius="10" Offset="0,3" /></Border.Shadow>
+            <HorizontalStackLayout Spacing="6">
+                <Image Source="ic_up_w.png" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" />
+                <Label Text="{l:Tr reels_new_videos}" TextColor="White" FontFamily="BarlowBold" FontSize="13.5" VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnNewPillTapped" /></Border.GestureRecognizers>
+        </Border>
+    </Grid>
+</ContentPage>

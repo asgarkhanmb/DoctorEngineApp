@@ -89,11 +89,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="11.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.15" />
 		<PackageReference Include="Plugin.Maui.Audio" Version="4.0.0" />
+	</ItemGroup>
+
+	<!-- Android: tətbiq bağlı olanda da bildirişləri yoxlamaq (WorkManager, ~15 dəqiqədən bir).
+	     2.10.3 — MAUI-nin AndroidX Lifecycle 2.9.2.1 versiyası ilə eyni (2.11 Lifecycle-ı 2.11-ə qaldırır, uyğunsuzluq yaradır) -->
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.10.3" />
 	</ItemGroup>
 
 	<ItemGroup>

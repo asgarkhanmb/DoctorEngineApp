@@ -37,5 +37,5 @@ public partial class ServicesViewModel : BaseViewModel
 
     [RelayCommand]
     private Task Book(CategoryItem? category) =>
-        Shell.Current.GoToAsync(category?.ReservationServiceId is int id ? $"//booking?serviceId={id}" : "//booking");
+        Shell.Current.GoToAsync(category?.ReservationServiceId is int id ? $"booking?serviceId={id}" : "booking");
 }
